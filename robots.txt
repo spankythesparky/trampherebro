@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://trampherebro.com/sitemap.xml
