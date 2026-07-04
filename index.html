@@ -736,7 +736,8 @@ document.getElementById('contact-form').addEventListener('submit',async function
 });
 function showRes(){showView(resourcesview,navRes);}
 function showJnctn(){showView(jnctnview,navJnctn);}
-navBoard.onclick=showBoard;navRes.onclick=showRes;if(navJnctn)navJnctn.onclick=showJnctn;
+function showContact(){showView(contactview,navContact);}
+navBoard.onclick=showBoard;navRes.onclick=showRes;if(navJnctn)navJnctn.onclick=showJnctn;if(navContact)navContact.onclick=showContact;
 var _tl=document.getElementById('teaser-learn');if(_tl)_tl.onclick=showJnctn;
 
 var _logo=document.querySelector('.logo');if(_logo){_logo.style.cursor='pointer';_logo.onclick=showBoard;}
