@@ -508,6 +508,7 @@ const CALLS = [
 ];
 
 const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function extUrl(u){u=(u||'').trim();if(!u||u==='#')return '#';if(/^https?:\/\//i.test(u))return u;return 'https://'+u.replace(/^\/+/,'');}
 const _rm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 function countUp(el,target,dur){ if(!el) return; if(_rm){el.textContent=target;return;} const t0=performance.now();
   function step(t){ const p=Math.min((t-t0)/dur,1); const e=1-Math.pow(1-p,3); el.textContent=Math.round(target*e); if(p<1)requestAnimationFrame(step);} requestAnimationFrame(step);}
@@ -546,7 +547,7 @@ function detailHTML(lu){
     '<div class="vit"><div class="l">H&amp;W</div><div class="v">'+(L.hw==="\u2014"?"\u2014":"$"+L.hw)+'</div></div>'+
     '<div class="vit"><div class="l">Pension</div><div class="v small">'+L.pension+'</div></div></div>'+
     '<div class="contact"><span>'+L.phone+'</span><a href="mailto:'+L.email+'">'+L.email+'</a><a href="https://'+L.web+'" target="_blank" rel="noopener">'+L.web+'</a>'+
-    '<a class="dispatch-link" href="'+L.dispatch+'" target="_blank" rel="noopener">Open dispatch page<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></a></div>'+
+    '<a class="dispatch-link" href="'+extUrl(L.dispatch)+'" target="_blank" rel="noopener">Open dispatch page<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></a></div>'+
     (L.outlook?'<div class="outlook"><span class="k">Outlook \u2014</span> '+L.outlook+'</div>':'')+
     '<div class="calls">'+calls+'</div></div>';
 }
