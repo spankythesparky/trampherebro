@@ -36,6 +36,9 @@ const INDEX_HTML = path.join(SITE_DIR, 'index.html');
 const CONTACT_FILE = path.join(SITE_DIR, 'locals-contact.json');
 let CONTACT = {};
 try { CONTACT = JSON.parse(fs.readFileSync(CONTACT_FILE, 'utf8')); } catch (e) { CONTACT = {}; }
+const SCALE_FILE = path.join(SITE_DIR, 'locals-scale.json');
+let SCALE = {};
+try { SCALE = JSON.parse(fs.readFileSync(SCALE_FILE, 'utf8')); } catch (e) { SCALE = {}; }
 const TODAY = new Date();
 const ISO_DATE = TODAY.toISOString().slice(0, 10);
 const VALID_THROUGH = new Date(TODAY.getTime() + 21 * 864e5).toISOString().slice(0, 10);
@@ -253,6 +256,9 @@ function jobPostingLd(local, c) {
 
 function localPage(local, calls) {
   const n = localNumber(local.name);
+  const _sc = SCALE[localNumber(local.name)] || {};
+  if (_sc.scale) local.jw_scale = _sc.scale;
+  if (_sc.hw) local.hw = _sc.hw;
   const label = 'IBEW Local ' + (n || local.id);
   const place = [local.city, local.state].filter(Boolean).join(', ');
   const slug = slugFor(local.name, local.id);
@@ -274,15 +280,25 @@ function localPage(local, calls) {
   const cEmail = _ci.email || local.email || '';
   const cWebsite = _ci.website || local.website || '';
   const vit = (l, v, small) => `<div class="vit"><div class="l">${l}</div><div class="v${small ? ' small' : ''}">${v}</div></div>`;
+  const _m = v => (v != null && v !== '' && !isNaN(Number(v))) ? '$' + Number(v).toFixed(2) : null;
+  const _hr = '<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span>';
+  const _pen = [];
+  if (_sc.pension_def) _pen.push('Def ' + _m(_sc.pension_def));
+  if (_sc.pension_dc) _pen.push('DC ' + _m(_sc.pension_dc));
+  const _penDisplay = _pen.length ? _pen.join(' · ') : (local.pension != null ? money(local.pension) : null);
+  const _scaleStr = _m(local.jw_scale);
   const vitals = [
-    vit('Journeyman Scale', money(local.jw_scale)),
-    vit('Health &amp; Welfare', money(local.hw)),
-    vit('Pension', local.pension != null ? money(local.pension) : '—'),
+    vit('Journeyman Scale', _scaleStr ? _scaleStr + _hr : '—'),
+    _m(_sc.total) ? vit('Total Package', _m(_sc.total) + _hr) : '',
+    _m(local.hw) ? vit('Health &amp; Welfare', _m(local.hw)) : '',
+    _penDisplay ? vit('Pension', _penDisplay, _pen.length > 0) : '',
+    _sc.vacation ? vit('Vacation', esc(_sc.vacation), true) : '',
+    _sc.dues ? vit('Working Dues', esc(_sc.dues), true) : '',
     (local.book1 != null || local.book2 != null)
       ? vit('Books', `${local.book1 != null ? 'Bk1 ' + esc(local.book1) : ''}${(local.book1 != null && local.book2 != null) ? ' · ' : ''}${local.book2 != null ? 'Bk2 ' + esc(local.book2) : ''}` || '—', true)
-      : '',
-    ''
+      : ''
   ].filter(Boolean).join('');
+  const wageUpdated = _sc.updated ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated ${esc(_sc.updated)} · from published union wage sheets</div>` : '';
 
   const dispatchBtn = ''; // dispatch link removed per request
   const _telHref = cPhone.replace(/[^\d+]/g, '');
@@ -357,7 +373,7 @@ ${topbar('')}
 </div></header>
 <main class="wrap">
 <div class="sec-h">Local vitals</div>
-<div class="vitcard"><div class="vitals">${vitals}</div>${dispatchBtn}</div>
+<div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>
 ${contactCard}
 ${callsBlock}
 <p class="outlook">${outlook}</p>
