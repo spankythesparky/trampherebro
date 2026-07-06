@@ -39,6 +39,12 @@ try { CONTACT = JSON.parse(fs.readFileSync(CONTACT_FILE, 'utf8')); } catch (e) {
 const SCALE_FILE = path.join(SITE_DIR, 'locals-scale.json');
 let SCALE = {};
 try { SCALE = JSON.parse(fs.readFileSync(SCALE_FILE, 'utf8')); } catch (e) { SCALE = {}; }
+const UA_FILE = path.join(SITE_DIR, 'ua-locals.json');
+const TRADE = {
+  IBEW: { name: 'IBEW', slug: 'ibew', worker: 'inside wireman', workers: 'inside wiremen' },
+  UA:   { name: 'UA',   slug: 'ua',   worker: 'plumber & pipefitter', workers: 'plumbers, pipefitters & HVAC/R techs' }
+};
+const tradeOf = local => TRADE[local && local.trade] || TRADE.IBEW;
 const OUTLOOK_CACHE = path.join(SITE_DIR, 'outlook-cache.json');
 const OUTLOOK_MODEL = 'claude-haiku-4-5-20251001'; // change here if your account needs a different model string
 const SNAPSHOT_CACHE = path.join(SITE_DIR, 'snapshot-cache.json');
@@ -83,10 +89,11 @@ function localNumber(name) {
   const m = String(name || '').match(/(\d+)/);
   return m ? m[1] : null;
 }
-function slugFor(name, id) {
+function slugFor(name, id, trade) {
   const n = localNumber(name);
-  if (n) return 'ibew-local-' + n;
-  return 'ibew-' + String(name || id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + id;
+  const pfx = (trade === 'UA') ? 'ua' : 'ibew';
+  if (n) return pfx + '-local-' + n;
+  return pfx + '-' + String(name || id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + id;
 }
 function stateName(abbr) { return STATE_NAMES[abbr] || abbr || ''; }
 function countryOf(abbr) { return CA_PROVINCES.has(abbr) ? 'CA' : 'US'; }
@@ -250,11 +257,12 @@ function callRow(c) {
 
 function jobPostingLd(local, c) {
   const n = localNumber(local.name);
-  const title = (c.call_type || 'Inside Wireman') + ' — IBEW Local ' + (n || local.id);
-  const org = c.contractor || ('IBEW Local ' + (n || local.id));
+  const TL = tradeOf(local).name;
+  const title = (c.call_type || 'Journeyman') + ' — ' + TL + ' Local ' + (n || local.id);
+  const org = c.contractor || (TL + ' Local ' + (n || local.id));
   const descParts = [
     (c.num_needed ? c.num_needed + ' hands needed. ' : ''),
-    'Union job call dispatched through IBEW Local ' + (n || local.id) +
+    'Union job call dispatched through ' + TL + ' Local ' + (n || local.id) +
       (local.city ? ' (' + local.city + (local.state ? ', ' + local.state : '') + ')' : '') + '. ',
     (c.scale != null && c.scale !== '' ? 'Journeyman scale ' + money(c.scale) + '/hr. ' : ''),
     (c.per_diem ? 'Per diem ' + c.per_diem + '. ' : ''),
@@ -295,27 +303,28 @@ function jobPostingLd(local, c) {
 
 function localPage(local, calls) {
   const n = localNumber(local.name);
-  const _sc = SCALE[localNumber(local.name)] || {};
+  const T = tradeOf(local);
+  const _sc = (local.trade === 'UA') ? {} : (SCALE[localNumber(local.name)] || {});
   if (_sc.scale) local.jw_scale = _sc.scale;
   if (_sc.hw) local.hw = _sc.hw;
-  const label = 'IBEW Local ' + (n || local.id);
+  const label = T.name + ' Local ' + (n || local.id);
   const place = [local.city, local.state].filter(Boolean).join(', ');
-  const slug = slugFor(local.name, local.id);
+  const slug = slugFor(local.name, local.id, local.trade);
   const url = `${CANON}/locals/${slug}`;
   const hands = calls.reduce((s, c) => s + (Number(c.num_needed) || 0), 0);
   const hasCalls = calls.length > 0;
 
   const title = hasCalls
-    ? `${label} Job Calls — ${calls.length} Open Inside Wireman Calls, Scale & Dispatch | TrampHereBro`
+    ? `${label} Job Calls — ${calls.length} Open Calls, Scale & Dispatch | TrampHereBro`
     : `${label} Job Calls, Journeyman Scale & Dispatch${place ? ' — ' + place : ''} | TrampHereBro`;
   const desc = hasCalls
-    ? `${calls.length} open ${label} job calls right now — ${hands} hands needed${local.jw_scale != null ? ', JW scale ' + money(local.jw_scale) + '/hr' : ''}. Contractor, per diem, and dispatch info for traveling electricians. Updated ${PRETTY_DATE}.`
-    : `${label} job calls, journeyman scale${local.jw_scale != null ? ' (' + money(local.jw_scale) + '/hr)' : ''}, book numbers and dispatch contact for traveling electricians${place ? ' in ' + place : ''}. No open calls posted right now — updated daily.`;
+    ? `${calls.length} open ${label} job calls right now — ${hands} hands needed${local.jw_scale != null ? ', JW scale ' + money(local.jw_scale) + '/hr' : ''}. Contractor, per diem, and dispatch info for traveling ${T.workers}. Updated ${PRETTY_DATE}.`
+    : `${label} job calls${local.jw_scale != null ? ', journeyman scale (' + money(local.jw_scale) + '/hr),' : ','} contact and dispatch info for traveling ${T.workers}${place ? ' in ' + place : ''}. No open calls posted right now — updated daily.`;
 
   // vitals
-  const _ci = CONTACT[localNumber(local.name)] || {};
+  const _ci = (local.trade === 'UA') ? {} : (CONTACT[localNumber(local.name)] || {});
   const cPhone = _ci.phone || local.phone || '';
-  const cAddress = _ci.address || '';
+  const cAddress = _ci.address || local.address || '';
   const cEmail = _ci.email || local.email || '';
   const cWebsite = _ci.website || local.website || '';
   const vit = (l, v, small) => `<div class="vit"><div class="l">${l}</div><div class="v${small ? ' small' : ''}">${v}</div></div>`;
@@ -324,7 +333,7 @@ function localPage(local, calls) {
   const _scaleStr = _m(local.jw_scale);
   const _noPen = !_m(_sc.pension_def) && !_m(_sc.pension_dc) && !_m(_sc.nebf) && !_m(_sc.k401);
   const vitals = [
-    vit('Journeyman Scale', _scaleStr ? _scaleStr + _hr : '—'),
+    _scaleStr ? vit('Journeyman Scale', _scaleStr + _hr) : '',
     _m(_sc.total) ? vit('Total Package', _m(_sc.total) + _hr) : '',
     _m(local.hw) ? vit('Health &amp; Welfare', _m(local.hw)) : '',
     _m(_sc.pension_def) ? vit('Defined Pension', _m(_sc.pension_def)) : '',
@@ -359,9 +368,10 @@ function localPage(local, calls) {
       + `</div>`
     : `<div class="sec-h">Open calls</div><div class="nocalls"><b>No open calls posted right now.</b><br>This local isn't showing open calls at the moment. Scale and dispatch info below stays current — check back, the board is swept daily.</div>`;
 
+  const _scaleLine = local.jw_scale != null ? ` Journeyman scale runs <span class="k">${money(local.jw_scale)}/hr</span>.` : '';
   const outlook = hasCalls
-    ? `${label}${place ? ' out of ' + place : ''} currently has <span class="k">${calls.length} open job call${calls.length > 1 ? 's' : ''}</span> on the books, needing about <span class="k">${hands} hands</span>. Journeyman scale runs <span class="k">${money(local.jw_scale)}/hr</span>. Calls below are pulled live from the local's dispatch — sign the appropriate book and call the hall to confirm before you roll.`
-    : `${label}${place ? ' covers ' + place : ''} and is tracked here for traveling inside wiremen. Journeyman scale runs <span class="k">${money(local.jw_scale)}/hr</span>. No calls are open right now, but this page updates daily — bookmark it and check back, or watch the full <a href="/" style="color:var(--orange);font-weight:600">live board</a> for the whole country.`;
+    ? `${label}${place ? ' out of ' + place : ''} currently has <span class="k">${calls.length} open job call${calls.length > 1 ? 's' : ''}</span> on the books, needing about <span class="k">${hands} hands</span>.${_scaleLine} Calls below are pulled live from the local's dispatch — sign the appropriate book and call the hall to confirm before you roll.`
+    : `${label}${place ? ' covers ' + place : ''} and is tracked here for traveling ${T.workers}.${_scaleLine} No calls are open right now, but this page updates daily — bookmark it and check back, or watch the full <a href="/" style="color:var(--orange);font-weight:600">live board</a> for the whole country.`;
 
   // schema
   const breadcrumb = {
@@ -379,9 +389,9 @@ function localPage(local, calls) {
         acceptedAnswer: { '@type': 'Answer', text: hasCalls
           ? `Yes — ${label} has ${calls.length} open call${calls.length > 1 ? 's' : ''} needing about ${hands} hands as of ${PRETTY_DATE}. Details are listed on this page and updated daily.`
           : `Not at the moment. ${label} has no open calls posted as of ${PRETTY_DATE}. This page is swept daily, so check back for new calls.` } },
-      { '@type': 'Question', name: `What is the journeyman wireman scale at ${label}?`,
+      { '@type': 'Question', name: `What is the journeyman scale at ${label}?`,
         acceptedAnswer: { '@type': 'Answer', text: local.jw_scale != null
-          ? `The inside journeyman wireman base scale at ${label} is ${money(local.jw_scale)} per hour${local.hw != null ? ', plus ' + money(local.hw) + ' health & welfare' : ''}.`
+          ? `The journeyman base scale at ${label} is ${money(local.jw_scale)} per hour${local.hw != null ? ', plus ' + money(local.hw) + ' health & welfare' : ''}.`
           : `Scale for ${label} isn't confirmed on this page yet. Contact the local's dispatch for current wage rates.` } }
     ]
   };
@@ -406,18 +416,17 @@ ${ldBlocks}
 ${topbar('')}
 <header><div class="hero-inner">
 <div class="crumbs"><a href="/">Board</a> › <a href="/locals">Locals</a> › ${esc(label)}</div>
-<div class="kick"><span class="dot"></span>Live IBEW Job Calls</div>
+<div class="kick"><span class="dot"></span>Live ${T.name} Job Calls</div>
 <h1 class="lede">${esc(label)} <b>Job Calls</b></h1>
-<div class="hsub">${place ? esc(place) + ' · ' : ''}Open inside-wireman calls, journeyman scale, and dispatch info — pulled live and updated daily.</div>
+<div class="hsub">${place ? esc(place) + ' · ' : ''}${local.trade === 'UA' ? 'Contact and job-call info for traveling ' + T.workers + ' — updated daily.' : 'Open inside-wireman calls, journeyman scale, and dispatch info — pulled live and updated daily.'}</div>
 <div class="hstats">
 <div class="hstat"><div class="n accent">${hasCalls ? calls.length : '0'}</div><div class="l">OPEN CALLS</div></div>
 <div class="hstat"><div class="n">${hands}</div><div class="l">HANDS NEEDED</div></div>
-<div class="hstat"><div class="n">${local.jw_scale != null ? money(local.jw_scale) : '—'}</div><div class="l">JW SCALE / HR</div></div>
+${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_scale)}</div><div class="l">JW SCALE / HR</div></div>` : ''}
 </div>
 </div></header>
 <main class="wrap">
-<div class="sec-h">Local vitals</div>
-<div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>
+${vitals ? `<div class="sec-h">Local vitals</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
 ${contactCard}
 ${callsBlock}
 <p class="outlook">${outlook}</p>
@@ -444,9 +453,9 @@ function hubPage(rows) {
     const list = byState[st].slice().sort((a, b) => (Number(localNumber(a.local.name)) || 1e9) - (Number(localNumber(b.local.name)) || 1e9));
     const oc = list.reduce((s, r) => s + r.calls.length, 0);
     const links = list.map(r => {
-      const num = localNumber(r.local.name), slug = slugFor(r.local.name, r.local.id), cc = r.calls.length;
+      const num = localNumber(r.local.name), slug = slugFor(r.local.name, r.local.id, r.local.trade), cc = r.calls.length;
       const s = `${num || ''} ${(r.local.city || '').toLowerCase()} ${stateName(st).toLowerCase()} ${st.toLowerCase()}`;
-      return `<a class="hub-local" href="/locals/${slug}" data-s="${esc(s)}"><span class="hl-name">IBEW ${num || r.local.id}${r.local.city ? ' · ' + esc(r.local.city) : ''}</span><span class="hl-cc${cc > 0 ? ' hot' : ''}">${cc > 0 ? cc + ' open' : '—'}</span></a>`;
+      return `<a class="hub-local" href="/locals/${slug}" data-s="${esc(s)} ${(r.local.trade||'ibew').toLowerCase()}"><span class="hl-name">${tradeOf(r.local).name} ${num || r.local.id}${r.local.city ? ' · ' + esc(r.local.city) : ''}</span><span class="hl-cc${cc > 0 ? ' hot' : ''}">${cc > 0 ? cc + ' open' : '—'}</span></a>`;
     }).join('');
     return `<div class="hub-state" data-state="${st}"><button class="hub-state-h" onclick="toggleState(this)" aria-expanded="false"><span class="hs-name">${esc(stateName(st))}</span><span class="hs-meta">${oc > 0 ? `<span class="hs-oc">${oc} open</span>` : ''}<span>${list.length} local${list.length > 1 ? 's' : ''}</span></span><svg class="hs-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button><div class="hub-state-body"><div class="hub-state-in">${links}</div></div></div>`;
   }
@@ -461,8 +470,8 @@ function hubPage(rows) {
     return `<div class="hub-country"><div class="hub-country-h"><span class="hc-flag">${FLAG[c]}</span><span class="hc-name">${esc(c)}</span><span class="hc-meta">${ocN > 0 ? `<span class="hc-chip hot">${ocN} open</span>` : ''}<span class="hc-chip">${locN} locals</span></span></div>${sts.map(stateBlock).join('')}</div>`;
   }).join('');
 
-  const title = 'All IBEW Locals — Job Calls, Wage Scale & Dispatch Directory | TrampHereBro';
-  const desc = `Directory of ${rows.length} IBEW locals with live job-call counts, journeyman scale and contact info for traveling electricians. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
+  const title = 'All IBEW & UA Locals — Job Calls, Wage Scale & Dispatch Directory | TrampHereBro';
+  const desc = `Directory of ${rows.length} IBEW and UA locals with live job-call counts, journeyman scale and contact info for traveling tradesmen. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
   return `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
@@ -480,7 +489,7 @@ ${topbar('')}
 <header><div class="hero-inner">
 <div class="crumbs"><a href="/">Board</a> › Locals</div>
 <div class="kick"><span class="dot"></span>Local Directory</div>
-<h1 class="lede">All IBEW <b>Locals</b></h1>
+<h1 class="lede">All <b>Locals</b></h1>
 <div class="hsub">Every local we track. Search or tap a state to see its locals, live call counts, and wage info.</div>
 <div class="hstats">
 <div class="hstat"><div class="n accent">${totalCalls}</div><div class="l">OPEN CALLS</div></div>
@@ -515,7 +524,7 @@ function sitemap(rows) {
   const urls = [];
   CORE_PAGES.forEach(p => urls.push(CANON + '/' + p));
   urls.push(CANON + '/locals');
-  rows.forEach(r => urls.push(`${CANON}/locals/${slugFor(r.local.name, r.local.id)}`));
+  rows.forEach(r => urls.push(`${CANON}/locals/${slugFor(r.local.name, r.local.id, r.local.trade)}`));
   const body = urls.map(u =>
     `  <url><loc>${u}</loc><lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`).join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
@@ -585,7 +594,7 @@ function syncHomepageMap(rows, coords) {
       id: r.local.id, name: r.local.name,
       city: r.local.city || '', state: r.local.state || '',
       lat: coords[String(r.local.id)].lat, lng: coords[String(r.local.id)].lng,
-      trade: 'IBEW', active: false
+      trade: r.local.trade || 'IBEW', active: false
     }));
   const block = '/*MAPLOCALS_START*/\nconst MAPLOCALS = ' + JSON.stringify(arr) + ';\n/*MAPLOCALS_END*/';
   const out = html.replace(/\/\*MAPLOCALS_START\*\/[\s\S]*?\/\*MAPLOCALS_END\*\//, block);
@@ -707,9 +716,14 @@ ${footer()}
   calls.forEach(c => { (callsByLocal[c.local_id] = callsByLocal[c.local_id] || []).push(c); });
 
   // rows = every local, with its (possibly empty) open-call list
-  const rows = locs
+  const ibewRows = locs
     .filter(l => l && (l.name || l.id))
-    .map(l => ({ local: { ...l, name: cleanName(l.name, l.id) }, calls: (callsByLocal[l.id] || []) }));
+    .map(l => ({ local: { ...l, name: cleanName(l.name, l.id), trade: 'IBEW' }, calls: (callsByLocal[l.id] || []) }));
+  let UA = [];
+  try { UA = JSON.parse(fs.readFileSync(UA_FILE, 'utf8')); } catch (e) { UA = []; }
+  const uaRows = UA.map(u => ({ local: { ...u, trade: 'UA' }, calls: [] }));
+  const rows = [...ibewRows, ...uaRows];
+  console.log(`  IBEW: ${ibewRows.length}   UA: ${uaRows.length}   total pages: ${rows.length}`);
 
   // never commit the API key
   try { const gi = path.join(SITE_DIR, '.gitignore'); let g = ''; try { g = fs.readFileSync(gi, 'utf8'); } catch (e) {} if (!/^\.env\s*$/m.test(g)) fs.writeFileSync(gi, (g ? g.replace(/\s*$/, '') + '\n' : '') + '.env\n'); } catch (e) {}
@@ -751,7 +765,7 @@ ${footer()}
 
   let written = 0, withCalls = 0;
   for (const r of rows) {
-    const slug = slugFor(r.local.name, r.local.id);
+    const slug = slugFor(r.local.name, r.local.id, r.local.trade);
     fs.writeFileSync(path.join(LOCALS_DIR, slug + '.html'), localPage(r.local, r.calls));
     written++; if (r.calls.length) withCalls++;
   }
