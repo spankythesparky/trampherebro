@@ -657,7 +657,10 @@ function calculatorPage(rows) {
     const sc = SCALE[n] || {};
     const scale = sc.scale ? Number(sc.scale) : (r.local.jw_scale != null ? Number(r.local.jw_scale) : null);
     if (!scale || !n) return null;
-    return { n: Number(n), c: r.local.city || '', s: r.local.state || '', scale: scale, total: sc.total ? Number(sc.total) : null };
+    const total = sc.total ? Number(sc.total) : null;
+    let ben = (total && total > scale) ? (total - scale) : 0;
+    if (!ben) { ['hw', 'pension_def', 'pension_dc', 'nebf'].forEach(k => { if (sc[k]) ben += Number(sc[k]) || 0; }); }
+    return { n: Number(n), c: r.local.city || '', s: r.local.state || '', scale: scale, ben: Math.round(ben * 100) / 100 };
   }).filter(Boolean).sort((a, b) => b.scale - a.scale);
 
   const title = 'IBEW Paycheck Calculator — Compare Union Local Pay | TrampHereBro';
@@ -678,7 +681,13 @@ function calculatorPage(rows) {
   .calc-headline b{color:#fff;font-family:'Space Grotesk',sans-serif}
   .calc-search{width:100%;box-sizing:border-box;font:400 16px Inter,sans-serif;padding:13px 16px;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow);margin-bottom:14px}
   .calc-board{display:flex;flex-direction:column;gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
-  .calc-row{display:grid;grid-template-columns:44px 1fr auto auto auto;align-items:center;gap:14px;padding:13px 18px;border-top:1px solid var(--line2);text-decoration:none;color:var(--charcoal);transition:background .1s}
+  .calc-rankby{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .calc-rankby span{font:600 12px/1 'Space Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--slate)}
+  .calc-rankby .rb{font:600 13px Inter,sans-serif;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--slate);cursor:pointer}
+  .calc-rankby .rb.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .calc-sub{display:block;font:400 12px Inter,sans-serif;color:var(--slate);margin-top:2px}
+  .calc-sub2{display:block;font:400 11.5px Inter,sans-serif;color:var(--slate);margin-top:1px}
+  .calc-row{display:grid;grid-template-columns:44px 1fr auto auto;align-items:center;gap:14px;padding:13px 18px;border-top:1px solid var(--line2);text-decoration:none;color:var(--charcoal);transition:background .1s}
   .calc-row:first-child{border-top:none}
   .calc-row:hover{background:#fffdfb}
   .calc-row.me{background:#fff6ef}
@@ -691,7 +700,7 @@ function calculatorPage(rows) {
   .calc-delta.neg{background:#fee2e2;color:#b91c1c}
   .calc-note{font-size:12px;color:var(--slate);margin:14px 2px 0;line-height:1.5}
   @media(max-width:720px){.calc-controls{grid-template-columns:1fr 1fr}}
-  @media(max-width:560px){.calc-controls{grid-template-columns:1fr}.calc-row{grid-template-columns:34px 1fr auto;gap:8px;row-gap:2px;padding:12px 14px}.calc-scale{grid-column:2;font-size:12px}.calc-annual{grid-column:3;grid-row:1}.calc-delta{grid-column:3;grid-row:2;justify-self:end}}
+  @media(max-width:560px){.calc-controls{grid-template-columns:1fr}.calc-row{grid-template-columns:32px 1fr auto;gap:8px;row-gap:4px;padding:12px 14px}.calc-annual{grid-column:3;grid-row:1;text-align:right}.calc-delta{grid-column:3;grid-row:2;justify-self:end}.calc-name{grid-column:2;grid-row:1}}
   `;
 
   return `<!DOCTYPE html><html lang="en"><head>
@@ -722,43 +731,52 @@ ${topbar('calculator')}
 <div class="calc-ctl"><label>Per diem ($/day)</label><input type="number" id="c-pd" value="0" min="0" step="5"></div>
 </div>
 <div class="calc-baseline"><label>Compare against your home local:</label><select id="c-base"><option value="">— none —</option></select></div>
+<div class="calc-rankby"><span>Rank by</span><button type="button" class="rb on" data-rb="total">Total package</button><button type="button" class="rb" data-rb="wages">Take-home wages</button></div>
 <div class="calc-headline" id="c-headline"></div>
 <input class="calc-search" id="c-search" type="search" placeholder="Filter by local number, city, or state…">
 <div class="calc-board" id="c-board"></div>
-<div class="calc-note">Gross wages only — regular hours at scale, hours over 40 at your chosen OT rate, plus per diem (\u00d77 days). Benefits (H&amp;W, pension) are on top and vary by local. Figures are estimates from published scale (via unionpayscales.com); always confirm the exact call terms with the hall. Cost-of-living adjustment coming soon.</div>
+<div class="calc-note"><b>Take-home wages</b> = regular hours at scale + hours over 40 at your chosen OT rate + per diem (\u00d77 days). <b>Benefits</b> = the full package (H&amp;W + pensions + NEBF) paid flat on every hour worked. <b>Total package</b> = both combined. Figures are estimates from published scale &amp; package data (via unionpayscales.com); always confirm exact terms with the hall. Cost-of-living adjustment coming soon.</div>
 </main>
 <script>
 var PAY = ${DATA};
 var $ = function(id){ return document.getElementById(id); };
 function fmt(n){ return '$' + Math.round(n).toLocaleString(); }
+var rankBy = 'total';
 function compute(){
   var hrs = +$('c-hours').value, wks = +$('c-weeks').value || 50, mult = +$('c-ot').value, pd = +$('c-pd').value || 0;
   var reg = Math.min(hrs, 40), ot = Math.max(hrs - 40, 0);
   $('c-hours-v').textContent = hrs;
-  var base = $('c-base').value;
-  var list = PAY.map(function(p){ var weekly = reg*p.scale + ot*p.scale*mult; return { p:p, annual: weekly*wks + pd*7*wks }; });
-  var baseAnnual = null;
-  if(base){ for(var i=0;i<list.length;i++){ if(list[i].p.n==base){ baseAnnual = list[i].annual; break; } } }
-  list.sort(function(a,b){ return b.annual - a.annual; });
+  var base = $('c-base').value, key = rankBy;
+  var list = PAY.map(function(p){
+    var wages = (reg*p.scale + ot*p.scale*mult)*wks + pd*7*wks;
+    var benefits = (p.ben||0) * hrs * wks;
+    return { p:p, wages:wages, benefits:benefits, total: wages+benefits };
+  });
+  var baseVal = null;
+  if(base){ for(var i=0;i<list.length;i++){ if(list[i].p.n==base){ baseVal = list[i][key]; break; } } }
+  list.sort(function(a,b){ return b[key] - a[key]; });
   var q = ($('c-search').value || '').toLowerCase();
   var out = [];
   for(var j=0;j<list.length;j++){
     var r = list[j];
     if(q && (''+r.p.n).indexOf(q)===-1 && r.p.c.toLowerCase().indexOf(q)===-1 && r.p.s.toLowerCase().indexOf(q)===-1) continue;
     var delta = '';
-    if(baseAnnual!=null && r.p.n!=base){ var d = r.annual - baseAnnual; delta = '<span class="calc-delta ' + (d>=0?'pos':'neg') + '">' + (d>=0?'+':'\u2212') + fmt(Math.abs(d)) + '/yr</span>'; }
-    out.push('<a class="calc-row' + (base==r.p.n?' me':'') + '" href="/locals/ibew-local-' + r.p.n + '"><span class="calc-rank">' + (j+1) + '</span><span class="calc-name">IBEW ' + r.p.n + (r.p.c? ' \u00b7 ' + r.p.c + ', ' + r.p.s : '') + '</span><span class="calc-scale">$' + r.p.scale.toFixed(2) + '/hr</span><span class="calc-annual">' + fmt(r.annual) + '</span>' + delta + '</a>');
+    if(baseVal!=null && r.p.n!=base){ var d = r[key] - baseVal; delta = '<span class="calc-delta ' + (d>=0?'pos':'neg') + '">' + (d>=0?'+':'\u2212') + fmt(Math.abs(d)) + '/yr</span>'; }
+    var sec = key==='total' ? ('wages ' + fmt(r.wages) + ' \u00b7 benefits ' + fmt(r.benefits)) : ('+ ' + fmt(r.benefits) + ' benefits = ' + fmt(r.total) + ' total');
+    out.push('<a class="calc-row' + (base==r.p.n?' me':'') + '" href="/locals/ibew-local-' + r.p.n + '"><span class="calc-rank">' + (j+1) + '</span><span class="calc-name">IBEW ' + r.p.n + (r.p.c? ' \u00b7 ' + r.p.c + ', ' + r.p.s : '') + '<span class="calc-sub">$' + r.p.scale.toFixed(2) + '/hr scale \u00b7 $' + (r.p.ben||0).toFixed(2) + '/hr benefits</span></span><span class="calc-annual">' + fmt(r[key]) + '/yr<span class="calc-sub2">' + sec + '</span></span>' + delta + '</a>');
   }
   $('c-board').innerHTML = out.join('') || '<div style="padding:30px;text-align:center;color:var(--slate)">No locals match that search.</div>';
   var top = list[0], bot = list[list.length-1];
   if(top){
-    var hl = 'At <b>' + hrs + ' hrs/week</b> over <b>' + wks + ' weeks</b>, top-paying <b>IBEW ' + top.p.n + (top.p.c? ' (' + top.p.c + ', ' + top.p.s + ')':'') + '</b> grosses <b>' + fmt(top.annual) + '/yr</b> — <b>' + fmt(top.annual - bot.annual) + '</b> more than the lowest on the board.';
-    if(baseAnnual!=null){ var beat = 0; for(var k=0;k<list.length;k++){ if(list[k].annual > baseAnnual) beat++; } hl += ' <b>' + beat + '</b> locals out-earn your home local.'; }
+    var mn = key==='total' ? 'total package (wages + benefits)' : 'take-home wages';
+    var hl = 'At <b>' + hrs + ' hrs/week</b> over <b>' + wks + ' weeks</b>, by <b>' + mn + '</b>: top local <b>IBEW ' + top.p.n + (top.p.c? ' (' + top.p.c + ', ' + top.p.s + ')':'') + '</b> at <b>' + fmt(top[key]) + '/yr</b> — <b>' + fmt(top[key] - bot[key]) + '</b> more than the lowest.';
+    if(baseVal!=null){ var beat = 0; for(var k=0;k<list.length;k++){ if(list[k][key] > baseVal) beat++; } hl += ' <b>' + beat + '</b> locals out-earn your home local.'; }
     $('c-headline').innerHTML = hl;
   }
 }
 (function(){ var sel = $('c-base'); PAY.slice().sort(function(a,b){return a.n-b.n;}).forEach(function(p){ var o=document.createElement('option'); o.value=p.n; o.textContent='IBEW '+p.n+(p.c?' \u00b7 '+p.c:''); sel.appendChild(o); }); })();
 ['c-hours','c-weeks','c-ot','c-pd','c-search','c-base'].forEach(function(id){ var el=$(id); if(el){ el.addEventListener('input',compute); el.addEventListener('change',compute); } });
+Array.prototype.forEach.call(document.querySelectorAll('.calc-rankby .rb'), function(btn){ btn.addEventListener('click', function(){ Array.prototype.forEach.call(document.querySelectorAll('.calc-rankby .rb'), function(b){ b.classList.remove('on'); }); btn.classList.add('on'); rankBy = btn.getAttribute('data-rb'); compute(); }); });
 compute();
 </script>
 ${footer()}
