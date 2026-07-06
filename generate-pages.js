@@ -27,7 +27,7 @@ const SITE_DIR = '/Users/Owner/Desktop/trampherebro';   // your site repo folder
 const CANON    = 'https://www.trampherebro.com';        // canonical origin — matches your live redirect (apex → www)
 const SUPA_URL = 'https://cpyhqsfkvtkangjfddis.supabase.co';
 const SUPA_KEY = 'sb_publishable_lBCUtgCBIR7IkuwKt5I0Mg_-sb9vLMM';
-const CORE_PAGES = ['', 'jnctn', 'resources', 'contact']; // existing top-level pages, added to sitemap
+const CORE_PAGES = ['', 'snapshot', 'jnctn', 'resources', 'contact']; // existing top-level pages, added to sitemap
 /* =========================================================================== */
 
 const LOCALS_DIR = path.join(SITE_DIR, 'locals');
@@ -41,6 +41,8 @@ let SCALE = {};
 try { SCALE = JSON.parse(fs.readFileSync(SCALE_FILE, 'utf8')); } catch (e) { SCALE = {}; }
 const OUTLOOK_CACHE = path.join(SITE_DIR, 'outlook-cache.json');
 const OUTLOOK_MODEL = 'claude-haiku-4-5-20251001'; // change here if your account needs a different model string
+const SNAPSHOT_CACHE = path.join(SITE_DIR, 'snapshot-cache.json');
+const SNAPSHOT_MODEL = 'claude-haiku-4-5-20251001'; // once-a-day editorial; bump to a Sonnet string for richer prose
 let ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || '';
 if (!ANTHROPIC_KEY) { try { const _t = fs.readFileSync(path.join(SITE_DIR, '.env'), 'utf8'); const _m = _t.match(/ANTHROPIC_API_KEY\s*=\s*['"]?([^'"\r\n]+)/); if (_m) ANTHROPIC_KEY = _m[1].trim(); } catch (e) {} }
 const TODAY = new Date();
@@ -145,6 +147,12 @@ main{padding:34px 0 10px}
 .ocall-pay{color:var(--navy);font-weight:700}
 .ocall-note{color:var(--slate)}
 .ocall-dot{color:#cdd5e0;margin:0 1px}
+.snap-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:16px;box-shadow:var(--shadow-lg);padding:28px 30px;font-size:15.5px;line-height:1.7;color:var(--charcoal)}
+.snap-card p{margin:0 0 16px}.snap-card p:last-child{margin-bottom:0}
+.snap-card b{color:var(--navy);font-family:'Space Grotesk',sans-serif;font-weight:700}
+.snap-card p:first-child b{font-size:19px;display:inline-block;margin-bottom:4px}
+.snap-date{font-size:12px;color:var(--slate);margin:16px 2px 0}
+@media(max-width:600px){.snap-card{padding:22px 20px}}
 .outlook{font-size:14.5px;color:var(--charcoal);line-height:1.62;max-width:74ch;margin:2px 0 26px}
 .outlook .k{color:var(--orange);font-weight:700}
 .faq{margin:6px 0 30px}
@@ -205,7 +213,7 @@ function topbar(active) {
   const on = p => active === p ? ' class="on"' : '';
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="/">Tramp<span class="b">Here</span>Bro</a>
-<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/jnctn"${on('jnctn')}>JNCTN</a><a href="/resources"${on('resources')}>Resources</a><a href="/contact"${on('contact')}>Contact</a></nav>
+<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/snapshot"${on('snapshot')}>Daily Update</a><a href="/jnctn"${on('jnctn')}>JNCTN</a><a href="/resources"${on('resources')}>Resources</a><a href="/contact"${on('contact')}>Contact</a></nav>
 </div></div>`;
 }
 function footer() {
@@ -611,6 +619,82 @@ async function generateOutlook(local, calls) {
   } catch (e) { return null; }
 }
 
+/* -------------------- Daily Snapshot (whole-board brief) ------------------ */
+function boardDigest(rows) {
+  const withCalls = rows.filter(r => r.calls.length);
+  const stats = {
+    totalCalls: withCalls.reduce((s, r) => s + r.calls.length, 0),
+    totalHands: withCalls.reduce((s, r) => s + r.calls.reduce((x, c) => x + (Number(c.num_needed) || 0), 0), 0),
+    activeLocals: withCalls.length
+  };
+  const agg = withCalls.map(r => {
+    const n = localNumber(r.local.name);
+    const hands = r.calls.reduce((x, c) => x + (Number(c.num_needed) || 0), 0);
+    const scales = r.calls.map(c => Number(c.scale)).filter(x => !isNaN(x));
+    const maxScale = scales.length ? Math.max(...scales) : (Number(r.local.jw_scale) || 0);
+    const top = r.calls.slice().sort((a, b) => (Number(b.num_needed) || 0) - (Number(a.num_needed) || 0)).slice(0, 4)
+      .map(c => `${c.contractor || 'contractor'} (${c.num_needed || '?'} ${c.call_type || 'JW'}, ${[c.job_name, c.location].filter(Boolean).join(' ') || 'project'}${c.scale ? ', $' + c.scale : ''}${c.per_diem ? ', PD ' + c.per_diem : ''}${c.notes ? ', ' + String(c.notes).replace(/\s+/g, ' ').slice(0, 50) : ''})`).join('; ');
+    return { label: 'LU-' + (n || r.local.id), place: [r.local.city, r.local.state].filter(Boolean).join(', '), calls: r.calls.length, hands, maxScale, book1: r.local.book1, top };
+  });
+  const picked = new Map();
+  agg.slice().sort((a, b) => b.hands - a.hands).slice(0, 14).forEach(x => picked.set(x.label, x));
+  agg.slice().sort((a, b) => b.maxScale - a.maxScale).slice(0, 6).forEach(x => picked.set(x.label, x));
+  const digest = [...picked.values()].map(x => `${x.label} ${x.place} — ${x.calls} calls, ~${x.hands} hands, top scale $${x.maxScale.toFixed(2)}${x.book1 != null ? ', Book1 ' + x.book1 : ''}. ${x.top}`).join('\n');
+  return { digest, stats };
+}
+async function generateSnapshot(rows) {
+  if (!ANTHROPIC_KEY) return null;
+  const { digest, stats } = boardDigest(rows);
+  if (!stats.totalCalls) return null;
+  const dayname = TODAY.toLocaleDateString('en-US', { weekday: 'long' });
+  const prompt = `You are writing today's "IBEW Traveler Snapshot" for TrampHereBro — a daily briefing for traveling inside wiremen deciding where to chase work. Today is ${dayname}, ${PRETTY_DATE}.\n\nBoard-wide right now: ${stats.totalCalls} open calls across ${stats.activeLocals} locals, about ${stats.totalHands} hands needed.\n\nStandout locals (live from union dispatch):\n${digest}\n\nWrite a sharp editorial snapshot of about 220-280 words in the voice of a savvy fellow tradesman. Start with a bold title line exactly: **IBEW Traveler Snapshot — ${dayname}, ${PRETTY_DATE}**. Then feature the 4-6 most notable locals as short paragraphs — lead with the top earners and biggest boards. For each, bold the local header like **LU-494 Milwaukee, WI** and bold the standout dollar figures. Mention key contractors and projects (data centers are hot), hands needed, over-scale/premium pay, and book depth where useful. Close with one sentence on the overall market trend. No preamble or sign-off.`;
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: SNAPSHOT_MODEL, max_tokens: 900, messages: [{ role: 'user', content: prompt }] })
+    });
+    if (!r.ok) { console.log('  snapshot API ' + r.status); return null; }
+    const j = await r.json();
+    const txt = (j.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n').trim();
+    return txt || null;
+  } catch (e) { return null; }
+}
+function snapshotMd(t) {
+  return esc(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').split(/\n\s*\n/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+}
+function snapshotPage(text) {
+  const title = 'IBEW Traveler Snapshot — Daily Job Call Update | TrampHereBro';
+  const desc = `Today's IBEW traveler snapshot: top-paying locals, the biggest boards, and where the data-center work is right now. Updated ${PRETTY_DATE}.`;
+  return `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(desc)}">
+<link rel="canonical" href="${CANON}/snapshot">
+<meta property="og:type" content="article"><meta property="og:site_name" content="TrampHereBro">
+<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${CANON}/snapshot"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta name="twitter:card" content="summary_large_image">
+${FAVICON_LINK}
+${FONTS}
+<style>${CSS}</style>
+</head><body>
+${topbar('snapshot')}
+<header><div class="hero-inner">
+<div class="crumbs"><a href="/">Board</a> › Daily Update</div>
+<div class="kick"><span class="dot"></span>Updated ${esc(PRETTY_DATE)}</div>
+<h1 class="lede">Traveler <b>Snapshot</b></h1>
+<div class="hsub">Where the work is right now — top-paying locals, the biggest boards, and the projects driving demand, pulled live from union dispatch.</div>
+</div></header>
+<main class="wrap">
+<div class="snap-card">${snapshotMd(text)}</div>
+<div class="snap-date">Updated ${esc(PRETTY_DATE)} · generated from live union dispatch data</div>
+<div class="backbar" style="margin-top:26px"><a class="backbtn" href="/locals">Browse all locals →</a> &nbsp; <a class="backbtn" href="/">Live board →</a></div>
+</main>
+${footer()}
+</body></html>`;
+}
+
 (async function main() {
   console.log('→ Fetching live data from Supabase…');
   const [locs, calls] = await Promise.all([
@@ -647,6 +731,15 @@ async function generateOutlook(local, calls) {
   try { fs.writeFileSync(OUTLOOK_CACHE, JSON.stringify(OUTLOOKS, null, 0)); } catch (e) {}
   if (ANTHROPIC_KEY) console.log(`  generated ${freshOutlooks} new work outlook(s) via ${OUTLOOK_MODEL}`);
 
+  // Daily Snapshot — one cached editorial brief for the whole board
+  let snapText = null;
+  const boardHash = callsHash(rows.flatMap(r => r.calls));
+  try { const sc = JSON.parse(fs.readFileSync(SNAPSHOT_CACHE, 'utf8')); if (sc.hash === boardHash) snapText = sc.text; } catch (e) {}
+  if (!snapText && ANTHROPIC_KEY) {
+    snapText = await generateSnapshot(rows);
+    if (snapText) { try { fs.writeFileSync(SNAPSHOT_CACHE, JSON.stringify({ hash: boardHash, text: snapText, date: ISO_DATE })); } catch (e) {} console.log('  generated daily snapshot via ' + SNAPSHOT_MODEL); }
+  }
+
   if (!fs.existsSync(LOCALS_DIR)) fs.mkdirSync(LOCALS_DIR, { recursive: true });
 
   // write favicon.png once (from the same hard-hat mark the homepage uses)
@@ -663,6 +756,7 @@ async function generateOutlook(local, calls) {
     written++; if (r.calls.length) withCalls++;
   }
   fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows));
+  if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText)); console.log('  wrote snapshot.html'); }
   fs.writeFileSync(path.join(SITE_DIR, 'sitemap.xml'), sitemap(rows));
 
   // keep the homepage map + browse board in sync with Supabase
