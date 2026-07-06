@@ -442,7 +442,7 @@ ${callsBlock}
 <h3>Does ${esc(label)} have open calls right now?</h3>
 <p>${hasCalls ? `Yes — ${calls.length} open call${calls.length > 1 ? 's' : ''} needing ~${hands} hands as of ${esc(PRETTY_DATE)}, listed above and updated daily.` : `Not right now. No open calls posted as of ${esc(PRETTY_DATE)}. This page is swept daily — check back.`}</p>
 <h3>What's the journeyman scale at ${esc(label)}?</h3>
-<p>${local.jw_scale != null ? `Inside JW base scale is ${money(local.jw_scale)}/hr${local.hw != null ? `, plus ${money(local.hw)} H&amp;W` : ''}.` : `Scale isn't confirmed here yet — contact dispatch for current rates.`}</p>
+<p>${local.jw_scale != null ? `${local.trade === 'LINEMAN' ? 'Journeyman lineman' : (local.trade && local.trade !== 'IBEW' ? 'Journeyman' : 'Inside JW')} base scale is ${money(local.jw_scale)}/hr${local.hw != null ? `, plus ${money(local.hw)} H&amp;W` : ''}.` : `Scale isn't confirmed here yet — contact dispatch for current rates.`}</p>
 </div>
 <div class="backbar"><a class="backbtn" href="/">← Back to the full live board</a> &nbsp; <a class="backbtn" href="/locals">All locals →</a></div>
 </main>
