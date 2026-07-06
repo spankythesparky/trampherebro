@@ -39,6 +39,8 @@ try { CONTACT = JSON.parse(fs.readFileSync(CONTACT_FILE, 'utf8')); } catch (e) {
 const SCALE_FILE = path.join(SITE_DIR, 'locals-scale.json');
 let SCALE = {};
 try { SCALE = JSON.parse(fs.readFileSync(SCALE_FILE, 'utf8')); } catch (e) { SCALE = {}; }
+let LINEMAN_SCALE = {};
+try { LINEMAN_SCALE = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'lineman-scale.json'), 'utf8')); } catch (e) { LINEMAN_SCALE = {}; }
 const UA_FILE = path.join(SITE_DIR, 'ua-locals.json');
 const TRADE = {
   IBEW: { name: 'IBEW', slug: 'ibew', worker: 'inside wireman', workers: 'inside wiremen' },
@@ -310,7 +312,7 @@ function jobPostingLd(local, c) {
 function localPage(local, calls) {
   const n = localNumber(local.name);
   const T = tradeOf(local);
-  const _sc = (local.trade && local.trade !== 'IBEW') ? {} : (SCALE[localNumber(local.name)] || {});
+  const _sc = local.trade === 'LINEMAN' ? (LINEMAN_SCALE[localNumber(local.name)] || {}) : ((local.trade && local.trade !== 'IBEW') ? {} : (SCALE[localNumber(local.name)] || {}));
   if (_sc.scale) local.jw_scale = _sc.scale;
   if (_sc.hw) local.hw = _sc.hw;
   const label = T.name + ' Local ' + (n || local.id);
