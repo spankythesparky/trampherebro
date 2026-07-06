@@ -270,8 +270,7 @@ function localPage(local, calls) {
     local.phone ? vit('Dispatch', esc(local.phone), true) : ''
   ].filter(Boolean).join('');
 
-  const dispatchBtn = local.website
-    ? `<a class="dispatch-link" href="${esc(local.website)}" target="_blank" rel="noopener">Local dispatch page ↗</a>` : '';
+  const dispatchBtn = ''; // dispatch link removed per request
 
   const callsBlock = hasCalls
     ? `<div class="sec-h">Open calls — ${calls.length} posted · ${hands} hands</div><div class="callcard">${calls.map(callRow).join('')}</div>`

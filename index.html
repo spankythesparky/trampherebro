@@ -337,7 +337,7 @@
 .stategroup.open .shead{border-color:var(--orange)}
 
 /* individual local rows: make ACTIVE ones stand out, cleaner nesting */
-.local{border-bottom:none !important;margin-bottom:6px}
+.local{border-bottom:none !important;margin-bottom:6px;display:block}
 .lhead{background:#fff;border:1px solid var(--line);border-radius:10px;padding:13px 14px !important;transition:border-color .14s,box-shadow .14s,background .14s}
 .lhead:hover{border-color:#cfd8e6;box-shadow:0 4px 14px rgba(7,37,84,.07)}
 /* active local = has open calls: orange left edge + subtle tint so it pops */
@@ -585,13 +585,12 @@ function renderList(){
     const n=callsFor(l.id,activeType).length; const hands=handsFor(l.id,activeType);
     if(n>0){
       const isLO=(openState[l.id]!==undefined)?openState[l.id]:!!q;
-      return '<div class="local '+(isLO?'open':'')+'" data-lu="'+l.id+'"><div class="lhead lclick">'+
+      return '<a class="local active" href="'+_lhref(l.name)+'"><div class="lhead">'+
         '<div><div class="lid">'+l.name+'</div><div class="lcity">'+l.city+', '+l.state+'</div></div><div class="spacer"></div>'+
         '<div class="lcount"><div class="b">'+n+'</div><div class="s">'+hands+' hands</div></div>'+
-        '<svg class="chevron" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></div>'+
-        '<div class="lbody"><div class="lbody-inner">'+detailHTML(l.id)+'</div></div></div>';
+        '<svg class="chevron" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div></a>';
     }
-    return '<div class="local tracked"><div class="lhead"><div><div class="lid">'+l.name+'</div><div class="lcity">'+l.city+', '+l.state+'</div></div><div class="spacer"></div><span class="quiet">no open calls</span></div></div>';
+    return '<a class="local tracked" href="'+_lhref(l.name)+'"><div class="lhead"><div><div class="lid">'+l.name+'</div><div class="lcity">'+l.city+', '+l.state+'</div></div><div class="spacer"></div><span class="quiet">no open calls</span><svg class="chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div></a>';
   }
   function stateGroupHTML(st){
     const nm=STATE_NAMES[st.s]||st.s;
@@ -625,14 +624,8 @@ function renderList(){
   wrap.querySelectorAll('.lclick').forEach(h=>h.onclick=()=>{const el=h.closest('.local');const lu=+el.dataset.lu;const willOpen=!el.classList.contains('open');el.parentNode.querySelectorAll(':scope > .local').forEach(x=>{x.classList.remove('open');if(x.dataset.lu)openState[+x.dataset.lu]=false;});if(willOpen){el.classList.add('open');openState[lu]=true;}});
 }
 
-function jumpTo(lu){
-  const loc=LOCBYID[lu]; if(!loc) return;
-  currentCountry=countryOf(loc.state);
-  document.querySelectorAll('.ctabs button').forEach(b=>b.classList.toggle('on',b.dataset.c===currentCountry));
-  if(currentCountry==='United States') openRegions[REGION_OF[loc.state]||'Other']=true;
-  openStates[loc.state]=true; openState[lu]=true; renderList();
-  setTimeout(()=>{const el=document.querySelector('.local[data-lu="'+lu+'"]');if(el)el.scrollIntoView({behavior:'smooth',block:'center'});},70);
-}
+function _lhref(nm){ var m=String(nm||'').match(/(\d+)/); return m?('/locals/ibew-local-'+m[1]):'#'; }
+function jumpTo(lu){ const loc=LOCBYID[lu]; if(!loc) return; window.location.href=_lhref(loc.name); }
 window.jumpTo=jumpTo;
 renderList();
 document.getElementById('foot-verified').textContent='Last pull: 07/03/2026 \u00b7 2 locals live';
@@ -709,7 +702,7 @@ const vList=document.getElementById('v-list'),vMap=document.getElementById('v-ma
 const listView=document.getElementById('listview'),mapViewEl=document.getElementById('mapview');
 vList.onclick=()=>{vList.classList.add('on');vMap.classList.remove('on');listView.classList.remove('hidden');mapViewEl.classList.add('hidden');};
 vMap.onclick=()=>{vMap.classList.add('on');vList.classList.remove('on');mapViewEl.classList.remove('hidden');listView.classList.add('hidden');buildMap();};
-function openLocalFromMap(lu){vList.click();jumpTo(lu);}
+function openLocalFromMap(lu){jumpTo(lu);}
 window.openLocalFromMap=openLocalFromMap;
 function buildMap(){
   if(mapBuilt){setTimeout(()=>map.invalidateSize(),50);return;}
