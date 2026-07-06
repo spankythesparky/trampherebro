@@ -178,7 +178,7 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 .foot-legal .credit{color:#cdd8ea}.foot-legal .credit b{color:var(--orange);font-weight:700}
 .foot-legal .copyright{color:#63799a;margin-top:2px}
 /* directory hub — collapsible + searchable */
-.hub-search{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font:400 15px Inter,sans-serif;color:var(--charcoal);box-shadow:var(--shadow);margin-bottom:22px}
+.hub-search{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font:400 16px Inter,sans-serif;color:var(--charcoal);box-shadow:var(--shadow);margin-bottom:22px}
 .hub-search::placeholder{color:var(--slate)}
 .hub-search:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
 .hub-country{margin-bottom:30px}
