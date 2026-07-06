@@ -107,11 +107,14 @@ body{color:var(--charcoal);font-family:'Inter',system-ui,sans-serif;font-weight:
 .wrap{max-width:1040px;margin:0 auto;padding:0 28px}
 a{color:inherit;text-decoration:none}
 .topbar{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 1px 10px rgba(7,37,84,.05);position:sticky;top:0;z-index:20}
-.topbar .inner{max-width:1040px;margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.topbar .inner{max-width:1040px;margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative}
 .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--navy);letter-spacing:-.02em}
 .brand .b{color:var(--orange)}
 .nav{display:flex;gap:22px;align-items:center}
 .nav a{font-size:14px;font-weight:600;color:var(--slate);transition:color .15s}
+.navtoggle{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:8px;margin-left:auto}
+.navtoggle span{display:block;width:22px;height:2.5px;background:var(--navy);border-radius:2px}
+@media(max-width:640px){.navtoggle{display:flex}.nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:0 12px 26px rgba(7,37,84,.12);padding:6px 0;z-index:40}.nav.open{display:flex}.nav a{font-size:15px;padding:13px 20px;width:100%;box-sizing:border-box}}
 .nav a:hover,.nav a.on{color:var(--navy)}
 header{position:relative;margin:0 calc(50% - 50vw);padding:56px max(28px,calc(50vw - 492px)) 46px;background:linear-gradient(180deg,#05122b 0%,#071e46 55%,#0b2a5c 100%);overflow:hidden;color:#EAF0FA;border-bottom:3px solid var(--orange)}
 header::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:radial-gradient(circle at 68% 30%,#000,transparent 72%);mask-image:radial-gradient(circle at 68% 30%,#000,transparent 72%);opacity:.55}
@@ -220,7 +223,8 @@ function topbar(active) {
   const on = p => active === p ? ' class="on"' : '';
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="/">Tramp<span class="b">Here</span>Bro</a>
-<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/snapshot"${on('snapshot')}>Daily Update</a><a href="/jnctn"${on('jnctn')}>JNCTN</a><a href="/resources"${on('resources')}>Resources</a><a href="/contact"${on('contact')}>Contact</a></nav>
+<button class="navtoggle" aria-label="Menu" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
+<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/snapshot"${on('snapshot')}>Daily Update</a><a href="/resources"${on('resources')}>Resources</a><a href="/contact"${on('contact')}>Contact</a></nav>
 </div></div>`;
 }
 function footer() {
@@ -611,7 +615,7 @@ function syncHomepageMap(rows, coords, snapText) {
 
   // Bake the daily snapshot onto the homepage (server-rendered, crawlable)
   if (snapText && out.includes('<!--HS_START-->')) {
-    const snapHtml = `<section class="homesnap"><div class="homesnap-inner"><div class="hs-kick"><span class="hs-dot"></span>Today's Traveler Snapshot · ${esc(PRETTY_DATE)}</div><div class="hs-body">${snapshotMd(snapText)}</div><a class="hs-more" href="/snapshot">See the full daily update →</a></div></section>`;
+    const snapHtml = `<section class="homesnap" id="homesnap"><div class="homesnap-inner"><div class="hs-kick"><span class="hs-dot"></span>Today's Traveler Snapshot · ${esc(PRETTY_DATE)}</div><div class="hs-body" id="hs-body">${snapshotMd(snapText)}</div><button class="hs-toggle" onclick="document.getElementById('homesnap').classList.toggle('collapsed')"></button><a class="hs-more" href="/snapshot">See the full daily update →</a></div></section>`;
     out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + snapHtml + '<!--HS_END-->');
   }
 
