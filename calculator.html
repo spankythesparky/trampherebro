@@ -172,6 +172,9 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
   .calc-detail .cd-line.cd-tot{border-bottom:none;border-top:1px solid rgba(255,255,255,.22);margin-top:3px;padding-top:9px}
   .calc-detail .cd-line.cd-tot span{color:#fff;font-size:14.5px;font-weight:700}
   .calc-detail .cd-grand{background:var(--orange);color:#fff;border-radius:10px;padding:12px 15px;margin-top:15px;display:flex;justify-content:space-between;font:700 16px 'Space Grotesk',sans-serif}
+  .calc-more{display:flex;justify-content:center;margin-top:14px}
+  .calc-morebtn{font:600 14px Inter,sans-serif;padding:11px 24px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);cursor:pointer;box-shadow:var(--shadow)}
+  .calc-morebtn:hover{border-color:var(--orange);color:var(--orange)}
   @media(max-width:720px){.calc-controls{grid-template-columns:1fr 1fr}}
   @media(max-width:560px){.calc-controls{grid-template-columns:1fr}.calc-row{grid-template-columns:32px 1fr auto;gap:8px;row-gap:4px;padding:12px 14px}.calc-annual{grid-column:3;grid-row:1;text-align:right}.calc-delta{grid-column:3;grid-row:2;justify-self:end}.calc-name{grid-column:2;grid-row:1}}
   </style>
@@ -198,7 +201,7 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 <div class="calc-rankby"><span>Rank by</span><button type="button" class="rb on" data-rb="total">Total package</button><button type="button" class="rb" data-rb="wages">Take-home wages</button></div>
 <div class="calc-headline" id="c-headline"></div>
 <input class="calc-search" id="c-search" type="search" placeholder="Filter by local number, city, or state…">
-<div class="calc-board" id="c-board"></div>
+<div class="calc-board" id="c-board"></div><div class="calc-more" id="c-more"></div>
 <div class="calc-note"><b>Take-home wages</b> = regular hours at scale + hours over 40 at your chosen OT rate + per diem (×7 days). <b>Benefits</b> = the full package (H&amp;W + pensions + NEBF) paid flat on every hour worked. <b>Total package</b> = both combined. Figures are estimates from published scale &amp; package data (via unionpayscales.com); always confirm exact terms with the hall. Cost-of-living adjustment coming soon.</div>
 </main>
 <script>
@@ -224,7 +227,8 @@ function detailHtml(p, hrs, wks, mult, pd, reg, ot){
     +'<div class="cd-line cd-tot"><span>Total benefits</span><span>'+fmt(benTotal)+'</span></div>'
     +'<div class="cd-grand"><span>Total package value</span><span>'+fmt(wages+benTotal)+'</span></div>';
 }
-var rankBy = 'total';
+var rankBy = 'total', expanded = false;
+function toggleExpand(){ expanded = !expanded; compute(); }
 function compute(){
   var hrs = +$('c-hours').value, wks = +$('c-weeks').value || 50, mult = +$('c-ot').value, pd = +$('c-pd').value || 0;
   var reg = Math.min(hrs, 40), ot = Math.max(hrs - 40, 0);
@@ -249,7 +253,9 @@ function compute(){
     var sec = key==='total' ? ('wages ' + fmt(r.wages) + ' · benefits ' + fmt(r.benefits)) : ('+ ' + fmt(r.benefits) + ' benefits = ' + fmt(r.total) + ' total');
     out.push('<a class="calc-row' + (base==r.p.n?' me':'') + '" href="/locals/ibew-local-' + r.p.n + '"><span class="calc-rank">' + (j+1) + '</span><span class="calc-name">IBEW ' + r.p.n + (r.p.c? ' · ' + r.p.c + ', ' + r.p.s : '') + '<span class="calc-sub">$' + r.p.scale.toFixed(2) + '/hr scale · $' + (r.p.ben||0).toFixed(2) + '/hr benefits</span></span><span class="calc-annual">' + fmt(r[key]) + '/yr<span class="calc-sub2">' + sec + '</span></span>' + delta + '</a>');
   }
-  $('c-board').innerHTML = out.join('') || '<div style="padding:30px;text-align:center;color:var(--slate)">No locals match that search.</div>';
+  var _total = out.length, _N = 12, _showAll = q || expanded;
+  $('c-board').innerHTML = (_showAll ? out : out.slice(0, _N)).join('') || '<div style="padding:30px;text-align:center;color:var(--slate)">No locals match that search.</div>';
+  $('c-more').innerHTML = (!q && _total > _N) ? '<button type="button" class="calc-morebtn" onclick="toggleExpand()">' + (expanded ? 'Show less ▲' : 'Show all ' + _total + ' locals ▼') + '</button>' : '';
   var top = list[0], bot = list[list.length-1];
   if(top){
     var mn = key==='total' ? 'total package (wages + benefits)' : 'take-home wages';
