@@ -39,6 +39,10 @@ try { CONTACT = JSON.parse(fs.readFileSync(CONTACT_FILE, 'utf8')); } catch (e) {
 const SCALE_FILE = path.join(SITE_DIR, 'locals-scale.json');
 let SCALE = {};
 try { SCALE = JSON.parse(fs.readFileSync(SCALE_FILE, 'utf8')); } catch (e) { SCALE = {}; }
+const OUTLOOK_CACHE = path.join(SITE_DIR, 'outlook-cache.json');
+const OUTLOOK_MODEL = 'claude-haiku-4-5-20251001'; // change here if your account needs a different model string
+let ANTHROPIC_KEY = process.env.ANTHROPIC_API_KEY || '';
+if (!ANTHROPIC_KEY) { try { const _t = fs.readFileSync(path.join(SITE_DIR, '.env'), 'utf8'); const _m = _t.match(/ANTHROPIC_API_KEY\s*=\s*['"]?([^'"\r\n]+)/); if (_m) ANTHROPIC_KEY = _m[1].trim(); } catch (e) {} }
 const TODAY = new Date();
 const ISO_DATE = TODAY.toISOString().slice(0, 10);
 const VALID_THROUGH = new Date(TODAY.getTime() + 21 * 864e5).toISOString().slice(0, 10);
@@ -134,6 +138,13 @@ main{padding:34px 0 10px}
 .cdetail{margin-top:6px;padding-left:56px;font-size:12.5px;color:var(--slate)}
 .nocalls{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 24px;margin-bottom:26px;color:var(--slate);font-size:15px}
 .nocalls b{color:var(--navy);font-family:'Space Grotesk',sans-serif}
+.outlook-lead{font-size:15.5px;line-height:1.62;color:var(--charcoal);font-weight:500;padding:4px 0 14px}
+.ocall-count{font-family:'Space Grotesk',sans-serif;font-size:11.5px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.05em;padding:10px 0 4px;border-top:1px solid var(--line2)}
+.ocall{padding:11px 0;border-top:1px solid var(--line2);font-size:14.5px;line-height:1.5;color:var(--charcoal)}
+.ocall b{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--navy)}
+.ocall-pay{color:var(--navy);font-weight:700}
+.ocall-note{color:var(--slate)}
+.ocall-dot{color:#cdd5e0;margin:0 1px}
 .outlook{font-size:14.5px;color:var(--charcoal);line-height:1.62;max-width:74ch;margin:2px 0 26px}
 .outlook .k{color:var(--orange);font-weight:700}
 .faq{margin:6px 0 30px}
@@ -214,19 +225,19 @@ function callDetail(c) {
   return bits.join(' · ');
 }
 function callRow(c) {
-  const need = c.num_needed ? ('+' + c.num_needed) : '—';
-  const loc = [c.job_name, c.location].filter(Boolean).map(esc).join(' · ') || '—';
-  const pay = (c.scale != null && c.scale !== '') ? money(c.scale)
-            : (c.per_diem ? 'per diem ' + esc(c.per_diem) : '—');
-  const contractor = c.contractor ? esc(c.contractor) : 'Signatory contractor';
-  const detail = callDetail(c);
-  return `<div class="crow"><div class="r1">`
-    + `<span class="cneed">${need}</span>`
-    + `<span class="cont">${contractor}</span>`
-    + `<span class="cloc">${loc}</span>`
-    + `<span class="cpay">${pay}</span></div>`
-    + (detail ? `<div class="cdetail">${detail}</div>` : ``)
-    + `</div>`;
+  const cls = String(c.call_type || 'JW').replace(/inside\s*/i, '').trim() || 'JW';
+  const parts = [];
+  if (c.contractor) parts.push(`<b>${esc(c.contractor)}</b>`);
+  if (c.num_needed) parts.push(`${c.num_needed} ${esc(cls)}`);
+  const loc = [c.job_name, c.location].filter(Boolean).map(esc).join(' ');
+  if (loc) parts.push(loc);
+  if (c.duration) parts.push(esc(c.duration));
+  const pay = (c.scale != null && c.scale !== '') ? '$' + Number(c.scale).toFixed(2) + '/hr'
+            : (c.per_diem ? 'per diem ' + esc(c.per_diem) : 'scale');
+  parts.push(`<span class="ocall-pay">${pay}</span>`);
+  if (c.per_diem && c.scale != null && c.scale !== '') parts.push('per diem ' + esc(c.per_diem));
+  if (c.notes) parts.push(`<span class="ocall-note">${esc(String(c.notes).replace(/\s+/g, ' ').slice(0, 90))}</span>`);
+  return `<div class="ocall">${parts.join(' <span class="ocall-dot">·</span> ')}</div>`;
 }
 
 function jobPostingLd(local, c) {
@@ -333,7 +344,11 @@ function localPage(local, calls) {
   const contactCard = contactItems ? `<div class="sec-h">Contact</div><div class="vitcard"><div class="vitals">${contactItems}</div></div>` : '';
 
   const callsBlock = hasCalls
-    ? `<div class="sec-h">Open calls — ${calls.length} posted · ${hands} hands</div><div class="callcard">${calls.map(callRow).join('')}</div>`
+    ? `<div class="sec-h">Work Outlook</div><div class="callcard">`
+      + (local._outlook ? `<p class="outlook-lead">${esc(local._outlook)}</p>` : '')
+      + `<div class="ocall-count">${calls.length} open call${calls.length > 1 ? 's' : ''} · ${hands} hands needed</div>`
+      + calls.map(callRow).join('')
+      + `</div>`
     : `<div class="sec-h">Open calls</div><div class="nocalls"><b>No open calls posted right now.</b><br>This local isn't showing open calls at the moment. Scale and dispatch info below stays current — check back, the board is swept daily.</div>`;
 
   const outlook = hasCalls
@@ -570,6 +585,32 @@ function syncHomepageMap(rows, coords) {
   return arr.length;
 }
 
+/* -------------------- AI Work Outlook (cached) ---------------------------- */
+function callsHash(calls) {
+  const key = calls.map(c => [c.contractor, c.num_needed, c.call_type, c.job_name, c.location, c.scale, c.per_diem].join('|')).sort().join('~');
+  let h = 0; for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) | 0;
+  return String(h);
+}
+async function generateOutlook(local, calls) {
+  if (!ANTHROPIC_KEY) return null;
+  const n = localNumber(local.name);
+  const label = 'IBEW Local ' + (n || local.id);
+  const hands = calls.reduce((s, c) => s + (Number(c.num_needed) || 0), 0);
+  const lines = calls.map(c => `- ${c.contractor || 'contractor'} needs ${c.num_needed || '?'} ${c.call_type || 'JW'} at ${[c.job_name, c.location].filter(Boolean).join(' ') || 'a project'}${c.scale ? ' ($' + c.scale + '/hr)' : ''}${c.per_diem ? ', per diem ' + c.per_diem : ''}${c.notes ? ' — ' + String(c.notes).replace(/\s+/g, ' ').slice(0, 80) : ''}`).join('\n');
+  const prompt = `Write a single-sentence "work outlook" for a traveling IBEW inside wireman looking at the open job calls at ${label}. There are ${calls.length} open calls needing about ${hands} hands.\n\nCalls:\n${lines}\n\nWrite ONE direct sentence (max 30 words) a fellow tradesman would find useful: total calls and hands, plus the dominant type of work (data center, industrial, hospital, commercial, etc.) inferred from the contractors and job names. No preamble, no quotation marks — just the sentence.`;
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01' },
+      body: JSON.stringify({ model: OUTLOOK_MODEL, max_tokens: 120, messages: [{ role: 'user', content: prompt }] })
+    });
+    if (!r.ok) { console.log('  outlook API ' + r.status + ' for ' + label); return null; }
+    const j = await r.json();
+    const txt = (j.content || []).filter(b => b.type === 'text').map(b => b.text).join(' ').trim();
+    return txt ? txt.replace(/^["']|["']$/g, '') : null;
+  } catch (e) { return null; }
+}
+
 (async function main() {
   console.log('→ Fetching live data from Supabase…');
   const [locs, calls] = await Promise.all([
@@ -585,6 +626,26 @@ function syncHomepageMap(rows, coords) {
   const rows = locs
     .filter(l => l && (l.name || l.id))
     .map(l => ({ local: { ...l, name: cleanName(l.name, l.id) }, calls: (callsByLocal[l.id] || []) }));
+
+  // never commit the API key
+  try { const gi = path.join(SITE_DIR, '.gitignore'); let g = ''; try { g = fs.readFileSync(gi, 'utf8'); } catch (e) {} if (!/^\.env\s*$/m.test(g)) fs.writeFileSync(gi, (g ? g.replace(/\s*$/, '') + '\n' : '') + '.env\n'); } catch (e) {}
+
+  // AI Work Outlook — one cached sentence per local with calls
+  let OUTLOOKS = {};
+  try { OUTLOOKS = JSON.parse(fs.readFileSync(OUTLOOK_CACHE, 'utf8')); } catch (e) { OUTLOOKS = {}; }
+  if (!ANTHROPIC_KEY) console.log('  (no ANTHROPIC_API_KEY — skipping AI outlooks; pages still build)');
+  let freshOutlooks = 0;
+  for (const r of rows) {
+    if (!r.calls.length) continue;
+    const h = callsHash(r.calls);
+    const cached = OUTLOOKS[r.local.id];
+    if (cached && cached.hash === h) { r.local._outlook = cached.text; continue; }
+    const txt = await generateOutlook(r.local, r.calls);
+    if (txt) { OUTLOOKS[r.local.id] = { hash: h, text: txt }; r.local._outlook = txt; freshOutlooks++; }
+    else if (cached) { r.local._outlook = cached.text; }
+  }
+  try { fs.writeFileSync(OUTLOOK_CACHE, JSON.stringify(OUTLOOKS, null, 0)); } catch (e) {}
+  if (ANTHROPIC_KEY) console.log(`  generated ${freshOutlooks} new work outlook(s) via ${OUTLOOK_MODEL}`);
 
   if (!fs.existsSync(LOCALS_DIR)) fs.mkdirSync(LOCALS_DIR, { recursive: true });
 
