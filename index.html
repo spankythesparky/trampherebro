@@ -412,7 +412,7 @@
       <div class="tabs"><button class="on" data-f="all">All work</button><button data-f="Inside JW">Inside JW</button><button data-f="CW/CE">CW / CE</button><button data-f="Telecom/VDV">Telecom</button></div>
     </div>
     <div id="topwrap"><div class="topcalls-head" id="topcalls-toggle"><div><span class="tc-title">Top calls right now</span> <span class="sub-c" id="tc-count"></span></div><svg class="tc-chev" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 9l6 6 6-6"/></svg></div><div class="topcalls-body"><div class="topcalls-inner"><div class="toplist" id="toplist"></div></div></div></div><div id="hotwrap"><div class="sec-h" style="margin-bottom:12px">Hotspots <span class="sub-c">locals with 50+ open calls</span></div><div class="hotstrip" id="hotstrip"></div></div>
-    <div class="sec-h" style="margin:4px 0 8px">Browse locals <span class="sub-c" id="browse-c"></span></div>
+    <div class="sec-h" style="margin:4px 0 8px">Browse locals <span class="sub-c" id="browse-c"></span><a href="/locals" style="margin-left:auto;color:var(--orange);font-weight:600;font-size:13px;text-decoration:none">View all locals →</a></div>
     <div class="ctabs" id="ctabs"><button class="on" data-c="United States">USA</button><button data-c="Canada">Canada</button></div>
     <div class="states" id="states"></div>
   </div>
@@ -547,7 +547,7 @@ function detailHTML(lu){
     '<div class="vit"><div class="l">H&amp;W</div><div class="v">'+(L.hw==="\u2014"?"\u2014":"$"+L.hw)+'</div></div>'+
     '<div class="vit"><div class="l">Pension</div><div class="v small">'+L.pension+'</div></div></div>'+
     '<div class="contact"><span>'+L.phone+'</span><a href="mailto:'+L.email+'">'+L.email+'</a><a href="https://'+L.web+'" target="_blank" rel="noopener">'+L.web+'</a>'+
-    '<a class="dispatch-link" href="'+extUrl(L.dispatch)+'" target="_blank" rel="noopener">Open dispatch page<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></a></div>'+
+    '<a class="dispatch-link" href="'+extUrl(L.dispatch)+'" target="_blank" rel="noopener">Open dispatch page<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></a>'+((String(L.id||'').match(/(\d+)/))?'<a class="dispatch-link" style="background:var(--navy);margin-left:8px" href="/locals/ibew-local-'+String(L.id).match(/(\d+)/)[1]+'">Full page ↗</a>':'')+'</div>'+
     (L.outlook?'<div class="outlook"><span class="k">Outlook \u2014</span> '+L.outlook+'</div>':'')+
     '<div class="calls">'+calls+'</div></div>';
 }
