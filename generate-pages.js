@@ -812,7 +812,7 @@ function compute(){
   });
   var baseVal = null;
   if(base){ for(var i=0;i<list.length;i++){ if(list[i].p.n==base){ baseVal = list[i][key]; break; } } }
-  if(curTrade==='LINEMAN'){ list.sort(function(a,b){ return a.p.n - b.p.n; }); } else { list.sort(function(a,b){ return b[key] - a[key]; }); }
+  list.sort(function(a,b){ return a.p.n - b.p.n; });
   var q = ($('c-search').value || '').toLowerCase();
   var out = [];
   for(var j=0;j<list.length;j++){
