@@ -31,6 +31,8 @@ const CORE_PAGES = ['', 'jnctn', 'resources', 'contact']; // existing top-level 
 /* =========================================================================== */
 
 const LOCALS_DIR = path.join(SITE_DIR, 'locals');
+const COORDS_CACHE = path.join(SITE_DIR, 'coords-cache.json');
+const INDEX_HTML = path.join(SITE_DIR, 'index.html');
 const TODAY = new Date();
 const ISO_DATE = TODAY.toISOString().slice(0, 10);
 const VALID_THROUGH = new Date(TODAY.getTime() + 21 * 864e5).toISOString().slice(0, 10);
@@ -415,6 +417,77 @@ function sitemap(rows) {
 }
 
 /* -------------------------------- main ------------------------------------ */
+
+/* --------------------- homepage map/board sync ---------------------------- */
+// rough state/province centroids — fallback pin if geocoding a new local fails
+const STATE_CENTROIDS = {
+  AL:[32.8,-86.8],AK:[64.2,-149.5],AZ:[34.3,-111.7],AR:[34.8,-92.4],CA:[37.2,-119.3],
+  CO:[39.0,-105.5],CT:[41.6,-72.7],DE:[39.0,-75.5],FL:[28.6,-82.4],GA:[32.6,-83.4],
+  HI:[20.3,-156.4],ID:[44.4,-114.6],IL:[40.0,-89.2],IN:[39.9,-86.3],IA:[42.0,-93.5],
+  KS:[38.5,-98.4],KY:[37.5,-85.3],LA:[31.0,-92.0],ME:[45.4,-69.2],MD:[39.0,-76.8],
+  MA:[42.3,-71.8],MI:[44.3,-85.4],MN:[46.3,-94.3],MS:[32.7,-89.7],MO:[38.4,-92.5],
+  MT:[46.9,-110.0],NE:[41.5,-99.8],NV:[39.3,-116.6],NH:[43.7,-71.6],NJ:[40.1,-74.7],
+  NM:[34.4,-106.1],NY:[42.9,-75.6],NC:[35.6,-79.4],ND:[47.5,-100.5],OH:[40.3,-82.8],
+  OK:[35.6,-97.5],OR:[44.0,-120.5],PA:[40.9,-77.8],RI:[41.7,-71.5],SC:[33.9,-80.9],
+  SD:[44.4,-100.2],TN:[35.9,-86.4],TX:[31.5,-99.3],UT:[39.3,-111.7],VT:[44.1,-72.7],
+  VA:[37.5,-78.9],WA:[47.4,-120.5],WV:[38.6,-80.6],WI:[44.6,-89.9],WY:[43.0,-107.6],
+  DC:[38.9,-77.0],AB:[53.9,-116.6],BC:[53.7,-124.0],MB:[53.8,-98.8],NB:[46.5,-66.4],
+  NL:[53.1,-57.7],NS:[45.0,-63.0],ON:[50.0,-85.0],PE:[46.4,-63.2],QC:[52.0,-72.0],
+  SK:[54.0,-106.0],YT:[63.0,-135.0],NT:[64.8,-124.8],NU:[70.3,-83.1]
+};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function geocodeOne(city, state) {
+  if (!city && !state) return null;
+  const q = encodeURIComponent([city, state, countryOf(state) === 'CA' ? 'Canada' : 'USA'].filter(Boolean).join(', '));
+  try {
+    const r = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + q,
+      { headers: { 'User-Agent': 'TrampHereBro/1.0 (https://www.trampherebro.com)' } });
+    if (!r.ok) return null;
+    const j = await r.json();
+    if (Array.isArray(j) && j[0]) {
+      const la = Number(j[0].lat), lo = Number(j[0].lon);
+      if (Number.isFinite(la) && Number.isFinite(lo)) return { lat: +la.toFixed(4), lng: +lo.toFixed(4) };
+    }
+  } catch (e) { /* offline / rate-limited — fall back */ }
+  return null;
+}
+async function resolveCoords(rows) {
+  let cache = {};
+  try { cache = JSON.parse(fs.readFileSync(COORDS_CACHE, 'utf8')); } catch (e) { cache = {}; }
+  const coords = {}; let geocoded = 0, fell = 0;
+  for (const r of rows) {
+    const id = String(r.local.id);
+    const cached = cache[id];
+    if (cached && cached.lat != null && cached.lng != null) { coords[id] = { lat: cached.lat, lng: cached.lng }; continue; }
+    // new local — geocode it (throttled to respect Nominatim's 1 req/sec policy)
+    await sleep(1100);
+    let c = await geocodeOne(r.local.city, r.local.state);
+    if (c && Number.isFinite(c.lat) && Number.isFinite(c.lng)) { geocoded++; }
+    else { c = null; const ctr = STATE_CENTROIDS[r.local.state]; if (ctr) { c = { lat: ctr[0], lng: ctr[1] }; fell++; } }
+    if (c) { coords[id] = c; cache[id] = { lat: c.lat, lng: c.lng, city: r.local.city || '', state: r.local.state || '', name: r.local.name }; }
+  }
+  try { fs.writeFileSync(COORDS_CACHE, JSON.stringify(cache, null, 0)); } catch (e) {}
+  if (geocoded || fell) console.log(`  geocoded ${geocoded} new local(s), ${fell} via state fallback`);
+  return coords;
+}
+function syncHomepageMap(rows, coords) {
+  let html;
+  try { html = fs.readFileSync(INDEX_HTML, 'utf8'); } catch (e) { return false; }
+  if (!html.includes('/*MAPLOCALS_START*/') || !html.includes('/*MAPLOCALS_END*/')) return false;
+  const arr = rows
+    .filter(r => { const c = coords[String(r.local.id)]; return c && Number.isFinite(c.lat) && Number.isFinite(c.lng); })
+    .map(r => ({
+      id: r.local.id, name: r.local.name,
+      city: r.local.city || '', state: r.local.state || '',
+      lat: coords[String(r.local.id)].lat, lng: coords[String(r.local.id)].lng,
+      trade: 'IBEW', active: false
+    }));
+  const block = '/*MAPLOCALS_START*/\nconst MAPLOCALS = ' + JSON.stringify(arr) + ';\n/*MAPLOCALS_END*/';
+  const out = html.replace(/\/\*MAPLOCALS_START\*\/[\s\S]*?\/\*MAPLOCALS_END\*\//, block);
+  fs.writeFileSync(INDEX_HTML, out);
+  return arr.length;
+}
+
 (async function main() {
   console.log('→ Fetching live data from Supabase…');
   const [locs, calls] = await Promise.all([
@@ -449,8 +522,13 @@ function sitemap(rows) {
   fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows));
   fs.writeFileSync(path.join(SITE_DIR, 'sitemap.xml'), sitemap(rows));
 
+  // keep the homepage map + browse board in sync with Supabase
+  const coords = await resolveCoords(rows);
+  const mapCount = syncHomepageMap(rows, coords);
+
   console.log(`\n✓ Wrote ${written} local pages (${withCalls} with open calls, ${written - withCalls} evergreen)`);
   console.log(`✓ Wrote locals/index.html hub`);
   console.log(`✓ Rebuilt sitemap.xml (${written + CORE_PAGES.length + 1} URLs)`);
+  console.log(mapCount ? `✓ Synced homepage map + board (${mapCount} locals)` : '  (homepage map markers not found — skipped)');
   console.log(`\nNext:  git add . && git commit -m "Generate per-local pages" && git push`);
 })().catch(e => { console.error('\n✗ FAILED:', e.message); process.exit(1); });
