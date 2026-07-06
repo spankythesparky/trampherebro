@@ -812,7 +812,7 @@ function compute(){
   });
   var baseVal = null;
   if(base){ for(var i=0;i<list.length;i++){ if(list[i].p.n==base){ baseVal = list[i][key]; break; } } }
-  list.sort(function(a,b){ return b[key] - a[key]; });
+  if(curTrade==='LINEMAN'){ list.sort(function(a,b){ return a.p.n - b.p.n; }); } else { list.sort(function(a,b){ return b[key] - a[key]; }); }
   var q = ($('c-search').value || '').toLowerCase();
   var out = [];
   for(var j=0;j<list.length;j++){
@@ -826,7 +826,7 @@ function compute(){
   var _total = out.length, _N = 12, _showAll = q || expanded;
   $('c-board').innerHTML = (_showAll ? out : out.slice(0, _N)).join('') || '<div style="padding:30px;text-align:center;color:var(--slate)">No locals match that search.</div>';
   $('c-more').innerHTML = (!q && _total > _N) ? '<button type="button" class="calc-morebtn" onclick="toggleExpand()">' + (expanded ? 'Show less \u25b2' : 'Show all ' + _total + ' locals \u25bc') + '</button>' : '';
-  var top = list[0], bot = list[list.length-1];
+  var _byPay = list.slice().sort(function(a,b){ return b[key] - a[key]; }); var top = _byPay[0], bot = _byPay[_byPay.length-1];
   if(top){
     var mn = key==='total' ? 'total package (wages + benefits)' : 'take-home wages';
     var hl = 'At <b>' + hrs + ' hrs/week</b> over <b>' + wks + ' weeks</b>, by <b>' + mn + '</b>: top local <b>IBEW ' + top.p.n + (top.p.c? ' (' + top.p.c + ', ' + top.p.s + ')':'') + '</b> at <b>' + fmt(top[key]) + '/yr</b> — <b>' + fmt(top[key] - bot[key]) + '</b> more than the lowest.';
