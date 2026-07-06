@@ -155,8 +155,13 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 .hub-search{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font:400 15px Inter,sans-serif;color:var(--charcoal);box-shadow:var(--shadow);margin-bottom:22px}
 .hub-search::placeholder{color:var(--slate)}
 .hub-search:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
-.hub-region{margin-bottom:22px}
-.hub-region-h{font:700 12px/1 'Space Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--orange);border-radius:8px;padding:9px 14px;margin-bottom:10px;display:inline-block}
+.hub-country{margin-bottom:30px}
+.hub-country-h{display:flex;align-items:center;gap:13px;background:linear-gradient(135deg,#0a2350 0%,#061b40 100%);border-left:4px solid var(--orange);border-radius:12px;padding:16px 20px;margin-bottom:14px;box-shadow:0 6px 20px rgba(7,37,84,.14)}
+.hc-flag{font-size:22px;line-height:1}
+.hc-name{font:700 20px 'Space Grotesk',sans-serif;color:#fff;letter-spacing:-.02em}
+.hc-meta{margin-left:auto;display:flex;gap:8px;font-size:12px;font-weight:600}
+.hc-chip{background:rgba(255,255,255,.12);color:#cdd8ea;padding:5px 12px;border-radius:999px;font-family:'Space Grotesk',sans-serif}
+.hc-chip.hot{background:var(--orange);color:#fff}
 .hub-state{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden}
 .hub-state-h{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:15px 16px;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:background .12s}
 .hub-state-h:hover{background:#fbfcfe}
@@ -407,15 +412,6 @@ ${footer()}
 
 /* ----------------------------- directory hub ------------------------------ */
 function hubPage(rows) {
-  const REGIONS = {
-    'West Coast':['AK','AZ','CA','CO','HI','ID','MT','NM','NV','OR','UT','WA','WY'],
-    'Midwest':['IA','IL','IN','KS','MI','MN','MO','ND','NE','OH','SD','WI'],
-    'South':['AL','AR','DE','FL','GA','KY','LA','MD','MS','NC','OK','SC','TN','TX','VA','WV'],
-    'East Coast':['CT','MA','ME','NH','NJ','NY','PA','RI','VT']
-  };
-  const REGION_ORDER = ['West Coast','Midwest','South','East Coast'];
-  const regionOf = st => { for (const r in REGIONS) if (REGIONS[r].includes(st)) return r; return CA_PROVINCES.has(st) ? 'Canada' : 'Other'; };
-
   const byState = {};
   rows.forEach(r => { (byState[r.local.state] = byState[r.local.state] || []).push(r); });
   const totalCalls = rows.reduce((s, r) => s + r.calls.length, 0);
@@ -432,12 +428,14 @@ function hubPage(rows) {
     return `<div class="hub-state" data-state="${st}"><button class="hub-state-h" onclick="toggleState(this)" aria-expanded="false"><span class="hs-name">${esc(stateName(st))}</span><span class="hs-meta">${oc > 0 ? `<span class="hs-oc">${oc} open</span>` : ''}<span>${list.length} local${list.length > 1 ? 's' : ''}</span></span><svg class="hs-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button><div class="hub-state-body"><div class="hub-state-in">${links}</div></div></div>`;
   }
 
-  const statesByRegion = {};
-  Object.keys(byState).forEach(st => { const r = regionOf(st); (statesByRegion[r] = statesByRegion[r] || []).push(st); });
-  const order = [...REGION_ORDER, 'Canada', 'Other'].filter(r => statesByRegion[r]);
-  const body = order.map(r => {
-    const sts = statesByRegion[r].sort((a, b) => stateName(a).localeCompare(stateName(b)));
-    return `<div class="hub-region"><div class="hub-region-h">${esc(r)}</div>${sts.map(stateBlock).join('')}</div>`;
+  const byCountry = { 'United States': [], 'Canada': [] };
+  Object.keys(byState).forEach(st => { byCountry[CA_PROVINCES.has(st) ? 'Canada' : 'United States'].push(st); });
+  const FLAG = { 'United States': '\uD83C\uDDFA\uD83C\uDDF8', 'Canada': '\uD83C\uDDE8\uD83C\uDDE6' };
+  const body = ['United States', 'Canada'].filter(c => byCountry[c].length).map(c => {
+    const sts = byCountry[c].sort((a, b) => stateName(a).localeCompare(stateName(b)));
+    const locN = sts.reduce((s, st) => s + byState[st].length, 0);
+    const ocN = sts.reduce((s, st) => s + byState[st].reduce((x, r) => x + r.calls.length, 0), 0);
+    return `<div class="hub-country"><div class="hub-country-h"><span class="hc-flag">${FLAG[c]}</span><span class="hc-name">${esc(c)}</span><span class="hc-meta">${ocN > 0 ? `<span class="hc-chip hot">${ocN} open</span>` : ''}<span class="hc-chip">${locN} locals</span></span></div>${sts.map(stateBlock).join('')}</div>`;
   }).join('');
 
   const title = 'All IBEW Locals — Job Calls, Wage Scale & Dispatch Directory | TrampHereBro';
@@ -476,7 +474,7 @@ ${topbar('')}
 <script>
 function toggleState(btn){var s=btn.parentElement;var open=s.classList.toggle('open');btn.setAttribute('aria-expanded',open);}
 function filterHub(q){q=(q||'').trim().toLowerCase();var any=false;
-  document.querySelectorAll('#hubwrap .hub-region').forEach(function(rg){var rv=false;
+  document.querySelectorAll('#hubwrap .hub-country').forEach(function(rg){var rv=false;
     rg.querySelectorAll('.hub-state').forEach(function(st){var m=0;
       st.querySelectorAll('.hub-local').forEach(function(a){var hit=!q||a.getAttribute('data-s').indexOf(q)>-1;a.style.display=hit?'':'none';if(hit)m++;});
       st.style.display=m?'':'none';if(m){rv=true;any=true;if(q){st.classList.add('open');}else{st.classList.remove('open');}}
