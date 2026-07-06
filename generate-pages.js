@@ -151,17 +151,32 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 .foot-legal p{margin:0 0 8px}
 .foot-legal .credit{color:#cdd8ea}.foot-legal .credit b{color:var(--orange);font-weight:700}
 .foot-legal .copyright{color:#63799a;margin-top:2px}
-/* directory hub */
-.hubgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:6px}
-.hubstate{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
-.hubstate h2{font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--navy);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.hubstate h2 .oc{font-size:12px;color:#fff;background:var(--orange);border-radius:999px;padding:2px 9px}
-.hublink{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;border-top:1px solid var(--line2)}
-.hublink:first-of-type{border-top:none}
-.hublink .nm{color:var(--charcoal);font-weight:500}
-.hubstate a:hover .nm{color:var(--orange)}
-.hublink .cc{font-size:12px;color:var(--slate)}
-.hublink .cc.hot{color:var(--orange);font-weight:700}
+/* directory hub — collapsible + searchable */
+.hub-search{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font:400 15px Inter,sans-serif;color:var(--charcoal);box-shadow:var(--shadow);margin-bottom:22px}
+.hub-search::placeholder{color:var(--slate)}
+.hub-search:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
+.hub-region{margin-bottom:22px}
+.hub-region-h{font:700 12px/1 'Space Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--orange);border-radius:8px;padding:9px 14px;margin-bottom:10px;display:inline-block}
+.hub-state{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden}
+.hub-state-h{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:15px 16px;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:background .12s}
+.hub-state-h:hover{background:#fbfcfe}
+.hs-name{font:700 16px 'Space Grotesk',sans-serif;color:var(--navy);letter-spacing:-.01em}
+.hs-meta{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--slate)}
+.hs-oc{background:var(--orange);color:#fff;font-weight:700;padding:2px 9px;border-radius:999px;font-family:'Space Grotesk',sans-serif}
+.hs-chev{color:var(--slate);flex:0 0 auto;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.hub-state.open .hs-chev{transform:rotate(180deg);color:var(--orange)}
+.hub-state.open .hub-state-h{border-bottom:1px solid var(--line2)}
+.hub-state-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1)}
+.hub-state.open .hub-state-body{grid-template-rows:1fr}
+.hub-state-in{overflow:hidden;min-height:0}
+.hub-local{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line2);text-decoration:none;transition:background .1s}
+.hub-local:first-child{border-top:none}
+.hub-local:hover{background:#fffdfb}
+.hl-name{font-size:14.5px;color:var(--charcoal);font-weight:500}
+.hub-local:hover .hl-name{color:var(--orange)}
+.hl-cc{font-size:12.5px;color:var(--slate);flex:0 0 auto}
+.hl-cc.hot{color:#fff;background:var(--orange);font-weight:700;padding:2px 9px;border-radius:999px;font-family:'Space Grotesk',sans-serif}
+.hub-empty{text-align:center;color:var(--slate);padding:40px;font-size:15px}
 @media(max-width:600px){h1.lede{font-size:32px}.cpay{margin-left:0;flex-basis:100%;margin-top:2px}.cdetail{padding-left:0}header{padding-top:40px;padding-bottom:38px}footer .inner{flex-direction:column;align-items:flex-start}}
 `;
 
@@ -282,23 +297,24 @@ function localPage(local, calls) {
   const vit = (l, v, small) => `<div class="vit"><div class="l">${l}</div><div class="v${small ? ' small' : ''}">${v}</div></div>`;
   const _m = v => (v != null && v !== '' && !isNaN(Number(v))) ? '$' + Number(v).toFixed(2) : null;
   const _hr = '<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span>';
-  const _pen = [];
-  if (_sc.pension_def) _pen.push('Def ' + _m(_sc.pension_def));
-  if (_sc.pension_dc) _pen.push('DC ' + _m(_sc.pension_dc));
-  const _penDisplay = _pen.length ? _pen.join(' · ') : (local.pension != null ? money(local.pension) : null);
   const _scaleStr = _m(local.jw_scale);
+  const _noPen = !_m(_sc.pension_def) && !_m(_sc.pension_dc) && !_m(_sc.nebf) && !_m(_sc.k401);
   const vitals = [
     vit('Journeyman Scale', _scaleStr ? _scaleStr + _hr : '—'),
     _m(_sc.total) ? vit('Total Package', _m(_sc.total) + _hr) : '',
     _m(local.hw) ? vit('Health &amp; Welfare', _m(local.hw)) : '',
-    _penDisplay ? vit('Pension', _penDisplay, _pen.length > 0) : '',
+    _m(_sc.pension_def) ? vit('Defined Pension', _m(_sc.pension_def)) : '',
+    _m(_sc.pension_dc) ? vit('Contribution Pension', _m(_sc.pension_dc)) : '',
+    _m(_sc.nebf) ? vit('NEBF Pension', _m(_sc.nebf)) : '',
+    _m(_sc.k401) ? vit('401(k)', _m(_sc.k401)) : '',
+    (_noPen && local.pension != null) ? vit('Pension', money(local.pension), true) : '',
     _sc.vacation ? vit('Vacation', esc(_sc.vacation), true) : '',
     _sc.dues ? vit('Working Dues', esc(_sc.dues), true) : '',
     (local.book1 != null || local.book2 != null)
       ? vit('Books', `${local.book1 != null ? 'Bk1 ' + esc(local.book1) : ''}${(local.book1 != null && local.book2 != null) ? ' · ' : ''}${local.book2 != null ? 'Bk2 ' + esc(local.book2) : ''}` || '—', true)
       : ''
   ].filter(Boolean).join('');
-  const wageUpdated = _sc.updated ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated ${esc(_sc.updated)} · from published union wage sheets</div>` : '';
+  const wageUpdated = _sc.updated ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated ${esc(_sc.updated)} · Wage data via <a href="https://www.unionpayscales.com" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline">unionpayscales.com</a></div>` : '';
 
   const dispatchBtn = ''; // dispatch link removed per request
   const _telHref = cPhone.replace(/[^\d+]/g, '');
@@ -391,26 +407,41 @@ ${footer()}
 
 /* ----------------------------- directory hub ------------------------------ */
 function hubPage(rows) {
+  const REGIONS = {
+    'West Coast':['AK','AZ','CA','CO','HI','ID','MT','NM','NV','OR','UT','WA','WY'],
+    'Midwest':['IA','IL','IN','KS','MI','MN','MO','ND','NE','OH','SD','WI'],
+    'South':['AL','AR','DE','FL','GA','KY','LA','MD','MS','NC','OK','SC','TN','TX','VA','WV'],
+    'East Coast':['CT','MA','ME','NH','NJ','NY','PA','RI','VT']
+  };
+  const REGION_ORDER = ['West Coast','Midwest','South','East Coast'];
+  const regionOf = st => { for (const r in REGIONS) if (REGIONS[r].includes(st)) return r; return CA_PROVINCES.has(st) ? 'Canada' : 'Other'; };
+
   const byState = {};
   rows.forEach(r => { (byState[r.local.state] = byState[r.local.state] || []).push(r); });
-  const states = Object.keys(byState).sort((a, b) => stateName(a).localeCompare(stateName(b)));
   const totalCalls = rows.reduce((s, r) => s + r.calls.length, 0);
   const activeLocals = rows.filter(r => r.calls.length > 0).length;
 
-  const grid = states.map(st => {
+  function stateBlock(st) {
     const list = byState[st].slice().sort((a, b) => (Number(localNumber(a.local.name)) || 1e9) - (Number(localNumber(b.local.name)) || 1e9));
     const oc = list.reduce((s, r) => s + r.calls.length, 0);
     const links = list.map(r => {
-      const n = localNumber(r.local.name);
-      const slug = slugFor(r.local.name, r.local.id);
-      const cc = r.calls.length;
-      return `<a href="/locals/${slug}"><div class="hublink"><span class="nm">IBEW Local ${n || r.local.id}${r.local.city ? ' · ' + esc(r.local.city) : ''}</span><span class="cc${cc > 0 ? ' hot' : ''}">${cc > 0 ? cc + ' open' : '—'}</span></div></a>`;
+      const num = localNumber(r.local.name), slug = slugFor(r.local.name, r.local.id), cc = r.calls.length;
+      const s = `${num || ''} ${(r.local.city || '').toLowerCase()} ${stateName(st).toLowerCase()} ${st.toLowerCase()}`;
+      return `<a class="hub-local" href="/locals/${slug}" data-s="${esc(s)}"><span class="hl-name">IBEW ${num || r.local.id}${r.local.city ? ' · ' + esc(r.local.city) : ''}</span><span class="hl-cc${cc > 0 ? ' hot' : ''}">${cc > 0 ? cc + ' open' : '—'}</span></a>`;
     }).join('');
-    return `<div class="hubstate"><h2>${esc(stateName(st))}${oc > 0 ? `<span class="oc">${oc}</span>` : ''}</h2>${links}</div>`;
+    return `<div class="hub-state" data-state="${st}"><button class="hub-state-h" onclick="toggleState(this)" aria-expanded="false"><span class="hs-name">${esc(stateName(st))}</span><span class="hs-meta">${oc > 0 ? `<span class="hs-oc">${oc} open</span>` : ''}<span>${list.length} local${list.length > 1 ? 's' : ''}</span></span><svg class="hs-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button><div class="hub-state-body"><div class="hub-state-in">${links}</div></div></div>`;
+  }
+
+  const statesByRegion = {};
+  Object.keys(byState).forEach(st => { const r = regionOf(st); (statesByRegion[r] = statesByRegion[r] || []).push(st); });
+  const order = [...REGION_ORDER, 'Canada', 'Other'].filter(r => statesByRegion[r]);
+  const body = order.map(r => {
+    const sts = statesByRegion[r].sort((a, b) => stateName(a).localeCompare(stateName(b)));
+    return `<div class="hub-region"><div class="hub-region-h">${esc(r)}</div>${sts.map(stateBlock).join('')}</div>`;
   }).join('');
 
-  const title = 'All IBEW Locals — Job Calls, Scale & Dispatch Directory | TrampHereBro';
-  const desc = `Directory of ${rows.length} IBEW locals with live job-call counts, journeyman scale and dispatch info for traveling electricians. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
+  const title = 'All IBEW Locals — Job Calls, Wage Scale & Dispatch Directory | TrampHereBro';
+  const desc = `Directory of ${rows.length} IBEW locals with live job-call counts, journeyman scale and contact info for traveling electricians. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
   return `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
@@ -429,7 +460,7 @@ ${topbar('')}
 <div class="crumbs"><a href="/">Board</a> › Locals</div>
 <div class="kick"><span class="dot"></span>Local Directory</div>
 <h1 class="lede">All IBEW <b>Locals</b></h1>
-<div class="hsub">Every local we track, with live open-call counts. Tap any local for calls, scale, and dispatch info.</div>
+<div class="hsub">Every local we track. Search or tap a state to see its locals, live call counts, and wage info.</div>
 <div class="hstats">
 <div class="hstat"><div class="n accent">${totalCalls}</div><div class="l">OPEN CALLS</div></div>
 <div class="hstat"><div class="n">${activeLocals}</div><div class="l">ACTIVE LOCALS</div></div>
@@ -437,14 +468,28 @@ ${topbar('')}
 </div>
 </div></header>
 <main class="wrap">
-<div class="hubgrid">${grid}</div>
-<div class="backbar" style="margin-top:34px"><a class="backbtn" href="/">← Back to the live board</a></div>
+<input class="hub-search" type="search" placeholder="Search by local number, city, or state…" oninput="filterHub(this.value)" aria-label="Search locals">
+<div id="hubwrap">${body}</div>
+<div class="hub-empty" id="hubEmpty" hidden>No locals match that search.</div>
+<div class="backbar" style="margin-top:30px"><a class="backbtn" href="/">← Back to the live board</a></div>
 </main>
+<script>
+function toggleState(btn){var s=btn.parentElement;var open=s.classList.toggle('open');btn.setAttribute('aria-expanded',open);}
+function filterHub(q){q=(q||'').trim().toLowerCase();var any=false;
+  document.querySelectorAll('#hubwrap .hub-region').forEach(function(rg){var rv=false;
+    rg.querySelectorAll('.hub-state').forEach(function(st){var m=0;
+      st.querySelectorAll('.hub-local').forEach(function(a){var hit=!q||a.getAttribute('data-s').indexOf(q)>-1;a.style.display=hit?'':'none';if(hit)m++;});
+      st.style.display=m?'':'none';if(m){rv=true;any=true;if(q){st.classList.add('open');}else{st.classList.remove('open');}}
+    });
+    rg.style.display=rv?'':'none';
+  });
+  document.getElementById('hubEmpty').hidden=any;
+}
+</script>
 ${footer()}
 </body></html>`;
 }
 
-/* ------------------------------- sitemap ---------------------------------- */
 function sitemap(rows) {
   const urls = [];
   CORE_PAGES.forEach(p => urls.push(CANON + '/' + p));

@@ -74,17 +74,32 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 .foot-legal p{margin:0 0 8px}
 .foot-legal .credit{color:#cdd8ea}.foot-legal .credit b{color:var(--orange);font-weight:700}
 .foot-legal .copyright{color:#63799a;margin-top:2px}
-/* directory hub */
-.hubgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:6px}
-.hubstate{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
-.hubstate h2{font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--navy);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.hubstate h2 .oc{font-size:12px;color:#fff;background:var(--orange);border-radius:999px;padding:2px 9px}
-.hublink{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;border-top:1px solid var(--line2)}
-.hublink:first-of-type{border-top:none}
-.hublink .nm{color:var(--charcoal);font-weight:500}
-.hubstate a:hover .nm{color:var(--orange)}
-.hublink .cc{font-size:12px;color:var(--slate)}
-.hublink .cc.hot{color:var(--orange);font-weight:700}
+/* directory hub — collapsible + searchable */
+.hub-search{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font:400 15px Inter,sans-serif;color:var(--charcoal);box-shadow:var(--shadow);margin-bottom:22px}
+.hub-search::placeholder{color:var(--slate)}
+.hub-search:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
+.hub-region{margin-bottom:22px}
+.hub-region-h{font:700 12px/1 'Space Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--orange);border-radius:8px;padding:9px 14px;margin-bottom:10px;display:inline-block}
+.hub-state{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden}
+.hub-state-h{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:15px 16px;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:background .12s}
+.hub-state-h:hover{background:#fbfcfe}
+.hs-name{font:700 16px 'Space Grotesk',sans-serif;color:var(--navy);letter-spacing:-.01em}
+.hs-meta{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--slate)}
+.hs-oc{background:var(--orange);color:#fff;font-weight:700;padding:2px 9px;border-radius:999px;font-family:'Space Grotesk',sans-serif}
+.hs-chev{color:var(--slate);flex:0 0 auto;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.hub-state.open .hs-chev{transform:rotate(180deg);color:var(--orange)}
+.hub-state.open .hub-state-h{border-bottom:1px solid var(--line2)}
+.hub-state-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1)}
+.hub-state.open .hub-state-body{grid-template-rows:1fr}
+.hub-state-in{overflow:hidden;min-height:0}
+.hub-local{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line2);text-decoration:none;transition:background .1s}
+.hub-local:first-child{border-top:none}
+.hub-local:hover{background:#fffdfb}
+.hl-name{font-size:14.5px;color:var(--charcoal);font-weight:500}
+.hub-local:hover .hl-name{color:var(--orange)}
+.hl-cc{font-size:12.5px;color:var(--slate);flex:0 0 auto}
+.hl-cc.hot{color:#fff;background:var(--orange);font-weight:700;padding:2px 9px;border-radius:999px;font-family:'Space Grotesk',sans-serif}
+.hub-empty{text-align:center;color:var(--slate);padding:40px;font-size:15px}
 @media(max-width:600px){h1.lede{font-size:32px}.cpay{margin-left:0;flex-basis:100%;margin-top:2px}.cdetail{padding-left:0}header{padding-top:40px;padding-bottom:38px}footer .inner{flex-direction:column;align-items:flex-start}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.trampherebro.com/"},{"@type":"ListItem","position":2,"name":"Locals","item":"https://www.trampherebro.com/locals"},{"@type":"ListItem","position":3,"name":"IBEW Local 915","item":"https://www.trampherebro.com/locals/ibew-local-915"}]}</script>
@@ -107,7 +122,7 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 </div></header>
 <main class="wrap">
 <div class="sec-h">Local vitals</div>
-<div class="vitcard"><div class="vitals"><div class="vit"><div class="l">Journeyman Scale</div><div class="v">$33.11<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Total Package</div><div class="v">$51.05<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Health &amp; Welfare</div><div class="v">$8.11</div></div><div class="vit"><div class="l">Pension</div><div class="v small">Def $3.81 · DC $3.70</div></div><div class="vit"><div class="l">Vacation</div><div class="v small">$1.32</div></div><div class="vit"><div class="l">Working Dues</div><div class="v small">3.50%</div></div></div><div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated 12/15/25 · from published union wage sheets</div></div>
+<div class="vitcard"><div class="vitals"><div class="vit"><div class="l">Journeyman Scale</div><div class="v">$33.11<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Total Package</div><div class="v">$51.05<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Health &amp; Welfare</div><div class="v">$8.11</div></div><div class="vit"><div class="l">Defined Pension</div><div class="v">$3.81</div></div><div class="vit"><div class="l">Contribution Pension</div><div class="v">$3.70</div></div><div class="vit"><div class="l">NEBF Pension</div><div class="v">$0.99</div></div><div class="vit"><div class="l">Vacation</div><div class="v small">$1.32</div></div><div class="vit"><div class="l">Working Dues</div><div class="v small">3.50%</div></div></div><div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated 12/15/25 · Wage data via <a href="https://www.unionpayscales.com" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline">unionpayscales.com</a></div></div>
 <div class="sec-h">Contact</div><div class="vitcard"><div class="vitals"><div class="vit"><div class="l">Address</div><div class="v small">5621 Harney Road Tampa, FL 33610</div></div><div class="vit"><div class="l">Phone</div><div class="v small"><a href="tel:8136216451" style="color:inherit">(813) 621-6451</a></div></div><div class="vit"><div class="l">Email</div><div class="v small"><a href="mailto:info@ibew915.org" style="color:var(--orange);font-weight:600">info@ibew915.org</a></div></div><div class="vit"><div class="l">Website</div><div class="v small"><a href="https://www.ibew915.org" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600">www.ibew915.org</a></div></div></div></div>
 <div class="sec-h">Open calls</div><div class="nocalls"><b>No open calls posted right now.</b><br>This local isn't showing open calls at the moment. Scale and dispatch info below stays current — check back, the board is swept daily.</div>
 <p class="outlook">IBEW Local 915 covers Tampa, FL and is tracked here for traveling inside wiremen. Journeyman scale runs <span class="k">$33.11/hr</span>. No calls are open right now, but this page updates daily — bookmark it and check back, or watch the full <a href="/" style="color:var(--orange);font-weight:600">live board</a> for the whole country.</p>

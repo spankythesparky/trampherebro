@@ -74,17 +74,32 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 .foot-legal p{margin:0 0 8px}
 .foot-legal .credit{color:#cdd8ea}.foot-legal .credit b{color:var(--orange);font-weight:700}
 .foot-legal .copyright{color:#63799a;margin-top:2px}
-/* directory hub */
-.hubgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin-top:6px}
-.hubstate{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
-.hubstate h2{font-family:'Space Grotesk',sans-serif;font-size:15px;color:var(--navy);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
-.hubstate h2 .oc{font-size:12px;color:#fff;background:var(--orange);border-radius:999px;padding:2px 9px}
-.hublink{display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:14px;border-top:1px solid var(--line2)}
-.hublink:first-of-type{border-top:none}
-.hublink .nm{color:var(--charcoal);font-weight:500}
-.hubstate a:hover .nm{color:var(--orange)}
-.hublink .cc{font-size:12px;color:var(--slate)}
-.hublink .cc.hot{color:var(--orange);font-weight:700}
+/* directory hub — collapsible + searchable */
+.hub-search{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font:400 15px Inter,sans-serif;color:var(--charcoal);box-shadow:var(--shadow);margin-bottom:22px}
+.hub-search::placeholder{color:var(--slate)}
+.hub-search:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-soft)}
+.hub-region{margin-bottom:22px}
+.hub-region-h{font:700 12px/1 'Space Grotesk',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:var(--orange);border-radius:8px;padding:9px 14px;margin-bottom:10px;display:inline-block}
+.hub-state{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:8px;overflow:hidden}
+.hub-state-h{width:100%;box-sizing:border-box;display:flex;align-items:center;gap:14px;padding:15px 16px;background:none;border:none;cursor:pointer;font-family:inherit;text-align:left;transition:background .12s}
+.hub-state-h:hover{background:#fbfcfe}
+.hs-name{font:700 16px 'Space Grotesk',sans-serif;color:var(--navy);letter-spacing:-.01em}
+.hs-meta{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--slate)}
+.hs-oc{background:var(--orange);color:#fff;font-weight:700;padding:2px 9px;border-radius:999px;font-family:'Space Grotesk',sans-serif}
+.hs-chev{color:var(--slate);flex:0 0 auto;transition:transform .28s cubic-bezier(.4,0,.2,1)}
+.hub-state.open .hs-chev{transform:rotate(180deg);color:var(--orange)}
+.hub-state.open .hub-state-h{border-bottom:1px solid var(--line2)}
+.hub-state-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .3s cubic-bezier(.4,0,.2,1)}
+.hub-state.open .hub-state-body{grid-template-rows:1fr}
+.hub-state-in{overflow:hidden;min-height:0}
+.hub-local{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-top:1px solid var(--line2);text-decoration:none;transition:background .1s}
+.hub-local:first-child{border-top:none}
+.hub-local:hover{background:#fffdfb}
+.hl-name{font-size:14.5px;color:var(--charcoal);font-weight:500}
+.hub-local:hover .hl-name{color:var(--orange)}
+.hl-cc{font-size:12.5px;color:var(--slate);flex:0 0 auto}
+.hl-cc.hot{color:#fff;background:var(--orange);font-weight:700;padding:2px 9px;border-radius:999px;font-family:'Space Grotesk',sans-serif}
+.hub-empty{text-align:center;color:var(--slate);padding:40px;font-size:15px}
 @media(max-width:600px){h1.lede{font-size:32px}.cpay{margin-left:0;flex-basis:100%;margin-top:2px}.cdetail{padding-left:0}header{padding-top:40px;padding-bottom:38px}footer .inner{flex-direction:column;align-items:flex-start}}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://www.trampherebro.com/"},{"@type":"ListItem","position":2,"name":"Locals","item":"https://www.trampherebro.com/locals"},{"@type":"ListItem","position":3,"name":"IBEW Local 586","item":"https://www.trampherebro.com/locals/ibew-local-586"}]}</script>
@@ -115,7 +130,7 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 </div></header>
 <main class="wrap">
 <div class="sec-h">Local vitals</div>
-<div class="vitcard"><div class="vitals"><div class="vit"><div class="l">Journeyman Scale</div><div class="v">$49.16<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Total Package</div><div class="v">$71.01<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Health &amp; Welfare</div><div class="v">$3.70</div></div><div class="vit"><div class="l">Pension</div><div class="v small">Def $10.78</div></div><div class="vit"><div class="l">Vacation</div><div class="v small">$5.90</div></div></div><div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated 9/2/23 · from published union wage sheets</div></div>
+<div class="vitcard"><div class="vitals"><div class="vit"><div class="l">Journeyman Scale</div><div class="v">$49.16<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Total Package</div><div class="v">$71.01<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span></div></div><div class="vit"><div class="l">Health &amp; Welfare</div><div class="v">$3.70</div></div><div class="vit"><div class="l">Defined Pension</div><div class="v">$10.78</div></div><div class="vit"><div class="l">NEBF Pension</div><div class="v">$1.47</div></div><div class="vit"><div class="l">Vacation</div><div class="v small">$5.90</div></div></div><div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated 9/2/23 · Wage data via <a href="https://www.unionpayscales.com" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline">unionpayscales.com</a></div></div>
 <div class="sec-h">Contact</div><div class="vitcard"><div class="vitals"><div class="vit"><div class="l">Address</div><div class="v small">2460 Lancaster Road Suite 103 Ottawa, ON K1B 4S5</div></div><div class="vit"><div class="l">Phone</div><div class="v small"><a href="tel:6137415664" style="color:inherit">(613) 741-5664</a></div></div><div class="vit"><div class="l">Website</div><div class="v small"><a href="https://www.ibew586.org" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600">www.ibew586.org</a></div></div></div></div>
 <div class="sec-h">Open calls — 8 posted · 26 hands</div><div class="callcard"><div class="crow"><div class="r1"><span class="cneed">+1</span><span class="cont">IBEW 586</span><span class="cloc">Working at Heights · Various site</span><span class="cpay">—</span></div><div class="cdetail">Other · Working at Heights course must be up to date</div></div><div class="crow"><div class="r1"><span class="cneed">+1</span><span class="cont">Drycore</span><span class="cloc">Rideau Center</span><span class="cpay">—</span></div><div class="cdetail">Apprentice · 2 weeks · 4-9&#39;s possible OT, fit up work</div></div><div class="crow"><div class="r1"><span class="cneed">+10</span><span class="cont">OPG</span><span class="cloc">OPG Pickering &amp; Darlington Projects · Pickering &amp; Darlington, ON</span><span class="cpay">—</span></div><div class="cdetail">Other · Requires OPG Nuclear security clearance; possible future work</div></div><div class="crow"><div class="r1"><span class="cneed">+1</span><span class="cont">Drycore</span><span class="cloc">Rideau Center</span><span class="cpay">—</span></div><div class="cdetail">Other · 2 weeks · 4-9&#39;s possible OT, fit up work</div></div><div class="crow"><div class="r1"><span class="cneed">+1</span><span class="cont">Drycore</span><span class="cloc">Embrun, ON</span><span class="cpay">—</span></div><div class="cdetail">Apprentice · 8 weeks · 4-9&#39;s</div></div><div class="crow"><div class="r1"><span class="cneed">+1</span><span class="cont">Drycore</span><span class="cloc">New TD Bank · Richmond Road</span><span class="cpay">—</span></div><div class="cdetail">Other · 8 weeks · 4-8&#39;s - 4 slab work</div></div><div class="crow"><div class="r1"><span class="cneed">+10</span><span class="cont">OPG</span><span class="cloc">OPG Pickering &amp; Darlington Projects · Pickering &amp; Darlington, ON</span><span class="cpay">—</span></div><div class="cdetail">Apprentice · Requires OPG Nuclear security clearance; possible future work</div></div><div class="crow"><div class="r1"><span class="cneed">+1</span><span class="cont">IBEW 586</span><span class="cloc">Working at Heights · Various site</span><span class="cpay">—</span></div><div class="cdetail">Apprentice · Working at Heights course must be up to date</div></div></div>
 <p class="outlook">IBEW Local 586 out of Ottawa, ON currently has <span class="k">8 open job calls</span> on the books, needing about <span class="k">26 hands</span>. Journeyman scale runs <span class="k">$49.16/hr</span>. Calls below are pulled live from the local's dispatch — sign the appropriate book and call the hall to confirm before you roll.</p>
