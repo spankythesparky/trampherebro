@@ -219,6 +219,7 @@ footer b{color:#fff;font-family:'Space Grotesk',sans-serif;font-weight:700}
 const FAVICON_B64 = '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';
 const FAVICON_LINK = `<link rel="icon" type="image/png" href="/favicon.png"><link rel="apple-touch-icon" href="/favicon.png">`;
 const FONTS = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet">`;
+const GA_TAG = `<script async src="https://www.googletagmanager.com/gtag/js?id=G-9FS52YDCPK"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-9FS52YDCPK');</script>`;
 
 function topbar(active) {
   const on = p => active === p ? ' class="on"' : '';
@@ -414,7 +415,7 @@ function localPage(local, calls) {
 <meta property="og:url" content="${url}"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${CANON}/share-banner.png">
 ${FAVICON_LINK}
-${FONTS}
+${FONTS}${GA_TAG}
 <style>${CSS}</style>
 ${ldBlocks}
 </head><body>
@@ -487,7 +488,7 @@ function hubPage(rows) {
 <meta property="og:url" content="${CANON}/locals"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
-${FONTS}
+${FONTS}${GA_TAG}
 <style>${CSS}</style>
 </head><body>
 ${topbar('')}
@@ -738,7 +739,7 @@ function calculatorPage(rows) {
 <meta property="og:url" content="${CANON}/calculator"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
-${FONTS}
+${FONTS}${GA_TAG}
 <style>${CSS}${CALC_CSS}</style>
 </head><body>
 ${topbar('calculator')}
@@ -899,7 +900,7 @@ function snapshotPage(text) {
 <meta property="og:url" content="${CANON}/snapshot"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
-${FONTS}
+${FONTS}${GA_TAG}
 <style>${CSS}</style>
 </head><body>
 ${topbar('snapshot')}
