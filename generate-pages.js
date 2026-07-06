@@ -658,9 +658,12 @@ function calculatorPage(rows) {
     const scale = sc.scale ? Number(sc.scale) : (r.local.jw_scale != null ? Number(r.local.jw_scale) : null);
     if (!scale || !n) return null;
     const total = sc.total ? Number(sc.total) : null;
-    let ben = (total && total > scale) ? (total - scale) : 0;
-    if (!ben) { ['hw', 'pension_def', 'pension_dc', 'nebf'].forEach(k => { if (sc[k]) ben += Number(sc[k]) || 0; }); }
-    return { n: Number(n), c: r.local.city || '', s: r.local.state || '', scale: scale, ben: Math.round(ben * 100) / 100 };
+    const numf = v => { const x = parseFloat(String(v == null ? '' : v).replace(/[^0-9.]/g, '')); return isFinite(x) ? x : 0; };
+    const hw = numf(sc.hw), pd = numf(sc.pension_def), pdc = numf(sc.pension_dc), nebf = numf(sc.nebf), k401 = numf(sc.k401), vac = numf(sc.vacation);
+    const itemsSum = hw + pd + pdc + nebf + k401 + vac;
+    let ben = Math.max(itemsSum, (total && total > scale) ? (total - scale) : 0);
+    ben = Math.round(ben * 100) / 100;
+    return { n: Number(n), c: r.local.city || '', s: r.local.state || '', scale: scale, ben: ben, hw: hw, pd: pd, pdc: pdc, nebf: nebf, k401: k401, vac: vac };
   }).filter(Boolean).sort((a, b) => b.scale - a.scale);
 
   const title = 'IBEW Paycheck Calculator — Compare Union Local Pay | TrampHereBro';
@@ -699,6 +702,24 @@ function calculatorPage(rows) {
   .calc-delta.pos{background:#dcfce7;color:#15803d}
   .calc-delta.neg{background:#fee2e2;color:#b91c1c}
   .calc-note{font-size:12px;color:var(--slate);margin:14px 2px 0;line-height:1.5}
+  .calc-picker{position:relative;flex:1;min-width:220px;max-width:420px}
+  .calc-picker input{width:100%;box-sizing:border-box;font:400 16px Inter,sans-serif;padding:10px 34px 10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--charcoal)}
+  .calc-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:22px;line-height:1;color:var(--slate);cursor:pointer;display:none;padding:2px 6px}
+  .calc-picker.has .calc-clear{display:block}
+  .calc-picker-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(7,37,84,.16);max-height:270px;overflow-y:auto;z-index:30;display:none}
+  .calc-picker-list.open{display:block}
+  .calc-picker-list button{display:block;width:100%;text-align:left;background:none;border:none;padding:11px 14px;font:400 14px Inter,sans-serif;color:var(--charcoal);cursor:pointer;border-top:1px solid var(--line2)}
+  .calc-picker-list button:first-child{border-top:none}
+  .calc-picker-list button:hover{background:#fffdfb;color:var(--orange)}
+  .calc-detail{background:linear-gradient(135deg,#0a2350,#061b40);color:#EAF0FA;border-radius:16px;box-shadow:var(--shadow-lg);padding:22px 24px;margin-bottom:16px}
+  .calc-detail h3{font:700 18px 'Space Grotesk',sans-serif;color:#fff;margin:0 0 3px}
+  .calc-detail .cd-scn{font-size:12.5px;color:#9db3d6;margin-bottom:12px}
+  .calc-detail .cd-sec{font:700 11px 'Space Grotesk',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin:15px 0 5px}
+  .calc-detail .cd-line{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:13.5px;border-bottom:1px solid rgba(255,255,255,.07)}
+  .calc-detail .cd-line span:last-child{font-family:'Space Grotesk',sans-serif;font-weight:600;color:#fff;white-space:nowrap}
+  .calc-detail .cd-line.cd-tot{border-bottom:none;border-top:1px solid rgba(255,255,255,.22);margin-top:3px;padding-top:9px}
+  .calc-detail .cd-line.cd-tot span{color:#fff;font-size:14.5px;font-weight:700}
+  .calc-detail .cd-grand{background:var(--orange);color:#fff;border-radius:10px;padding:12px 15px;margin-top:15px;display:flex;justify-content:space-between;font:700 16px 'Space Grotesk',sans-serif}
   @media(max-width:720px){.calc-controls{grid-template-columns:1fr 1fr}}
   @media(max-width:560px){.calc-controls{grid-template-columns:1fr}.calc-row{grid-template-columns:32px 1fr auto;gap:8px;row-gap:4px;padding:12px 14px}.calc-annual{grid-column:3;grid-row:1;text-align:right}.calc-delta{grid-column:3;grid-row:2;justify-self:end}.calc-name{grid-column:2;grid-row:1}}
   `;
@@ -730,7 +751,7 @@ ${topbar('calculator')}
 <div class="calc-ctl"><label>Overtime rate</label><select id="c-ot"><option value="1.5">1.5&times; (time &amp; a half)</option><option value="2">2&times; (double time)</option></select></div>
 <div class="calc-ctl"><label>Per diem ($/day)</label><input type="number" id="c-pd" value="0" min="0" step="5"></div>
 </div>
-<div class="calc-baseline"><label>Compare against your home local:</label><select id="c-base"><option value="">— none —</option></select></div>
+<div class="calc-baseline"><label>Your home local</label><div class="calc-picker"><input type="text" id="c-basein" placeholder="Type a local number or city…" autocomplete="off"><button type="button" id="c-baseclear" class="calc-clear" title="Clear">&times;</button><div class="calc-picker-list" id="c-baselist"></div></div><input type="hidden" id="c-base" value=""></div><div class="calc-detail" id="c-detail" hidden></div>
 <div class="calc-rankby"><span>Rank by</span><button type="button" class="rb on" data-rb="total">Total package</button><button type="button" class="rb" data-rb="wages">Take-home wages</button></div>
 <div class="calc-headline" id="c-headline"></div>
 <input class="calc-search" id="c-search" type="search" placeholder="Filter by local number, city, or state…">
@@ -741,12 +762,32 @@ ${topbar('calculator')}
 var PAY = ${DATA};
 var $ = function(id){ return document.getElementById(id); };
 function fmt(n){ return '$' + Math.round(n).toLocaleString(); }
+function detailHtml(p, hrs, wks, mult, pd, reg, ot){
+  var totHrs = hrs*wks, regHrs = reg*wks, otHrs = ot*wks;
+  var regW = reg*p.scale*wks, otW = ot*p.scale*mult*wks, pdW = pd*7*wks, wages = regW+otW+pdW;
+  var comps = [['Health & Welfare',p.hw],['Defined Pension',p.pd],['Annuity / DC Pension',p.pdc],['NEBF',p.nebf],['401(k)',p.k401],['Vacation',p.vac]].filter(function(x){return x[1]>0;});
+  var itemsSum = 0; comps.forEach(function(x){ itemsSum += x[1]; });
+  var benTotal = p.ben*totHrs, otherPerHr = Math.max(0, p.ben - itemsSum);
+  var lines = comps.map(function(x){ return '<div class="cd-line"><span>'+x[0]+' ($'+x[1].toFixed(2)+'/hr)</span><span>'+fmt(x[1]*totHrs)+'</span></div>'; }).join('');
+  if(otherPerHr > 0.01){ lines += '<div class="cd-line"><span>Other fringes (training, etc.)</span><span>'+fmt(otherPerHr*totHrs)+'</span></div>'; }
+  return '<h3>IBEW '+p.n+(p.c?' \u00b7 '+p.c+', '+p.s:'')+' \u2014 your pick</h3>'
+    +'<div class="cd-scn">'+hrs+' hrs/week \u00b7 '+wks+' weeks \u00b7 '+Math.round(totHrs).toLocaleString()+' hours a year</div>'
+    +'<div class="cd-sec">Wages (to your check)</div>'
+    +'<div class="cd-line"><span>Regular ('+Math.round(regHrs).toLocaleString()+' hrs @ $'+p.scale.toFixed(2)+')</span><span>'+fmt(regW)+'</span></div>'
+    +(otHrs>0?'<div class="cd-line"><span>Overtime ('+Math.round(otHrs).toLocaleString()+' hrs @ $'+(p.scale*mult).toFixed(2)+')</span><span>'+fmt(otW)+'</span></div>':'')
+    +(pdW>0?'<div class="cd-line"><span>Per diem</span><span>'+fmt(pdW)+'</span></div>':'')
+    +'<div class="cd-line cd-tot"><span>Take-home wages</span><span>'+fmt(wages)+'</span></div>'
+    +'<div class="cd-sec">Benefits paid on your behalf ('+Math.round(totHrs).toLocaleString()+' hrs)</div>'+lines
+    +'<div class="cd-line cd-tot"><span>Total benefits</span><span>'+fmt(benTotal)+'</span></div>'
+    +'<div class="cd-grand"><span>Total package value</span><span>'+fmt(wages+benTotal)+'</span></div>';
+}
 var rankBy = 'total';
 function compute(){
   var hrs = +$('c-hours').value, wks = +$('c-weeks').value || 50, mult = +$('c-ot').value, pd = +$('c-pd').value || 0;
   var reg = Math.min(hrs, 40), ot = Math.max(hrs - 40, 0);
   $('c-hours-v').textContent = hrs;
   var base = $('c-base').value, key = rankBy;
+  var _det=$('c-detail'), _bp=null; if(base){ for(var _i=0;_i<PAY.length;_i++){ if(PAY[_i].n==base){ _bp=PAY[_i]; break; } } } if(_bp){ _det.hidden=false; _det.innerHTML=detailHtml(_bp,hrs,wks,mult,pd,reg,ot); } else { _det.hidden=true; _det.innerHTML=''; }
   var list = PAY.map(function(p){
     var wages = (reg*p.scale + ot*p.scale*mult)*wks + pd*7*wks;
     var benefits = (p.ben||0) * hrs * wks;
@@ -774,7 +815,18 @@ function compute(){
     $('c-headline').innerHTML = hl;
   }
 }
-(function(){ var sel = $('c-base'); PAY.slice().sort(function(a,b){return a.n-b.n;}).forEach(function(p){ var o=document.createElement('option'); o.value=p.n; o.textContent='IBEW '+p.n+(p.c?' \u00b7 '+p.c:''); sel.appendChild(o); }); })();
+(function(){
+  var PL = PAY.slice().sort(function(a,b){return a.n-b.n;});
+  var bin=$('c-basein'), blist=$('c-baselist'), bhid=$('c-base'), pick=document.querySelector('.calc-picker'), bclr=$('c-baseclear');
+  function draw(q){ q=(q||'').toLowerCase(); var m=PL.filter(function(p){ return !q || (''+p.n).indexOf(q)>-1 || p.c.toLowerCase().indexOf(q)>-1 || p.s.toLowerCase().indexOf(q)>-1; }).slice(0,40);
+    blist.innerHTML = m.length ? m.map(function(p){ return '<button type="button" data-n="'+p.n+'">IBEW '+p.n+(p.c?' \u00b7 '+p.c+', '+p.s:'')+'</button>'; }).join('') : '<button type="button" disabled style="color:#94a3b8">No match</button>';
+    blist.classList.add('open'); }
+  bin.addEventListener('focus',function(){ draw(bin.value); });
+  bin.addEventListener('input',function(){ draw(bin.value); });
+  blist.addEventListener('click',function(e){ var b=e.target.closest('button[data-n]'); if(!b)return; var n=b.getAttribute('data-n'); var p; for(var i=0;i<PL.length;i++){ if(PL[i].n==n){p=PL[i];break;} } bhid.value=n; bin.value='IBEW '+n+(p&&p.c?' \u00b7 '+p.c:''); blist.classList.remove('open'); pick.classList.add('has'); compute(); });
+  bclr.addEventListener('click',function(){ bhid.value=''; bin.value=''; pick.classList.remove('has'); blist.classList.remove('open'); compute(); });
+  document.addEventListener('click',function(e){ if(!pick.contains(e.target)) blist.classList.remove('open'); });
+})();
 ['c-hours','c-weeks','c-ot','c-pd','c-search','c-base'].forEach(function(id){ var el=$(id); if(el){ el.addEventListener('input',compute); el.addEventListener('change',compute); } });
 Array.prototype.forEach.call(document.querySelectorAll('.calc-rankby .rb'), function(btn){ btn.addEventListener('click', function(){ Array.prototype.forEach.call(document.querySelectorAll('.calc-rankby .rb'), function(b){ b.classList.remove('on'); }); btn.classList.add('on'); rankBy = btn.getAttribute('data-rb'); compute(); }); });
 compute();
