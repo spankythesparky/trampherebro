@@ -42,7 +42,8 @@ try { SCALE = JSON.parse(fs.readFileSync(SCALE_FILE, 'utf8')); } catch (e) { SCA
 const UA_FILE = path.join(SITE_DIR, 'ua-locals.json');
 const TRADE = {
   IBEW: { name: 'IBEW', slug: 'ibew', worker: 'inside wireman', workers: 'inside wiremen' },
-  UA:   { name: 'UA',   slug: 'ua',   worker: 'plumber & pipefitter', workers: 'plumbers, pipefitters & HVAC/R techs' }
+  UA:   { name: 'UA',   slug: 'ua',   worker: 'plumber & pipefitter', workers: 'plumbers, pipefitters & HVAC/R techs' },
+  LINEMAN: { name: 'IBEW Lineman', slug: 'lineman', worker: 'outside lineman', workers: 'outside linemen' }
 };
 const tradeOf = local => TRADE[local && local.trade] || TRADE.IBEW;
 const OUTLOOK_CACHE = path.join(SITE_DIR, 'outlook-cache.json');
@@ -91,7 +92,7 @@ function localNumber(name) {
 }
 function slugFor(name, id, trade) {
   const n = localNumber(name);
-  const pfx = (trade === 'UA') ? 'ua' : 'ibew';
+  const pfx = (TRADE[trade] && TRADE[trade].slug) || 'ibew';
   if (n) return pfx + '-local-' + n;
   return pfx + '-' + String(name || id).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') + '-' + id;
 }
@@ -308,7 +309,7 @@ function jobPostingLd(local, c) {
 function localPage(local, calls) {
   const n = localNumber(local.name);
   const T = tradeOf(local);
-  const _sc = (local.trade === 'UA') ? {} : (SCALE[localNumber(local.name)] || {});
+  const _sc = (local.trade && local.trade !== 'IBEW') ? {} : (SCALE[localNumber(local.name)] || {});
   if (_sc.scale) local.jw_scale = _sc.scale;
   if (_sc.hw) local.hw = _sc.hw;
   const label = T.name + ' Local ' + (n || local.id);
@@ -326,7 +327,7 @@ function localPage(local, calls) {
     : `${label} job calls${local.jw_scale != null ? ', journeyman scale (' + money(local.jw_scale) + '/hr),' : ','} contact and dispatch info for traveling ${T.workers}${place ? ' in ' + place : ''}. No open calls posted right now — updated daily.`;
 
   // vitals
-  const _ci = (local.trade === 'UA') ? {} : (CONTACT[localNumber(local.name)] || {});
+  const _ci = (local.trade && local.trade !== 'IBEW') ? {} : (CONTACT[localNumber(local.name)] || {});
   const cPhone = _ci.phone || local.phone || '';
   const cAddress = _ci.address || local.address || '';
   const cEmail = _ci.email || local.email || '';
@@ -422,7 +423,7 @@ ${topbar('')}
 <div class="crumbs"><a href="/">Board</a> › <a href="/locals">Locals</a> › ${esc(label)}</div>
 <div class="kick"><span class="dot"></span>Live ${T.name} Job Calls</div>
 <h1 class="lede">${esc(label)} <b>Job Calls</b></h1>
-<div class="hsub">${place ? esc(place) + ' · ' : ''}${local.trade === 'UA' ? 'Contact and job-call info for traveling ' + T.workers + ' — updated daily.' : 'Open inside-wireman calls, journeyman scale, and dispatch info — pulled live and updated daily.'}</div>
+<div class="hsub">${place ? esc(place) + ' · ' : ''}${local.trade && local.trade !== 'IBEW' ? 'Contact and job-call info for traveling ' + T.workers + ' — updated daily.' : 'Open inside-wireman calls, journeyman scale, and dispatch info — pulled live and updated daily.'}</div>
 <div class="hstats">
 <div class="hstat"><div class="n accent">${hasCalls ? calls.length : '0'}</div><div class="l">OPEN CALLS</div></div>
 <div class="hstat"><div class="n">${hands}</div><div class="l">HANDS NEEDED</div></div>
@@ -652,7 +653,7 @@ async function generateOutlook(local, calls) {
 
 /* -------------------- Paycheck Calculator page -------------------------- */
 function calculatorPage(rows) {
-  const pay = rows.filter(r => (r.local.trade || 'IBEW') !== 'UA').map(r => {
+  const pay = rows.filter(r => (r.local.trade || 'IBEW') === 'IBEW').map(r => {
     const n = localNumber(r.local.name);
     const sc = SCALE[n] || {};
     const scale = sc.scale ? Number(sc.scale) : (r.local.jw_scale != null ? Number(r.local.jw_scale) : null);
@@ -935,8 +936,11 @@ ${footer()}
   let UA = [];
   try { UA = JSON.parse(fs.readFileSync(UA_FILE, 'utf8')); } catch (e) { UA = []; }
   const uaRows = UA.map(u => ({ local: { ...u, trade: 'UA' }, calls: [] }));
-  const rows = [...ibewRows, ...uaRows];
-  console.log(`  IBEW: ${ibewRows.length}   UA: ${uaRows.length}   total pages: ${rows.length}`);
+  let LINE = [];
+  try { LINE = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'lineman-locals.json'), 'utf8')); } catch (e) { LINE = []; }
+  const lineRows = LINE.map(u => ({ local: { ...u, trade: 'LINEMAN' }, calls: [] }));
+  const rows = [...ibewRows, ...uaRows, ...lineRows];
+  console.log(`  IBEW: ${ibewRows.length}   UA: ${uaRows.length}   Lineman: ${lineRows.length}   total pages: ${rows.length}`);
 
   // never commit the API key
   try { const gi = path.join(SITE_DIR, '.gitignore'); let g = ''; try { g = fs.readFileSync(gi, 'utf8'); } catch (e) {} if (!/^\.env\s*$/m.test(g)) fs.writeFileSync(gi, (g ? g.replace(/\s*$/, '') + '\n' : '') + '.env\n'); } catch (e) {}
