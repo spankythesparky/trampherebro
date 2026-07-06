@@ -33,6 +33,9 @@ const CORE_PAGES = ['', 'jnctn', 'resources', 'contact']; // existing top-level 
 const LOCALS_DIR = path.join(SITE_DIR, 'locals');
 const COORDS_CACHE = path.join(SITE_DIR, 'coords-cache.json');
 const INDEX_HTML = path.join(SITE_DIR, 'index.html');
+const CONTACT_FILE = path.join(SITE_DIR, 'locals-contact.json');
+let CONTACT = {};
+try { CONTACT = JSON.parse(fs.readFileSync(CONTACT_FILE, 'utf8')); } catch (e) { CONTACT = {}; }
 const TODAY = new Date();
 const ISO_DATE = TODAY.toISOString().slice(0, 10);
 const VALID_THROUGH = new Date(TODAY.getTime() + 21 * 864e5).toISOString().slice(0, 10);
@@ -265,6 +268,11 @@ function localPage(local, calls) {
     : `${label} job calls, journeyman scale${local.jw_scale != null ? ' (' + money(local.jw_scale) + '/hr)' : ''}, book numbers and dispatch contact for traveling electricians${place ? ' in ' + place : ''}. No open calls posted right now — updated daily.`;
 
   // vitals
+  const _ci = CONTACT[localNumber(local.name)] || {};
+  const cPhone = _ci.phone || local.phone || '';
+  const cAddress = _ci.address || '';
+  const cEmail = _ci.email || local.email || '';
+  const cWebsite = _ci.website || local.website || '';
   const vit = (l, v, small) => `<div class="vit"><div class="l">${l}</div><div class="v${small ? ' small' : ''}">${v}</div></div>`;
   const vitals = [
     vit('Journeyman Scale', money(local.jw_scale)),
@@ -273,10 +281,19 @@ function localPage(local, calls) {
     (local.book1 != null || local.book2 != null)
       ? vit('Books', `${local.book1 != null ? 'Bk1 ' + esc(local.book1) : ''}${(local.book1 != null && local.book2 != null) ? ' · ' : ''}${local.book2 != null ? 'Bk2 ' + esc(local.book2) : ''}` || '—', true)
       : '',
-    local.phone ? vit('Dispatch', esc(local.phone), true) : ''
+    ''
   ].filter(Boolean).join('');
 
   const dispatchBtn = ''; // dispatch link removed per request
+  const _telHref = cPhone.replace(/[^\d+]/g, '');
+  const _webShow = cWebsite.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const contactItems = [
+    cAddress ? vit('Address', esc(cAddress), true) : '',
+    cPhone ? vit('Phone', `<a href="tel:${esc(_telHref)}" style="color:inherit">${esc(cPhone)}</a>`, true) : '',
+    cEmail ? vit('Email', `<a href="mailto:${esc(cEmail)}" style="color:var(--orange);font-weight:600">${esc(cEmail)}</a>`, true) : '',
+    cWebsite ? vit('Website', `<a href="${esc(cWebsite)}" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600">${esc(_webShow)}</a>`, true) : ''
+  ].filter(Boolean).join('');
+  const contactCard = contactItems ? `<div class="sec-h">Contact</div><div class="vitcard"><div class="vitals">${contactItems}</div></div>` : '';
 
   const callsBlock = hasCalls
     ? `<div class="sec-h">Open calls — ${calls.length} posted · ${hands} hands</div><div class="callcard">${calls.map(callRow).join('')}</div>`
@@ -341,6 +358,7 @@ ${topbar('')}
 <main class="wrap">
 <div class="sec-h">Local vitals</div>
 <div class="vitcard"><div class="vitals">${vitals}</div>${dispatchBtn}</div>
+${contactCard}
 ${callsBlock}
 <p class="outlook">${outlook}</p>
 <div class="faq">
