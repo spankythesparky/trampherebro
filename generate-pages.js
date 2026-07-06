@@ -584,7 +584,7 @@ async function resolveCoords(rows) {
   if (geocoded || fell) console.log(`  geocoded ${geocoded} new local(s), ${fell} via state fallback`);
   return coords;
 }
-function syncHomepageMap(rows, coords) {
+function syncHomepageMap(rows, coords, snapText) {
   let html;
   try { html = fs.readFileSync(INDEX_HTML, 'utf8'); } catch (e) { return false; }
   if (!html.includes('/*MAPLOCALS_START*/') || !html.includes('/*MAPLOCALS_END*/')) return false;
@@ -597,7 +597,24 @@ function syncHomepageMap(rows, coords) {
       trade: r.local.trade || 'IBEW', active: false
     }));
   const block = '/*MAPLOCALS_START*/\nconst MAPLOCALS = ' + JSON.stringify(arr) + ';\n/*MAPLOCALS_END*/';
-  const out = html.replace(/\/\*MAPLOCALS_START\*\/[\s\S]*?\/\*MAPLOCALS_END\*\//, block);
+  let out = html.replace(/\/\*MAPLOCALS_START\*\/[\s\S]*?\/\*MAPLOCALS_END\*\//, block);
+
+  // Bake live stats into raw HTML so crawlers/AI see real numbers (JS still updates them live)
+  const openCalls = rows.reduce((s, r) => s + r.calls.length, 0);
+  const hands = rows.reduce((s, r) => s + r.calls.reduce((x, c) => x + (Number(c.num_needed) || 0), 0), 0);
+  const activeLocals = rows.filter(r => r.calls.length > 0).length;
+  const setStat = (id, val) => { out = out.replace(new RegExp('(id="' + id + '">)[^<]*'), '$1' + val); };
+  setStat('s-calls', openCalls);
+  setStat('s-pos', hands);
+  setStat('s-active', activeLocals);
+  setStat('s-tracked', arr.length);
+
+  // Bake the daily snapshot onto the homepage (server-rendered, crawlable)
+  if (snapText && out.includes('<!--HS_START-->')) {
+    const snapHtml = `<section class="homesnap"><div class="homesnap-inner"><div class="hs-kick"><span class="hs-dot"></span>Today's Traveler Snapshot · ${esc(PRETTY_DATE)}</div><div class="hs-body">${snapshotMd(snapText)}</div><a class="hs-more" href="/snapshot">See the full daily update →</a></div></section>`;
+    out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + snapHtml + '<!--HS_END-->');
+  }
+
   fs.writeFileSync(INDEX_HTML, out);
   return arr.length;
 }
@@ -771,11 +788,27 @@ ${footer()}
   }
   fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows));
   if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText)); console.log('  wrote snapshot.html'); }
+  const totalOpen = rows.reduce((s, r) => s + r.calls.length, 0);
+  const activeN = rows.filter(r => r.calls.length > 0).length;
+  fs.writeFileSync(path.join(SITE_DIR, 'llms.txt'),
+`# TrampHereBro
+> Live IBEW job-call board for traveling union electricians. ${totalOpen} open calls across ${activeN} active locals right now, plus journeyman wage scale and hall contact info for ${rows.length} IBEW & UA locals across the US and Canada. Updated daily from hall dispatch pages.
+
+## Key pages
+- [Live board](${CANON}/): all open job calls, top locals, and today's snapshot
+- [Daily snapshot](${CANON}/snapshot): editorial rundown of where the work is nationwide
+- [All locals](${CANON}/locals): directory of every local with call counts, wage scale, and contact info
+- [Sitemap](${CANON}/sitemap.xml): every local page
+
+## About
+TrampHereBro aggregates publicly posted union job calls so traveling inside wiremen (and, increasingly, other trades) can find work before calling the hall. Independent information platform; not affiliated with the IBEW, UA, or any union.
+`);
+  console.log('  wrote llms.txt');
   fs.writeFileSync(path.join(SITE_DIR, 'sitemap.xml'), sitemap(rows));
 
   // keep the homepage map + browse board in sync with Supabase
   const coords = await resolveCoords(rows);
-  const mapCount = syncHomepageMap(rows, coords);
+  const mapCount = syncHomepageMap(rows, coords, snapText);
 
   console.log(`\n✓ Wrote ${written} local pages (${withCalls} with open calls, ${written - withCalls} evergreen)`);
   console.log(`✓ Wrote locals/index.html hub`);

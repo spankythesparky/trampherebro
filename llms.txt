@@ -1,0 +1,11 @@
+# TrampHereBro
+> Live IBEW job-call board for traveling union electricians. 724 open calls across 88 active locals right now, plus journeyman wage scale and hall contact info for 552 IBEW & UA locals across the US and Canada. Updated daily from hall dispatch pages.
+
+## Key pages
+- [Live board](https://www.trampherebro.com/): all open job calls, top locals, and today's snapshot
+- [Daily snapshot](https://www.trampherebro.com/snapshot): editorial rundown of where the work is nationwide
+- [All locals](https://www.trampherebro.com/locals): directory of every local with call counts, wage scale, and contact info
+- [Sitemap](https://www.trampherebro.com/sitemap.xml): every local page
+
+## About
+TrampHereBro aggregates publicly posted union job calls so traveling inside wiremen (and, increasingly, other trades) can find work before calling the hall. Independent information platform; not affiliated with the IBEW, UA, or any union.
