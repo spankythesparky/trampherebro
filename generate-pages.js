@@ -932,14 +932,14 @@ ${footer()}
 
   // rows = every local, with its (possibly empty) open-call list
   const ibewRows = locs
-    .filter(l => l && (l.name || l.id))
+    .filter(l => l && (l.name || l.id) && (l.id || 0) < 20000)
     .map(l => ({ local: { ...l, name: cleanName(l.name, l.id), trade: 'IBEW' }, calls: (callsByLocal[l.id] || []) }));
   let UA = [];
   try { UA = JSON.parse(fs.readFileSync(UA_FILE, 'utf8')); } catch (e) { UA = []; }
   const uaRows = UA.map(u => ({ local: { ...u, trade: 'UA' }, calls: [] }));
   let LINE = [];
   try { LINE = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'lineman-locals.json'), 'utf8')); } catch (e) { LINE = []; }
-  const lineRows = LINE.map(u => ({ local: { ...u, trade: 'LINEMAN' }, calls: [] }));
+  const lineRows = LINE.map(u => ({ local: { ...u, trade: 'LINEMAN' }, calls: (callsByLocal[u.id] || []) }));
   const rows = [...ibewRows, ...uaRows, ...lineRows];
   console.log(`  IBEW: ${ibewRows.length}   UA: ${uaRows.length}   Lineman: ${lineRows.length}   total pages: ${rows.length}`);
 
