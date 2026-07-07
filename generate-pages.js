@@ -336,6 +336,15 @@ function localPage(local, calls) {
   const place = [local.city, local.state].filter(Boolean).join(', ');
   const slug = slugFor(local.name, local.id, local.trade);
   const url = `${CANON}/locals/${slug}`;
+  // "Send to a buddy" — text/email/copy share (baked per page)
+  const _scall = calls.slice(0, 5).map(c => '• ' + [c.contractor, ((c.num_needed ? c.num_needed + ' ' : '') + (c.call_type || '')).trim(), c.location].filter(Boolean).join(' · ')).join('\n');
+  const _sbody = calls.length
+    ? `${label} — ${calls.length} open call${calls.length > 1 ? 's' : ''} on TrampHereBro:\n\n${_scall}${calls.length > 5 ? `\n…and ${calls.length - 5} more` : ''}\n\nSee all calls + dispatch info:\n${url}`
+    : `${label} on TrampHereBro — dispatch, scale & contact info:\n${url}`;
+  const _ssub = `${label} job calls — TrampHereBro`;
+  const _sms = 'sms:?&body=' + encodeURIComponent(_sbody);
+  const _mail = 'mailto:?subject=' + encodeURIComponent(_ssub) + '&body=' + encodeURIComponent(_sbody);
+  const shareBlock = `<div style="margin:22px 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px"><div style="font-weight:800;color:var(--navy);font-size:15px">Send this local to a buddy</div><div style="color:var(--slate);font-size:13px;margin:4px 0 13px">Text or email these calls to someone chasing work.</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="${_sms}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Text it</a><a href="${_mail}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Email it</a><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}');this.textContent='Link copied'}" style="padding:11px 20px;border-radius:10px;background:#fff;color:var(--navy);border:1px solid var(--line);font-weight:700;font-size:14px;cursor:pointer">Copy link</button></div></div>`;
   const hands = calls.reduce((s, c) => s + (Number(c.num_needed) || 0), 0);
   const hasCalls = calls.length > 0;
 
@@ -454,6 +463,7 @@ ${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_s
 ${vitals ? `<div class="sec-h">Local vitals</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
 ${contactCard}
 ${callsBlock}
+${shareBlock}
 <p class="outlook">${outlook}</p>
 <div class="faq">
 <h3>Does ${esc(label)} have open calls right now?</h3>
