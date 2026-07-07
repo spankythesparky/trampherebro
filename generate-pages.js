@@ -58,6 +58,7 @@ const TODAY = new Date();
 const ISO_DATE = TODAY.toISOString().slice(0, 10);
 const VALID_THROUGH = new Date(TODAY.getTime() + 21 * 864e5).toISOString().slice(0, 10);
 const PRETTY_DATE = TODAY.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const UPDATED_STAMP = (()=>{const n=new Date();const d=n.toLocaleDateString('en-US',{timeZone:'America/New_York',month:'long',day:'numeric',year:'numeric'});const t=n.toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});return d+' \u00b7 '+t+' ET';})();
 
 const CA_PROVINCES = new Set(['AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT']);
 const STATE_NAMES = {
@@ -460,6 +461,7 @@ ${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_s
 </div>
 </div></header>
 <main class="wrap">
+<div style="display:inline-flex;align-items:center;gap:7px;margin:2px 0 16px;padding:6px 13px;background:rgba(255,107,0,.10);border:1px solid var(--line);border-radius:999px;color:var(--slate);font-size:12.5px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:var(--orange)"></span>Updated ${UPDATED_STAMP}</div>
 ${vitals ? `<div class="sec-h">Local vitals</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
 ${contactCard}
 ${shareBlock}
