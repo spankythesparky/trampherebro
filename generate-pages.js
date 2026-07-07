@@ -462,8 +462,8 @@ ${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_s
 <main class="wrap">
 ${vitals ? `<div class="sec-h">Local vitals</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
 ${contactCard}
-${callsBlock}
 ${shareBlock}
+${callsBlock}
 <p class="outlook">${outlook}</p>
 <div class="faq">
 <h3>Does ${esc(label)} have open calls right now?</h3>
