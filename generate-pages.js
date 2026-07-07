@@ -609,7 +609,7 @@ async function resolveCoords(rows) {
   if (geocoded || fell) console.log(`  geocoded ${geocoded} new local(s), ${fell} via state fallback`);
   return coords;
 }
-function syncHomepageMap(rows, coords, snapText) {
+function syncHomepageMap(rows, coords, snapText, snapTextLine) {
   let html;
   try { html = fs.readFileSync(INDEX_HTML, 'utf8'); } catch (e) { return false; }
   if (!html.includes('/*MAPLOCALS_START*/') || !html.includes('/*MAPLOCALS_END*/')) return false;
@@ -636,7 +636,11 @@ function syncHomepageMap(rows, coords, snapText) {
 
   // Bake the daily snapshot onto the homepage (server-rendered, crawlable)
   if (snapText && out.includes('<!--HS_START-->')) {
-    const snapHtml = `<section class="homesnap" id="homesnap"><div class="homesnap-inner"><div class="hs-kick"><span class="hs-dot"></span>Today's Traveler Snapshot · ${esc(PRETTY_DATE)}</div><div class="hs-body" id="hs-body">${snapshotMd(snapText)}</div><button class="hs-toggle" onclick="document.getElementById('homesnap').classList.toggle('collapsed')"></button><a class="hs-more" href="/snapshot">See the full daily update →</a></div></section>`;
+    const snaps = { IBEW: snapshotMd(snapText) };
+    const kicks = { IBEW: "Today's Traveler Snapshot" };
+    if (snapTextLine) { snaps.LINEMAN = snapshotMd(snapTextLine); kicks.LINEMAN = "Today's Lineman Snapshot"; }
+    const safeJson = o => JSON.stringify(o).replace(/<\/script/gi, '<\\/script');
+    const snapHtml = `<section class="homesnap" id="homesnap"><div class="homesnap-inner"><div class="hs-kick"><span class="hs-dot"></span><span id="hs-kick-label">Today's Traveler Snapshot</span> · ${esc(PRETTY_DATE)}</div><div class="hs-body" id="hs-body">${snapshotMd(snapText)}</div><button class="hs-toggle" onclick="document.getElementById('homesnap').classList.toggle('collapsed')"></button><a class="hs-more" href="/snapshot">See the full daily update →</a></div></section><script>window.SNAPS=${safeJson(snaps)};window.SNAP_KICK=${safeJson(kicks)};</script>`;
     out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + snapHtml + '<!--HS_END-->');
   }
 
@@ -894,12 +898,15 @@ function boardDigest(rows) {
   const digest = [...picked.values()].map(x => `${x.label} ${x.place} — ${x.calls} calls, ~${x.hands} hands, top scale $${x.maxScale.toFixed(2)}${x.book1 != null ? ', Book1 ' + x.book1 : ''}. ${x.top}`).join('\n');
   return { digest, stats };
 }
-async function generateSnapshot(rows) {
+async function generateSnapshot(rows, trade) {
   if (!ANTHROPIC_KEY) return null;
-  const { digest, stats } = boardDigest(rows);
+  trade = trade || 'IBEW';
+  const tRows = rows.filter(r => (r.local.trade || 'IBEW') === trade);
+  const { digest, stats } = boardDigest(tRows);
   if (!stats.totalCalls) return null;
   const dayname = TODAY.toLocaleDateString('en-US', { weekday: 'long' });
-  const prompt = `You are writing today's "IBEW Traveler Snapshot" for TrampHereBro — a daily intel briefing for traveling inside wiremen deciding where to chase work. You know this trade cold. Today is ${dayname}, ${PRETTY_DATE}.\n\nBoard-wide right now: ${stats.totalCalls} open calls across ${stats.activeLocals} locals, about ${stats.totalHands} hands needed.\n\nStandout locals (live from union dispatch — each line gives the local, its total calls and hands, top scale, book depth, then specific calls with contractor, project, pay, per diem, schedule and requirements):\n${digest}\n\nWrite a punchy, SPECIFIC editorial snapshot of ~240-300 words in the voice of a sharp journeyman who's actually in the work — not a generic recap. Lead with a bold title line exactly: **IBEW Traveler Snapshot — ${dayname}, ${PRETTY_DATE}**. Then feature the 5-6 most notable locals as tight paragraphs, ordered by a mix of top pay and biggest boards. For EACH featured local, be concrete with the data: bold the local header like **LU-494 Milwaukee, WI**; bold the exact standout pay (e.g. **$62.73/hr**) and call out over-scale premiums, per diem, and OT specifics (e.g. "all OT double time", "5-10s + Sat"); name the actual contractors and projects (data centers, refineries, steel mills, hospitals). Where the data shows book depth, work it in (e.g. "Book 1 nearly clear at 5 out"). Skip locals with thin data. Close with ONE sentence on the market trend — where the hands are going and what's driving it. No preamble, no sign-off. Use ONLY facts from the data above; never invent pay, projects, or numbers.`;
+  const CFG = trade === 'LINEMAN' ? { title: 'IBEW Lineman Snapshot', who: 'traveling outside linemen', proj: 'transmission lines, substations, distribution rebuilds, storm restoration, and utility/data-center work' } : { title: 'IBEW Traveler Snapshot', who: 'traveling inside wiremen', proj: 'data centers, refineries, steel mills, hospitals' };
+  const prompt = `You are writing today's "${CFG.title}" for TrampHereBro — a daily intel briefing for ${CFG.who} deciding where to chase work. You know this trade cold. Today is ${dayname}, ${PRETTY_DATE}.\n\nBoard-wide right now: ${stats.totalCalls} open calls across ${stats.activeLocals} locals, about ${stats.totalHands} hands needed.\n\nStandout locals (live from union dispatch — each line gives the local, its total calls and hands, top scale, book depth, then specific calls with contractor, project, pay, per diem, schedule and requirements):\n${digest}\n\nWrite a punchy, SPECIFIC editorial snapshot of ~240-300 words in the voice of a sharp journeyman who's actually in the work — not a generic recap. Lead with a bold title line exactly: **${CFG.title} — ${dayname}, ${PRETTY_DATE}**. Then feature the 5-6 most notable locals as tight paragraphs, ordered by a mix of top pay and biggest boards. For EACH featured local, be concrete with the data: bold the local header like **LU-494 Milwaukee, WI**; bold the exact standout pay (e.g. **$62.73/hr**) and call out over-scale premiums, per diem, and OT specifics (e.g. "all OT double time", "5-10s + Sat"); name the actual contractors and projects (${CFG.proj}). Where the data shows book depth, work it in (e.g. "Book 1 nearly clear at 5 out"). Skip locals with thin data. Close with ONE sentence on the market trend — where the hands are going and what's driving it. No preamble, no sign-off. Use ONLY facts from the data above; never invent pay, projects, or numbers.`;
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -991,14 +998,18 @@ ${footer()}
   try { fs.writeFileSync(OUTLOOK_CACHE, JSON.stringify(OUTLOOKS, null, 0)); } catch (e) {}
   if (ANTHROPIC_KEY) console.log(`  generated ${freshOutlooks} new work outlook(s) via ${OUTLOOK_MODEL}`);
 
-  // Daily Snapshot — one cached editorial brief for the whole board
-  let snapText = null;
-  const boardHash = callsHash(rows.flatMap(r => r.calls));
-  try { const sc = JSON.parse(fs.readFileSync(SNAPSHOT_CACHE, 'utf8')); if (sc.hash === boardHash) snapText = sc.text; } catch (e) {}
-  if (!snapText && ANTHROPIC_KEY) {
-    snapText = await generateSnapshot(rows);
-    if (snapText) { try { fs.writeFileSync(SNAPSHOT_CACHE, JSON.stringify({ hash: boardHash, text: snapText, date: ISO_DATE })); } catch (e) {} console.log('  generated daily snapshot via ' + SNAPSHOT_MODEL); }
-  }
+  // Daily Snapshots — inside + lineman, each cached by its own board hash
+  let snapText = null, snapTextLine = null;
+  const hIbew = callsHash(rows.filter(r => (r.local.trade || 'IBEW') === 'IBEW').flatMap(r => r.calls));
+  const hLine = callsHash(rows.filter(r => r.local.trade === 'LINEMAN').flatMap(r => r.calls));
+  let snapCache = {};
+  try { snapCache = JSON.parse(fs.readFileSync(SNAPSHOT_CACHE, 'utf8')); } catch (e) {}
+  if (snapCache.hash && snapCache.text && !snapCache.IBEW) snapCache = { IBEW: { hash: snapCache.hash, text: snapCache.text } };
+  if (snapCache.IBEW && snapCache.IBEW.hash === hIbew) snapText = snapCache.IBEW.text;
+  if (snapCache.LINEMAN && snapCache.LINEMAN.hash === hLine) snapTextLine = snapCache.LINEMAN.text;
+  if (!snapText && ANTHROPIC_KEY) { snapText = await generateSnapshot(rows, 'IBEW'); if (snapText) { snapCache.IBEW = { hash: hIbew, text: snapText }; console.log('  generated inside snapshot via ' + SNAPSHOT_MODEL); } }
+  if (!snapTextLine && ANTHROPIC_KEY) { snapTextLine = await generateSnapshot(rows, 'LINEMAN'); if (snapTextLine) { snapCache.LINEMAN = { hash: hLine, text: snapTextLine }; console.log('  generated lineman snapshot via ' + SNAPSHOT_MODEL); } }
+  try { fs.writeFileSync(SNAPSHOT_CACHE, JSON.stringify(snapCache)); } catch (e) {}
 
   if (!fs.existsSync(LOCALS_DIR)) fs.mkdirSync(LOCALS_DIR, { recursive: true });
 
@@ -1038,7 +1049,7 @@ TrampHereBro aggregates publicly posted union job calls so traveling inside wire
 
   // keep the homepage map + browse board in sync with Supabase
   const coords = await resolveCoords(rows);
-  const mapCount = syncHomepageMap(rows, coords, snapText);
+  const mapCount = syncHomepageMap(rows, coords, snapText, snapTextLine);
 
   console.log(`\n✓ Wrote ${written} local pages (${withCalls} with open calls, ${written - withCalls} evergreen)`);
   console.log(`✓ Wrote locals/index.html hub`);
