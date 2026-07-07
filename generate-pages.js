@@ -82,6 +82,23 @@ async function supaGet(pathq) {
   if (!r.ok) throw new Error(pathq + ' -> HTTP ' + r.status);
   return r.json();
 }
+// Supabase/PostgREST caps a single response at 1000 rows regardless of ?limit.
+// Paginate with Range headers to pull EVERYTHING.
+async function supaGetAll(pathq) {
+  let out = [], from = 0; const size = 1000;
+  for (;;) {
+    const r = await fetch(SUPA_URL + '/rest/v1/' + pathq, {
+      headers: { apikey: SUPA_KEY, Authorization: 'Bearer ' + SUPA_KEY,
+                 'Range-Unit': 'items', Range: from + '-' + (from + size - 1) }
+    });
+    if (!r.ok) throw new Error(pathq + ' -> HTTP ' + r.status);
+    const chunk = await r.json();
+    out = out.concat(chunk);
+    if (!Array.isArray(chunk) || chunk.length < size) break;
+    from += size;
+  }
+  return out;
+}
 const esc = s => String(s == null ? '' : s)
   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
   .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -933,8 +950,8 @@ ${footer()}
 (async function main() {
   console.log('→ Fetching live data from Supabase…');
   const [locs, calls] = await Promise.all([
-    supaGet('locals?select=*&limit=3000'),
-    supaGet('job_calls?select=*&status=eq.open&limit=8000')
+    supaGetAll('locals?select=*'),
+    supaGetAll('job_calls?select=*&status=eq.open')
   ]);
   console.log(`  locals: ${locs.length}   open calls: ${calls.length}`);
 
