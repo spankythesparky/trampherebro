@@ -647,6 +647,18 @@ async function supaGet(path){
   if(!r.ok) throw new Error(path+' '+r.status);
   return r.json();
 }
+async function supaAll(path){
+  var out=[],from=0,size=1000;
+  for(;;){
+    const r=await fetch(SUPA_URL+'/rest/v1/'+path,{headers:{apikey:SUPA_KEY,Authorization:'Bearer '+SUPA_KEY,'Range-Unit':'items',Range:from+'-'+(from+size-1)}});
+    if(!r.ok) throw new Error(path+' '+r.status);
+    const chunk=await r.json();
+    out=out.concat(chunk);
+    if(!Array.isArray(chunk)||chunk.length<size) break;
+    from+=size;
+  }
+  return out;
+}
 function updateStats(){
   if(typeof countUp!=='function') return;
   countUp(document.getElementById('s-calls'),CALLS.length,900);
@@ -658,8 +670,8 @@ const _cleanName=(n,id)=>String(n||('IBEW '+id)).replace(/IBEW\s+Local/i,'IBEW')
 async function loadLive(){
   try{
     const [locs,calls]=await Promise.all([
-      supaGet('locals?select=*&limit=2000'),
-      supaGet('job_calls?select=*&status=eq.open&limit=5000')
+      supaAll('locals?select=*'),
+      supaAll('job_calls?select=*&status=eq.open')
     ]);
     Object.keys(LOCALS).forEach(k=>delete LOCALS[k]);
     locs.forEach(l=>{ LOCALS[l.id]={
