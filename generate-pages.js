@@ -461,11 +461,11 @@ ${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_s
 </div>
 </div></header>
 <main class="wrap">
-<div style="display:inline-flex;align-items:center;gap:7px;margin:2px 0 16px;padding:6px 13px;background:rgba(255,107,0,.10);border:1px solid var(--line);border-radius:999px;color:var(--slate);font-size:12.5px;font-weight:600"><span style="width:7px;height:7px;border-radius:50%;background:var(--orange)"></span>Updated ${UPDATED_STAMP}</div>
 ${vitals ? `<div class="sec-h">Local vitals</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
 ${contactCard}
 ${shareBlock}
 ${callsBlock}
+<div data-ts="ol" style="display:inline-flex;align-items:center;gap:8px;margin:2px 0 12px;padding:8px 15px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.55);border-radius:999px;color:var(--orange);font-size:13px;font-weight:800"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></span>Updated ${UPDATED_STAMP}</div>
 <p class="outlook">${outlook}</p>
 <div class="faq">
 <h3>Does ${esc(label)} have open calls right now?</h3>
