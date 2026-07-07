@@ -245,7 +245,7 @@ function topbar(active) {
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="/">Tramp<span class="b">Here</span>Bro</a>
 <button class="navtoggle" aria-label="Menu" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/snapshot"${on('snapshot')}>Daily Update</a><a href="/calculator"${on('calculator')}>Pay Calculator</a><a href="/resources"${on('resources')}>Resources</a><a href="/contact"${on('contact')}>Contact</a></nav>
+<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/snapshot"${on('snapshot')}>Daily Update</a><a href="/calculator"${on('calculator')}>Pay Calculator</a><a href="/resources"${on('resources')}>Resources</a><a href="/contact"${on('contact')}>Contact</a><a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Join JNCTN</a></nav>
 </div></div>`;
 }
 function footer() {
