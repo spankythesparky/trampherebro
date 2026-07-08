@@ -262,7 +262,7 @@ function topbar(active) {
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="/">Tramp<span class="b">Here</span>Bro</a>
 <button class="navtoggle" aria-label="Menu" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/snapshot"${on('snapshot')}>Daily Update</a><a href="/calculator"${on('calculator')}>Pay Calculator</a><a href="/resources"${on('resources')}>Resources</a><a href="/unionhistory"${on('unionhistory')}>Union History</a><a href="/contact"${on('contact')}>Contact</a><a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Join JNCTN</a><button type="button" class="navsearch" aria-label="Search" style="background:none;border:none;cursor:pointer;padding:6px;display:inline-flex;align-items:center;color:var(--navy)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path></svg></button></nav>
+<nav class="nav"><a href="/"${on('home')}>Board</a><a href="/snapshot"${on('snapshot')}>Daily Update</a><a href="/calculator"${on('calculator')}>Pay Calculator</a><a href="/resources"${on('resources')}>Resources</a><a href="/unionhistory"${on('unionhistory')}>Union History</a><a href="/contact"${on('contact')}>Contact</a><a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Join JNCTN</a></nav>
 </div></div>`;
 }
 function footer() {
