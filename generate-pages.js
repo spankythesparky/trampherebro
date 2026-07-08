@@ -933,7 +933,21 @@ async function generateSnapshot(rows, trade) {
 function snapshotMd(t) {
   return esc(t).replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').split(/\n\s*\n/).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
 }
-function snapshotPage(text) {
+
+function snapTradeBlock(text, textLine){
+  var trades = [['IBEW','IBEW Inside Wiremen', text]];
+  if (textLine) trades.push(['LINEMAN','IBEW Lineman', textLine]);
+  var panels = trades.map(function(t,i){
+    return '<div class="snap-card" data-trade-snap="'+t[0]+'"'+(i===0?'':' style="display:none"')+'>'+snapshotMd(t[2])+'</div>';
+  }).join('');
+  if (trades.length < 2) return panels;
+  var opts = trades.map(function(t){ return '<option value="'+t[0]+'">'+esc(t[1])+'</option>'; }).join('');
+  var picker = '<div style="margin:0 0 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><label for="tradeSel" style="font-weight:700;color:var(--navy);font-size:14px">Viewing:</label><select id="tradeSel" style="padding:9px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--navy);font-weight:600;font-size:14px;font-family:inherit">'+opts+'</select></div>';
+  var script = '<script>(function(){var s=document.getElementById("tradeSel");if(!s)return;s.addEventListener("change",function(){var v=this.value;var els=document.querySelectorAll("[data-trade-snap]");for(var i=0;i<els.length;i++){els[i].style.display=els[i].getAttribute("data-trade-snap")===v?"":"none";}});})();</scr'+'ipt>';
+  return picker + panels + script;
+}
+
+function snapshotPage(text, textLine) {
   const title = 'IBEW Trampin Snapshot — Daily Job Call Update | TrampHereBro';
   const desc = `Today's IBEW traveler snapshot: top-paying locals, the biggest boards, and where the data-center work is right now. Updated ${PRETTY_DATE}.`;
   return `<!DOCTYPE html><html lang="en"><head>
@@ -953,11 +967,11 @@ ${topbar('snapshot')}
 <header><div class="hero-inner">
 <div class="crumbs"><a href="/">Board</a> › Daily Update</div>
 <div class="kick"><span class="dot"></span>Updated ${esc(PRETTY_DATE)}</div>
-<h1 class="lede">Trampin <b>Snapshot</b></h1>
+<h1 class="lede">Trampin <b>Day in Review</b></h1>
 <div class="hsub">Where the work is right now — top-paying locals, the biggest boards, and the projects driving demand, pulled live from union dispatch.</div>
 </div></header>
 <main class="wrap">
-<div class="snap-card">${snapshotMd(text)}</div>
+${snapTradeBlock(text, textLine)}
 <div class="snap-date">Updated ${esc(PRETTY_DATE)} · generated from live union dispatch data</div>
 <div class="backbar" style="margin-top:26px"><a class="backbtn" href="/locals">Browse all locals →</a> &nbsp; <a class="backbtn" href="/">Live board →</a></div>
 </main>
@@ -1038,7 +1052,7 @@ ${footer()}
     written++; if (r.calls.length) withCalls++;
   }
   fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows));
-  if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText)); console.log('  wrote snapshot.html'); }
+  if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText, snapTextLine)); console.log('  wrote snapshot.html'); }
   fs.writeFileSync(path.join(SITE_DIR, 'calculator.html'), calculatorPage(rows)); console.log('  wrote calculator.html');
   const totalOpen = rows.reduce((s, r) => s + r.calls.length, 0);
   const activeN = rows.filter(r => r.calls.length > 0).length;
