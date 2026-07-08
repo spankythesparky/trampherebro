@@ -427,7 +427,7 @@
       <div class="stat"><div class="n" id="s-tracked">690</div><div class="l">Locals tracked</div></div>
     </div>
     <div class="trust"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Updated daily at 5:30 PM EST. Always confirm with the local. <span style="color:var(--orange);font-weight:700">Let's get trampin.</span></div>
-    <div class="trades"><button type="button" class="trade on" data-trade="IBEW">IBEW Indoor</button><button type="button" class="trade" data-trade="LINEMAN">IBEW Lineman</button><div class="trade soon">UA Plumbers <span>SOON</span></div><div class="trade soon">Ironworkers <span>SOON</span></div></div>
+    <div class="trades"><button type="button" class="trade on" data-trade="IBEW">IBEW Indoor</button><button type="button" class="trade" data-trade="LINEMAN">IBEW Lineman</button><button type="button" class="trade" data-trade="UA">UA Plumbers</button><div class="trade soon">Ironworkers <span>SOON</span></div></div>
     <a class="hero-cta" onclick="document.querySelector('.controls').scrollIntoView({behavior:'smooth',block:'start'})">Browse the board <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12l7 7 7-7"/></svg></a><a class="hero-cta ghost" href="/snapshot">Trampin Snapshot <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
     </div>
   </header>
@@ -468,10 +468,47 @@ const REGIONS={'West Coast':['AK','AZ','CA','CO','HI','ID','MT','NM','NV','OR','
 const REGION_OF={}; Object.keys(REGIONS).forEach(r=>REGIONS[r].forEach(s=>REGION_OF[s]=r));
 const REGION_ORDER=['West Coast','Midwest','South','East Coast'];
 const LOCALS = {
+  20192:{id:"UA 192",city:"Cheyenne, WY",verified:"today",scale:"\u2014",hw:"\u2014",pension:"\u2014",book1:"\u2014",book2:"\u2014",phone:"(307) 634-5837",email:"",web:"https://www.plumbers192.org"},
+  20213:{id:"UA 213",city:"St. John, NB",verified:"today",scale:"\u2014",hw:"\u2014",pension:"\u2014",book1:"\u2014",book2:"\u2014",phone:"(506) 635-1605",email:"",web:"https://ualocal213.ca"},
+  20290:{id:"UA 290",city:"Portland, OR",verified:"today",scale:"\u2014",hw:"\u2014",pension:"\u2014",book1:"\u2014",book2:"\u2014",phone:"(503) 691-5700",email:"",web:"https://ua290.org"},
+  20325:{id:"UA 325",city:"Fredericton, NB",verified:"today",scale:"\u2014",hw:"\u2014",pension:"\u2014",book1:"\u2014",book2:"\u2014",phone:"(506) 459-6044",email:"",web:"https://ualocal325.ca"},
   11105:{id:"IBEW 1105",city:"Newark, OH",verified:"7m",scale:"42.75",hw:"11.00",pension:"defined $7.27 + DC $4.55",book1:"\u2014",book2:"\u2014",phone:"(740) 454-2304",email:"info@ibewlocal1105.org",web:"ibewlocal1105.org",dispatch:"https://www.ibewlocal1105.org/job-calls/",outlook:"Loaded with data-center and power work across New Albany & Johnstown. Cupertino and ESI calls pay $2.01 over scale with OT at double time; Bechtel's Cardinal call adds a $300/45-hr bonus."},
   10683:{id:"IBEW 683",city:"Columbus, OH",verified:"12m",scale:"46.00",hw:"\u2014",pension:"\u2014",book1:"\u2014",book2:"\u2014",phone:"(614) 294-4786",email:"staff@ibew683.org",web:"ibew683.org",dispatch:"https://www.ibew683.org/available_calls/",outlook:"Heavy data-center demand \u2014 ESI and Mid City are the volume calls at Cologix and beyond. New River is the pay standout at $54.50, and several hospital/institutional calls round out the board."},
 };
 const CALLS = [
+  {lu:20192,type:"Other",need:7,contractor:"PMI",loc:"Ellsworth Air Force Base, Box Elder, South Dakota"},
+  {lu:20192,type:"Other",need:2,contractor:"PMI",loc:"Fort Meade VA Hospital, Sturgis, South Dakota"},
+  {lu:20213,type:"Other",need:2,contractor:"Sunny Corner",loc:"Colson Cove"},
+  {lu:20213,type:"Other",need:1,contractor:"B&W",loc:"Irving Oil Refinery"},
+  {lu:20213,type:"Other",need:2,contractor:"Lorneville",loc:"Irving Oil Refinery"},
+  {lu:20213,type:"Other",need:1,contractor:"Cam",loc:"Irving Oil Refinery"},
+  {lu:20290,type:"Other",need:2,contractor:"Apollo",loc:"Tigard, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Apollo Mechanical",loc:"Bend, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"BMWC",loc:"Tualatin, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"BMWC",loc:"Tualatin, OR"},
+  {lu:20290,type:"Other",need:2,contractor:"Charter Mechanical",loc:"Hillsboro, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Harder Mechanical",loc:"Milwaukie, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Harder Mechanical",loc:"Milwaukie, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"JH Kelly",loc:"Vancouver, WA"},
+  {lu:20290,type:"Other",need:1,contractor:"Process Piping",loc:"Hillsboro, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Cascade General",loc:"Portland, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Crown Plumbing",loc:"Portland, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"APCCO",loc:"Salem, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"CJ Hansen",loc:"Salem, OR"},
+  {lu:20290,type:"Residential",need:3,contractor:"Dr. HVAC",loc:"McMinnville, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"JH Kelly",loc:"Milwaukie, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"MacDonald Miller",loc:"Portland, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"MacDonald Miller",loc:"Portland, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"MacDonald Miller",loc:"Portland, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Northwest Mechanical",loc:"Canby, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Northwest Mechanical",loc:"Medford, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"OESC Key Mechanical",loc:"Bend, OR"},
+  {lu:20290,type:"Other",need:3,contractor:"PermaCold",loc:"Portland, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Total Mechanical",loc:"Camas, WA"},
+  {lu:20290,type:"Other",need:1,contractor:"USA Mechanical",loc:"Portland, OR"},
+  {lu:20290,type:"Other",need:1,contractor:"Yadon Mechanical",loc:"Vancouver, WA"},
+  {lu:20325,type:"Other",need:2,contractor:"Lorneville",loc:"Irving Refinery"},
+  {lu:20325,type:"Other",need:1,contractor:"CAM",loc:"Irving Refinery"},
   {lu:11105,type:"Inside JW",need:33,contractor:"The Superior Group",loc:"CMH02 Conesville",pay:"$42.75 \u00b7 OT DT",sched:"4-10s + 1-8",req:[]},
   {lu:11105,type:"Inside JW",need:18,contractor:"Mid-City",loc:"Various \u00b7 New Albany",pay:"$42.75 \u00b7 OT DT",sched:"6-10s",req:["lunch provided"]},
   {lu:11105,type:"Inside JW",need:15,contractor:"The Superior Group",loc:"CMH120",pay:"$42.75 scale",sched:"",req:[]},
