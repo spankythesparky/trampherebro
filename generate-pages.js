@@ -60,6 +60,22 @@ const VALID_THROUGH = new Date(TODAY.getTime() + 21 * 864e5).toISOString().slice
 const PRETTY_DATE = TODAY.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 const UPDATED_STAMP = (()=>{const n=new Date();const d=n.toLocaleDateString('en-US',{timeZone:'America/New_York',month:'long',day:'numeric',year:'numeric'});const t=n.toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});return d+' \u00b7 '+t+' ET';})();
 
+function stampFor(calls){
+  var newest = 0;
+  if (calls && calls.length) {
+    for (var i=0;i<calls.length;i++){
+      var ls = calls[i] && calls[i].last_seen ? Date.parse(calls[i].last_seen) : 0;
+      if (ls && ls > newest) newest = ls;
+    }
+  }
+  if (!newest) return UPDATED_STAMP;
+  var n = new Date(newest);
+  var d = n.toLocaleDateString('en-US',{timeZone:'America/New_York',month:'long',day:'numeric',year:'numeric'});
+  var t = n.toLocaleTimeString('en-US',{timeZone:'America/New_York',hour:'numeric',minute:'2-digit'});
+  return d + ' \u00b7 ' + t + ' ET';
+}
+
+
 const CA_PROVINCES = new Set(['AB','BC','MB','NB','NL','NS','NT','NU','ON','PE','QC','SK','YT']);
 const STATE_NAMES = {
   AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',CO:'Colorado',CT:'Connecticut',
@@ -345,7 +361,7 @@ function localPage(local, calls) {
   const _ssub = `${label} job calls — TrampHereBro`;
   const _sms = 'sms:?&body=' + encodeURIComponent(_sbody);
   const _mail = 'mailto:?subject=' + encodeURIComponent(_ssub) + '&body=' + encodeURIComponent(_sbody);
-  const shareBlock = `<div style="margin:22px 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="font-weight:800;color:var(--navy);font-size:15px">Send this local to a buddy</div><div data-ts="buddy" style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.55);border-radius:999px;color:var(--orange);font-size:12.5px;font-weight:800;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></span>Updated ${UPDATED_STAMP}</div></div><div style="color:var(--slate);font-size:13px;margin:4px 0 13px">Text or email these calls to someone chasing work.</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="${_sms}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Text it</a><a href="${_mail}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Email it</a><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}');this.textContent='Link copied'}" style="padding:11px 20px;border-radius:10px;background:#fff;color:var(--navy);border:1px solid var(--line);font-weight:700;font-size:14px;cursor:pointer">Copy link</button></div></div>`;
+  const shareBlock = `<div style="margin:22px 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="font-weight:800;color:var(--navy);font-size:15px">Send this local to a buddy</div><div data-ts="buddy" style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.55);border-radius:999px;color:var(--orange);font-size:12.5px;font-weight:800;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></span>Updated ${stampFor(calls)}</div></div><div style="color:var(--slate);font-size:13px;margin:4px 0 13px">Text or email these calls to someone chasing work.</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="${_sms}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Text it</a><a href="${_mail}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Email it</a><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}');this.textContent='Link copied'}" style="padding:11px 20px;border-radius:10px;background:#fff;color:var(--navy);border:1px solid var(--line);font-weight:700;font-size:14px;cursor:pointer">Copy link</button></div></div>`;
   const hands = calls.reduce((s, c) => s + (Number(c.num_needed) || 0), 0);
   const hasCalls = calls.length > 0;
 
