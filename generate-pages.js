@@ -27,7 +27,7 @@ const SITE_DIR = '/Users/Owner/Desktop/trampherebro';   // your site repo folder
 const CANON    = 'https://www.trampherebro.com';        // canonical origin — matches your live redirect (apex → www)
 const SUPA_URL = 'https://cpyhqsfkvtkangjfddis.supabase.co';
 const SUPA_KEY = 'sb_publishable_lBCUtgCBIR7IkuwKt5I0Mg_-sb9vLMM';
-const CORE_PAGES = ['', 'snapshot', 'calculator', 'jnctn', 'resources', 'contact', 'history']; // existing top-level pages, added to sitemap
+const CORE_PAGES = ['', 'snapshot', 'calculator', 'jnctn', 'resources', 'contact', 'unionhistory']; // existing top-level pages, added to sitemap
 /* =========================================================================== */
 
 const LOCALS_DIR = path.join(SITE_DIR, 'locals');
@@ -268,7 +268,7 @@ function topbar(active) {
 function footer() {
   return `<footer><div class="inner"><div><b>TrampHereBro</b></div>
 <div class="foot-updated"><span class="fu-dot"></span>Updated ${esc(PRETTY_DATE)}</div></div>
-<div class="foot-legal"><p style="margin-bottom:10px"><a href="/history" style="color:var(--orange);font-weight:600;text-decoration:none">History of Organized Labor</a></p><p>TrampHereBro is an independent information platform. We have no affiliation with any union, labor organization, government entity, or industry group. All information is provided for educational purposes only.</p>
+<div class="foot-legal"><p style="margin-bottom:10px"><a href="/unionhistory" style="color:var(--orange);font-weight:600;text-decoration:none">History of Organized Labor</a></p><p>TrampHereBro is an independent information platform. We have no affiliation with any union, labor organization, government entity, or industry group. All information is provided for educational purposes only.</p>
 <p class="credit">Proudly made by Noah "<b>Spanky The Sparky</b>" — IBEW Journeyman</p><p class="copyright">© ${TODAY.getFullYear()} TrampHereBro. All rights reserved.</p></div></footer>`;
 }
 
@@ -1015,10 +1015,10 @@ function historyPage() {
   const won = WON.map(w => `<div class="h-w"><div class="h">${esc(w[0])}</div><div class="d">${esc(w[1])}</div></div>`).join('');
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${CANON}/history">
+<link rel="canonical" href="${CANON}/unionhistory">
 <meta property="og:type" content="article"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
-<meta property="og:url" content="${CANON}/history"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta property="og:url" content="${CANON}/unionhistory"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
 ${FONTS}${GA_TAG}
@@ -1158,7 +1158,7 @@ ${footer()}
   fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows));
   if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText, snapTextLine)); console.log('  wrote snapshot.html'); }
   fs.writeFileSync(path.join(SITE_DIR, 'calculator.html'), calculatorPage(rows)); console.log('  wrote calculator.html');
-  fs.writeFileSync(path.join(SITE_DIR, 'history.html'), historyPage()); console.log('  wrote history.html');
+  fs.writeFileSync(path.join(SITE_DIR, 'unionhistory.html'), historyPage()); console.log('  wrote unionhistory.html');
   const totalOpen = rows.reduce((s, r) => s + r.calls.length, 0);
   const activeN = rows.filter(r => r.calls.length > 0).length;
   fs.writeFileSync(path.join(SITE_DIR, 'llms.txt'),

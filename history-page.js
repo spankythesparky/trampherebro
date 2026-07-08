@@ -50,10 +50,10 @@ function historyPage() {
   const won = WON.map(w => `<div class="h-w"><div class="h">${esc(w[0])}</div><div class="d">${esc(w[1])}</div></div>`).join('');
   return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${CANON}/history">
+<link rel="canonical" href="${CANON}/unionhistory">
 <meta property="og:type" content="article"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
-<meta property="og:url" content="${CANON}/history"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta property="og:url" content="${CANON}/unionhistory"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
 ${FONTS}${GA_TAG}
