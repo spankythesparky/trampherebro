@@ -789,7 +789,7 @@ function calculatorPage(rows) {
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${CANON}/calculator">
+<link rel="canonical" href="${CANON}/calculator"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Union Paycheck Calculator","url":"${CANON}/calculator","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Free tool to compare union journeyman pay scale, benefits, and take-home across IBEW, lineman, and UA locals nationwide."}</script>
 <meta property="og:type" content="website"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${CANON}/calculator"><meta property="og:image" content="${CANON}/share-banner.png">
