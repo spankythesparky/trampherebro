@@ -1409,7 +1409,7 @@ ${footer()}
   const activeN = rows.filter(r => r.calls.length > 0).length;
   fs.writeFileSync(path.join(SITE_DIR, 'llms.txt'),
 `# TrampHereBro
-> Live IBEW job-call board for traveling union electricians. ${totalOpen} open calls across ${activeN} active locals right now, plus journeyman wage scale and hall contact info for ${rows.length} IBEW & UA locals across the US and Canada. Updated daily from hall dispatch pages.
+> Live union job-call board for traveling tradespeople — IBEW inside wiremen, IBEW linemen, and UA plumbers & pipefitters. ${totalOpen} open calls across ${activeN} active locals right now, plus journeyman wage scale and hall contact info for ${rows.length} locals across the US and Canada. Updated daily from hall dispatch pages.
 
 ## Key pages
 - [Live board](${CANON}/): all open job calls, top locals, and today's snapshot
