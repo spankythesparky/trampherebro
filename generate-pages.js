@@ -630,6 +630,9 @@ function sitemap(rows) {
     `  <url><loc>${loc}</loc>${key !== undefined ? alts(key) : ''}<lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`;
   const lines = [];
   CORE_PAGES.forEach(p => lines.push(entry(CANON + '/' + p, p)));
+  // Spanish homepage: hand-built entry since '' isn't a normal page key
+  const homeAlts = `<xhtml:link rel="alternate" hreflang="en" href="${CANON}/"/><xhtml:link rel="alternate" hreflang="es" href="${CANON}/es"/><xhtml:link rel="alternate" hreflang="x-default" href="${CANON}/"/>`;
+  lines.push(`  <url><loc>${CANON}/es</loc>${homeAlts}<lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`);
   // Spanish mirrors of translated core pages get their own sitemap entries
   CORE_PAGES.forEach(p => { if (TRANSLATED.has(p)) lines.push(entry(CANON + '/es/' + p, p)); });
   lines.push(entry(CANON + '/locals'));
@@ -692,7 +695,120 @@ async function resolveCoords(rows) {
   if (geocoded || fell) console.log(`  geocoded ${geocoded} new local(s), ${fell} via state fallback`);
   return coords;
 }
+/* Build es/index.html from the freshly-synced English homepage.
+   Runs AFTER syncHomepageMap so the Spanish board carries live data
+   (map locals, stat counts, daily snapshot) rather than a frozen copy. */
+function makeSpanishHome() {
+  let h;
+  try { h = fs.readFileSync(INDEX_HTML, 'utf8'); } catch (e) { return false; }
+
+  // --- head: lang, canonical, hreflang, title/description ---
+  h = h.replace('<html lang="en">', '<html lang="es">');
+  h = h.replace(
+    '<title>TrampHereBro — Live Union Job Calls: IBEW, Lineman & UA</title>',
+    '<title>TrampHereBro — Ofertas de Trabajo Sindical en Vivo: IBEW, Lineman y UA</title>'
+  );
+  h = h.replace(
+    /<meta name="description" content="[^"]*"/,
+    '<meta name="description" content="Ofertas de trabajo sindical en vivo de los salones sindicales de todo el país — llamadas abiertas, manos necesarias, escala de pago y números de libro. Gratis y actualizado a diario. Hecho por un viajero, para viajeros."'
+  );
+  h = h.replace(
+    /<link rel="canonical" href="[^"]*"\s*\/?>/,
+    '<link rel="canonical" href="' + CANON + '/es"><link rel="alternate" hreflang="en" href="' + CANON + '/"><link rel="alternate" hreflang="es" href="' + CANON + '/es"><link rel="alternate" hreflang="x-default" href="' + CANON + '/">'
+  );
+  h = h.replace(/<meta property="og:url" content="[^"]*"/, '<meta property="og:url" content="' + CANON + '/es"');
+
+  // --- nav: labels, localized hrefs, EN toggle pill ---
+  const togStyle = 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 11px;border:1.5px solid var(--orange);color:var(--orange);border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.03em';
+  const esNav = '<nav class="nav"><a href="/es" class="on">Tablero de Trabajo</a>' +
+    '<a href="/snapshot">Reporte Diario</a>' +
+    '<a href="/calculator">Calculadora de Pago</a>' +
+    '<a href="/resources">Recursos</a>' +
+    '<a href="/es/unionretirement">Jubilación Sindical</a>' +
+    '<span class="navdd"><a href="/es/unionhistory">Historia<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a>' +
+    '<span class="ddmenu"><a href="/es/unionhistory">Historia Sindical</a><a href="/es/ibewhistory">Historia del IBEW</a><a href="/es/uahistory">Historia del UA</a></span></span>' +
+    '<a href="/contact">Contacto</a>' +
+    '<a href="/" hreflang="en" aria-label="View in English" style="' + togStyle + '">EN</a>' +
+    '<a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Únete a JNCTN</a></nav>';
+  h = h.replace(/<nav class="nav">[\s\S]*?<\/nav>/, esNav);
+  // brand + logo link back to the Spanish home
+  h = h.replace('<a href="/" aria-label="TrampHereBro home"', '<a href="/es" aria-label="TrampHereBro inicio"');
+
+  // --- hero ---
+  h = h.replace('>Live · Union Labor Local Dispatch Nationwide<', '>En Vivo · Despacho Sindical de Locales a Nivel Nacional<');
+  h = h.replace('Find the work <b>before</b> you call the hall.', 'Encuentra el trabajo <b>antes</b> de llamar al salón.');
+  h = h.replace('>Real-time union job calls, scale, and book numbers<', '>Ofertas de trabajo sindical, escala y números de libro en tiempo real<');
+
+  // --- stat labels (values are injected live; only the labels change) ---
+  h = h.replace('<div class="l">Open calls</div>', '<div class="l">Llamadas abiertas</div>');
+  h = h.replace('<div class="l">Hands needed</div>', '<div class="l">Manos necesarias</div>');
+  h = h.replace('<div class="l">Active locals</div>', '<div class="l">Locales activos</div>');
+  h = h.replace('<div class="l">Locals tracked</div>', '<div class="l">Locales monitoreados</div>');
+
+  // --- trust line + trade chips + CTAs ---
+  h = h.replace(
+    "Updated daily at 5:30 PM EST. Always confirm with the local. <span style=\"color:var(--orange);font-weight:700\">Let's get trampin.</span>",
+    'Actualizado a diario a las 5:30 PM EST. Siempre confirma con el local. <span style="color:var(--orange);font-weight:700">A viajar.</span>'
+  );
+  h = h.replace('data-trade="IBEW">IBEW Indoor<', 'data-trade="IBEW">IBEW Interior<');
+  h = h.replace('data-trade="UA">UA Plumbers<', 'data-trade="UA">UA Plomeros<');
+  h = h.replace('<div class="trade soon">Ironworkers <span>SOON</span></div>', '<div class="trade soon">Ironworkers <span>PRONTO</span></div>');
+  h = h.replace('>Browse the board <svg', '>Explorar el tablero <svg');
+  h = h.replace('>Trampin Snapshot <svg', '>Reporte Trampin <svg');
+
+  // --- board controls ---
+  h = h.replace('placeholder="Search local, city, contractor, or data center"', 'placeholder="Busca local, ciudad, contratista o centro de datos"');
+  h = h.replace('data-f="all">All work<', 'data-f="all">Todo el trabajo<');
+  h = h.replace('>Top Trampin Spots in current need<', '>Mejores Lugares para Viajar con Necesidad Actual<');
+  h = h.replace('>Hotspots <span class="sub-c">locals with 50+ open calls</span>', '>Puntos Calientes <span class="sub-c">locales con más de 50 llamadas abiertas</span>');
+  h = h.replace('>Browse locals <span class="sub-c" id="browse-c"></span>', '>Explorar locales <span class="sub-c" id="browse-c"></span>');
+  h = h.replace('>View all locals →<', '>Ver todos los locales →<');
+  h = h.replace('data-c="United States">USA<', 'data-c="United States">EE.UU.<');
+  h = h.replace('data-c="Canada">Canada<', 'data-c="Canada">Canadá<');
+  h = h.replace('>Explore locals on the map <span class="sub-c">tap a pin for calls, scale &amp; contact</span>', '>Explora los locales en el mapa <span class="sub-c">toca un pin para ver llamadas, escala y contacto</span>');
+  h = h.replace('>IBEW — open calls<', '>IBEW — llamadas abiertas<');
+  h = h.replace('>IBEW — tracked<', '>IBEW — monitoreados<');
+
+  // --- snapshot section chrome (the daily prose itself stays English: it is live AI-written copy) ---
+  h = h.replace(/>Today's Trampin Snapshot</g, '>Reporte Trampin de Hoy<');
+  h = h.replace('>See the full daily update →<', '>Ver el reporte diario completo →<');
+
+  // --- footer ---
+  h = h.replace('The Union Job Board', 'El Tablero de Trabajo Sindical');
+  h = h.replace(
+    'TrampHereBro is an independent information platform. We have no affiliation with any union, labor organization, government entity, or industry group. All information is provided for educational purposes only.',
+    'TrampHereBro es una plataforma de información independiente. No tenemos afiliación con ningún sindicato, organización laboral, entidad gubernamental o grupo industrial. Toda la información se proporciona únicamente con fines educativos.'
+  );
+  h = h.replace('Proudly made by Noah "<b>Spanky The Sparky</b>" — IBEW Journeyman', 'Hecho con orgullo por Noah "<b>Spanky The Sparky</b>" — Oficial del IBEW');
+  h = h.replace('All rights reserved.', 'Todos los derechos reservados.');
+
+  const ES_DIR = path.join(SITE_DIR, 'es');
+  if (!fs.existsSync(ES_DIR)) fs.mkdirSync(ES_DIR, { recursive: true });
+  fs.writeFileSync(path.join(ES_DIR, 'index.html'), h);
+  return true;
+}
+
 function syncHomepageMap(rows, coords, snapText, snapTextLine) {
+  // Ensure the English homepage advertises its Spanish twin (idempotent: safe on every build)
+  const ensureEnglishHomeToggle = html => {
+    let o = html;
+    if (!o.includes('hreflang="es"')) {
+      const tags = `<link rel="alternate" hreflang="en" href="${CANON}/"><link rel="alternate" hreflang="es" href="${CANON}/es"><link rel="alternate" hreflang="x-default" href="${CANON}/">`;
+      o = o.replace(/(<link rel="canonical" href="[^"]*"\s*\/?>)/, '$1' + tags);
+    }
+    if (!o.includes('>ES</a>')) {
+      const tog = 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 11px;border:1.5px solid var(--orange);color:var(--orange);border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.03em';
+      o = o.replace(
+        '<a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Join JNCTN</a>',
+        `<a href="/es" hreflang="es" aria-label="Ver en Español" style="${tog}">ES</a><a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Join JNCTN</a>`
+      );
+    }
+    return o;
+  };
+  return syncHomepageMapInner(rows, coords, snapText, snapTextLine, ensureEnglishHomeToggle);
+}
+
+function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix) {
   let html;
   try { html = fs.readFileSync(INDEX_HTML, 'utf8'); } catch (e) { return false; }
   if (!html.includes('/*MAPLOCALS_START*/') || !html.includes('/*MAPLOCALS_END*/')) return false;
@@ -727,6 +843,7 @@ function syncHomepageMap(rows, coords, snapText, snapTextLine) {
     out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + snapHtml + '<!--HS_END-->');
   }
 
+  if (typeof postFix === 'function') out = postFix(out);
   fs.writeFileSync(INDEX_HTML, out);
   return arr.length;
 }
@@ -1694,6 +1811,7 @@ TrampHereBro aggregates publicly posted union job calls so traveling inside wire
   // keep the homepage map + browse board in sync with Supabase
   const coords = await resolveCoords(rows);
   const mapCount = syncHomepageMap(rows, coords, snapText, snapTextLine);
+  if (makeSpanishHome()) console.log('  wrote es/index.html');
 
   console.log(`\n✓ Wrote ${written} local pages (${withCalls} with open calls, ${written - withCalls} evergreen)`);
   console.log(`✓ Wrote locals/index.html hub`);
