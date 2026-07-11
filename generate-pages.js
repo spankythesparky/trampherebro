@@ -280,7 +280,7 @@ function hreflangTags(page) {
 }
 /* ========================================================================= */
 
-function topbar(active, lang) {
+function topbar(active, lang, togglePath) {
   lang = lang || 'en';
   const on = p => active === p ? ' class="on"' : '';
   const T = lang === 'es'
@@ -289,10 +289,12 @@ function topbar(active, lang) {
   // EN/ES toggle — only shown on pages that actually have a mirror, so it never 404s
   const togStyle = 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 11px;border:1.5px solid var(--orange);color:var(--orange);border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.03em';
   let toggle = '';
-  if (TRANSLATED.has(active)) {
+  // togglePath (e.g. 'locals/ibew-local-237') lets pages with no nav key still offer the switch
+  const tp = togglePath || (TRANSLATED.has(active) ? active : null);
+  if (tp) {
     toggle = lang === 'es'
-      ? `<a href="/${active}" hreflang="en" aria-label="View in English" style="${togStyle}">EN</a>`
-      : `<a href="/es/${active}" hreflang="es" aria-label="Ver en Español" style="${togStyle}">ES</a>`;
+      ? `<a href="/${tp}" hreflang="en" aria-label="View in English" style="${togStyle}">EN</a>`
+      : `<a href="/es/${tp}" hreflang="es" aria-label="Ver en Español" style="${togStyle}">ES</a>`;
   }
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="${lhref('', lang)}">Tramp<span class="b">Here</span>Bro</a>
@@ -328,7 +330,8 @@ function callDetail(c) {
   if (c.notes) bits.push(esc(String(c.notes).replace(/\s+/g,' ').slice(0, 120)));
   return bits.join(' · ');
 }
-function callRow(c) {
+function callRow(c, lang) {
+  const es = lang === 'es';
   const cls = String(c.call_type || 'JW').replace(/inside\s*/i, '').trim() || 'JW';
   const parts = [];
   if (c.contractor) parts.push(`<b>${esc(c.contractor)}</b>`);
@@ -337,9 +340,9 @@ function callRow(c) {
   if (loc) parts.push(loc);
   if (c.duration) parts.push(esc(c.duration));
   const pay = (c.scale != null && c.scale !== '') ? '$' + Number(c.scale).toFixed(2) + '/hr'
-            : (c.per_diem ? 'per diem ' + esc(c.per_diem) : 'scale');
+            : (c.per_diem ? (es ? 'viáticos ' : 'per diem ') + esc(c.per_diem) : (es ? 'escala' : 'scale'));
   parts.push(`<span class="ocall-pay">${pay}</span>`);
-  if (c.per_diem && c.scale != null && c.scale !== '') parts.push('per diem ' + esc(c.per_diem));
+  if (c.per_diem && c.scale != null && c.scale !== '') parts.push((es ? 'viáticos ' : 'per diem ') + esc(c.per_diem));
   if (c.notes) parts.push(`<span class="ocall-note">${esc(String(c.notes).replace(/\s+/g, ' ').slice(0, 90))}</span>`);
   return `<div class="ocall">${parts.join(' <span class="ocall-dot">·</span> ')}</div>`;
 }
@@ -390,7 +393,9 @@ function jobPostingLd(local, c) {
   return obj;
 }
 
-function localPage(local, calls) {
+function localPage(local, calls, lang) {
+  lang = lang || 'en';
+  const es = lang === 'es';
   const n = localNumber(local.name);
   const T = tradeOf(local);
   const _sc = local.trade === 'LINEMAN' ? (LINEMAN_SCALE[localNumber(local.name)] || {}) : ((local.trade && local.trade !== 'IBEW') ? {} : (SCALE[localNumber(local.name)] || {}));
@@ -399,25 +404,48 @@ function localPage(local, calls) {
   const label = T.name + ' Local ' + (n || local.id);
   const place = [local.city, local.state].filter(Boolean).join(', ');
   const slug = slugFor(local.name, local.id, local.trade);
-  const url = `${CANON}/locals/${slug}`;
+  const urlEn = `${CANON}/locals/${slug}`;
+  const urlEs = `${CANON}/es/locals/${slug}`;
+  const url = es ? urlEs : urlEn;
+  const home = es ? '/es' : '/';
+  const localsHub = es ? '/es/locals' : '/locals';
+  // Spanish label for the workers of this trade
+  const workersEs = local.trade === 'LINEMAN' ? 'linemen' : (local.trade === 'UA' ? 'plomeros y pipefitters' : 'electricistas');
+  const workers = es ? workersEs : T.workers;
+
   // "Send to a buddy" — text/email/copy share (baked per page)
   const _scall = calls.slice(0, 5).map(c => '• ' + [c.contractor, ((c.num_needed ? c.num_needed + ' ' : '') + (c.call_type || '')).trim(), c.location].filter(Boolean).join(' · ')).join('\n');
   const _sbody = calls.length
-    ? `${label} — ${calls.length} open call${calls.length > 1 ? 's' : ''} on TrampHereBro:\n\n${_scall}${calls.length > 5 ? `\n…and ${calls.length - 5} more` : ''}\n\nSee all calls + dispatch info:\n${url}`
-    : `${label} on TrampHereBro — dispatch, scale & contact info:\n${url}`;
-  const _ssub = `${label} job calls — TrampHereBro`;
+    ? (es
+        ? `${label} — ${calls.length} llamada${calls.length > 1 ? 's' : ''} abierta${calls.length > 1 ? 's' : ''} en TrampHereBro:\n\n${_scall}${calls.length > 5 ? `\n…y ${calls.length - 5} más` : ''}\n\nVer todas las llamadas + info de despacho:\n${url}`
+        : `${label} — ${calls.length} open call${calls.length > 1 ? 's' : ''} on TrampHereBro:\n\n${_scall}${calls.length > 5 ? `\n…and ${calls.length - 5} more` : ''}\n\nSee all calls + dispatch info:\n${url}`)
+    : (es
+        ? `${label} en TrampHereBro — despacho, escala e info de contacto:\n${url}`
+        : `${label} on TrampHereBro — dispatch, scale & contact info:\n${url}`);
+  const _ssub = es ? `Llamadas de trabajo de ${label} — TrampHereBro` : `${label} job calls — TrampHereBro`;
   const _sms = 'sms:?&body=' + encodeURIComponent(_sbody);
   const _mail = 'mailto:?subject=' + encodeURIComponent(_ssub) + '&body=' + encodeURIComponent(_sbody);
-  const shareBlock = `<div style="margin:22px 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="font-weight:800;color:var(--navy);font-size:15px">Send this local to a buddy</div><div data-ts="buddy" style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.55);border-radius:999px;color:var(--orange);font-size:12.5px;font-weight:800;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></span>Updated ${stampFor(calls)}</div></div><div style="color:var(--slate);font-size:13px;margin:4px 0 13px">Text or email these calls to someone chasing work.</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="${_sms}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Text it</a><a href="${_mail}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;text-decoration:none">Email it</a><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}');this.textContent='Link copied'}" style="padding:11px 20px;border-radius:10px;background:#fff;color:var(--navy);border:1px solid var(--line);font-weight:700;font-size:14px;cursor:pointer">Copy link</button></div></div>`;
+  const S = es
+    ? { head: 'Manda este local a un compa', sub: 'Envía estas llamadas por mensaje o correo a alguien buscando trabajo.', txt: 'Mandar mensaje', mail: 'Enviar correo', copy: 'Copiar enlace', copied: 'Enlace copiado', upd: 'Actualizado' }
+    : { head: 'Send this local to a buddy', sub: 'Text or email these calls to someone chasing work.', txt: 'Text it', mail: 'Email it', copy: 'Copy link', copied: 'Link copied', upd: 'Updated' };
+  const shareBlock = `<div style="margin:22px 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="font-weight:800;color:var(--navy);font-size:15px">${S.head}</div><div data-ts="buddy" style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.55);border-radius:999px;color:var(--orange);font-size:12.5px;font-weight:800;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></span>${S.upd} ${stampFor(calls)}</div></div><div style="color:var(--slate);font-size:13px;margin:4px 0 13px">${S.sub}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="${_sms}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;text-decoration:none">${S.txt}</a><a href="${_mail}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;text-decoration:none">${S.mail}</a><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}');this.textContent='${S.copied}'}" style="padding:11px 20px;border-radius:10px;background:#fff;color:var(--navy);border:1px solid var(--line);font-weight:700;font-size:14px;cursor:pointer">${S.copy}</button></div></div>`;
   const hands = calls.reduce((s, c) => s + (Number(c.num_needed) || 0), 0);
   const hasCalls = calls.length > 0;
 
-  const title = hasCalls
-    ? `${label} Job Calls — ${calls.length} Open Calls, Scale & Dispatch | TrampHereBro`
-    : `${label} Job Calls, Journeyman Scale & Dispatch${place ? ' — ' + place : ''} | TrampHereBro`;
-  const desc = hasCalls
-    ? `${calls.length} open ${label} job calls right now — ${hands} hands needed${local.jw_scale != null ? ', JW scale ' + money(local.jw_scale) + '/hr' : ''}. Contractor, per diem, and dispatch info for traveling ${T.workers}. Updated ${PRETTY_DATE}.`
-    : `${label} job calls${local.jw_scale != null ? ', journeyman scale (' + money(local.jw_scale) + '/hr),' : ','} contact and dispatch info for traveling ${T.workers}${place ? ' in ' + place : ''}. No open calls posted right now — updated daily.`;
+  const title = es
+    ? (hasCalls
+        ? `Llamadas de Trabajo de ${label} — ${calls.length} Llamadas Abiertas, Escala y Despacho | TrampHereBro`
+        : `Llamadas de Trabajo de ${label}, Escala de Oficial y Despacho${place ? ' — ' + place : ''} | TrampHereBro`)
+    : (hasCalls
+        ? `${label} Job Calls — ${calls.length} Open Calls, Scale & Dispatch | TrampHereBro`
+        : `${label} Job Calls, Journeyman Scale & Dispatch${place ? ' — ' + place : ''} | TrampHereBro`);
+  const desc = es
+    ? (hasCalls
+        ? `${calls.length} llamadas de trabajo abiertas en ${label} ahora mismo — ${hands} manos necesarias${local.jw_scale != null ? ', escala de oficial ' + money(local.jw_scale) + '/hr' : ''}. Contratista, viáticos e info de despacho para ${workers} viajeros. Actualizado ${PRETTY_DATE_ES}.`
+        : `Llamadas de trabajo de ${label}${local.jw_scale != null ? ', escala de oficial (' + money(local.jw_scale) + '/hr),' : ','} contacto e información de despacho para ${workers} viajeros${place ? ' en ' + place : ''}. No hay llamadas abiertas ahora mismo — actualizado a diario.`)
+    : (hasCalls
+        ? `${calls.length} open ${label} job calls right now — ${hands} hands needed${local.jw_scale != null ? ', JW scale ' + money(local.jw_scale) + '/hr' : ''}. Contractor, per diem, and dispatch info for traveling ${T.workers}. Updated ${PRETTY_DATE}.`
+        : `${label} job calls${local.jw_scale != null ? ', journeyman scale (' + money(local.jw_scale) + '/hr),' : ','} contact and dispatch info for traveling ${T.workers}${place ? ' in ' + place : ''}. No open calls posted right now — updated daily.`);
 
   // vitals
   const _ci = (local.trade && local.trade !== 'IBEW') ? {} : (CONTACT[localNumber(local.name)] || {});
@@ -430,58 +458,85 @@ function localPage(local, calls) {
   const _hr = '<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span>';
   const _scaleStr = _m(local.jw_scale);
   const _noPen = !_m(_sc.pension_def) && !_m(_sc.pension_dc) && !_m(_sc.nebf) && !_m(_sc.k401);
+  const V = es
+    ? { jw: 'Escala de Oficial', total: 'Paquete Total', hw: 'Salud y Bienestar', pdef: 'Pensión Definida', pdc: 'Pensión de Contribución', nebf: 'Pensión NEBF', k401: '401(k)', pen: 'Pensión', vac: 'Vacaciones', dues: 'Cuotas de Trabajo', books: 'Libros', bk1: 'Lib1', bk2: 'Lib2' }
+    : { jw: 'Journeyman Scale', total: 'Total Package', hw: 'Health &amp; Welfare', pdef: 'Defined Pension', pdc: 'Contribution Pension', nebf: 'NEBF Pension', k401: '401(k)', pen: 'Pension', vac: 'Vacation', dues: 'Working Dues', books: 'Books', bk1: 'Bk1', bk2: 'Bk2' };
   const vitals = [
-    _scaleStr ? vit('Journeyman Scale', _scaleStr + _hr) : '',
-    _m(_sc.total) ? vit('Total Package', _m(_sc.total) + _hr) : '',
-    _m(local.hw) ? vit('Health &amp; Welfare', _m(local.hw)) : '',
-    _m(_sc.pension_def) ? vit('Defined Pension', _m(_sc.pension_def)) : '',
-    _m(_sc.pension_dc) ? vit('Contribution Pension', _m(_sc.pension_dc)) : '',
-    _m(_sc.nebf) ? vit('NEBF Pension', _m(_sc.nebf)) : '',
-    _m(_sc.k401) ? vit('401(k)', _m(_sc.k401)) : '',
-    (_noPen && local.pension != null) ? vit('Pension', money(local.pension), true) : '',
-    _sc.vacation ? vit('Vacation', esc(_sc.vacation), true) : '',
-    _sc.dues ? vit('Working Dues', esc(_sc.dues), true) : '',
+    _scaleStr ? vit(V.jw, _scaleStr + _hr) : '',
+    _m(_sc.total) ? vit(V.total, _m(_sc.total) + _hr) : '',
+    _m(local.hw) ? vit(V.hw, _m(local.hw)) : '',
+    _m(_sc.pension_def) ? vit(V.pdef, _m(_sc.pension_def)) : '',
+    _m(_sc.pension_dc) ? vit(V.pdc, _m(_sc.pension_dc)) : '',
+    _m(_sc.nebf) ? vit(V.nebf, _m(_sc.nebf)) : '',
+    _m(_sc.k401) ? vit(V.k401, _m(_sc.k401)) : '',
+    (_noPen && local.pension != null) ? vit(V.pen, money(local.pension), true) : '',
+    _sc.vacation ? vit(V.vac, esc(_sc.vacation), true) : '',
+    _sc.dues ? vit(V.dues, esc(_sc.dues), true) : '',
     (local.book1 != null || local.book2 != null)
-      ? vit('Books', `${local.book1 != null ? 'Bk1 ' + esc(local.book1) : ''}${(local.book1 != null && local.book2 != null) ? ' · ' : ''}${local.book2 != null ? 'Bk2 ' + esc(local.book2) : ''}` || '—', true)
+      ? vit(V.books, `${local.book1 != null ? V.bk1 + ' ' + esc(local.book1) : ''}${(local.book1 != null && local.book2 != null) ? ' · ' : ''}${local.book2 != null ? V.bk2 + ' ' + esc(local.book2) : ''}` || '—', true)
       : ''
   ].filter(Boolean).join('');
-  const wageUpdated = _sc.updated ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">Wage package last updated ${esc(_sc.updated)} · Wage data via <a href="https://www.unionpayscales.com" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline">unionpayscales.com</a></div>` : '';
+  const wageUpdated = _sc.updated
+    ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">${es ? 'Paquete salarial actualizado por última vez' : 'Wage package last updated'} ${esc(_sc.updated)} · ${es ? 'Datos salariales vía' : 'Wage data via'} <a href="https://www.unionpayscales.com" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline">unionpayscales.com</a></div>`
+    : '';
 
-  const dispatchBtn = ''; // dispatch link removed per request
   const _telHref = cPhone.replace(/[^\d+]/g, '');
   const _webShow = cWebsite.replace(/^https?:\/\//, '').replace(/\/$/, '');
+  const C = es
+    ? { contact: 'Contacto', addr: 'Dirección', phone: 'Teléfono', email: 'Correo', web: 'Sitio Web' }
+    : { contact: 'Contact', addr: 'Address', phone: 'Phone', email: 'Email', web: 'Website' };
   const contactItems = [
-    cAddress ? vit('Address', esc(cAddress), true) : '',
-    cPhone ? vit('Phone', `<a href="tel:${esc(_telHref)}" style="color:inherit">${esc(cPhone)}</a>`, true) : '',
-    cEmail ? vit('Email', `<a href="mailto:${esc(cEmail)}" style="color:var(--orange);font-weight:600">${esc(cEmail)}</a>`, true) : '',
-    cWebsite ? vit('Website', `<a href="${esc(cWebsite)}" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600">${esc(_webShow)}</a>`, true) : ''
+    cAddress ? vit(C.addr, esc(cAddress), true) : '',
+    cPhone ? vit(C.phone, `<a href="tel:${esc(_telHref)}" style="color:inherit">${esc(cPhone)}</a>`, true) : '',
+    cEmail ? vit(C.email, `<a href="mailto:${esc(cEmail)}" style="color:var(--orange);font-weight:600">${esc(cEmail)}</a>`, true) : '',
+    cWebsite ? vit(C.web, `<a href="${esc(cWebsite)}" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600">${esc(_webShow)}</a>`, true) : ''
   ].filter(Boolean).join('');
-  const contactCard = contactItems ? `<div class="sec-h">Contact</div><div class="vitcard"><div class="vitals">${contactItems}</div></div>` : '';
+  const contactCard = contactItems ? `<div class="sec-h">${C.contact}</div><div class="vitcard"><div class="vitals">${contactItems}</div></div>` : '';
 
   const callsBlock = hasCalls
-    ? `<div class="sec-h">Work Outlook</div><div class="callcard">`
+    ? `<div class="sec-h">${es ? 'Panorama de Trabajo' : 'Work Outlook'}</div><div class="callcard">`
       + (local._outlook ? `<p class="outlook-lead">${esc(local._outlook)}</p>` : '')
-      + `<div class="ocall-count">${calls.length} open call${calls.length > 1 ? 's' : ''} · ${hands} hands needed</div>`
-      + calls.map(callRow).join('')
+      + `<div class="ocall-count">${es ? `${calls.length} llamada${calls.length > 1 ? 's' : ''} abierta${calls.length > 1 ? 's' : ''} · ${hands} manos necesarias` : `${calls.length} open call${calls.length > 1 ? 's' : ''} · ${hands} hands needed`}</div>`
+      + calls.map(c => callRow(c, lang)).join('')
       + `</div>`
-    : `<div class="sec-h">Open calls</div><div class="nocalls"><b>No open calls posted right now.</b><br>This local isn't showing open calls at the moment. Scale and dispatch info below stays current — check back, the board is swept daily.</div>`;
+    : `<div class="sec-h">${es ? 'Llamadas abiertas' : 'Open calls'}</div><div class="nocalls">${es
+        ? `<b>No hay llamadas abiertas publicadas ahora mismo.</b><br>Este local no muestra llamadas abiertas en este momento. La escala y la información de despacho abajo siguen vigentes — vuelve a revisar, el tablero se actualiza a diario.`
+        : `<b>No open calls posted right now.</b><br>This local isn't showing open calls at the moment. Scale and dispatch info below stays current — check back, the board is swept daily.`}</div>`;
 
-  const _scaleLine = local.jw_scale != null ? ` Journeyman scale runs <span class="k">${money(local.jw_scale)}/hr</span>.` : '';
-  const outlook = hasCalls
-    ? `${label}${place ? ' out of ' + place : ''} currently has <span class="k">${calls.length} open job call${calls.length > 1 ? 's' : ''}</span> on the books, needing about <span class="k">${hands} hands</span>.${_scaleLine} Calls below are pulled live from the local's dispatch — sign the appropriate book and call the hall to confirm before you roll.`
-    : `${label}${place ? ' covers ' + place : ''} and is tracked here for traveling ${T.workers}.${_scaleLine} No calls are open right now, but this page updates daily — bookmark it and check back, or watch the full <a href="/" style="color:var(--orange);font-weight:600">live board</a> for the whole country.`;
+  const _scaleLine = local.jw_scale != null
+    ? (es ? ` La escala de oficial es de <span class="k">${money(local.jw_scale)}/hr</span>.` : ` Journeyman scale runs <span class="k">${money(local.jw_scale)}/hr</span>.`)
+    : '';
+  const outlook = es
+    ? (hasCalls
+        ? `${label}${place ? ' en ' + place : ''} tiene actualmente <span class="k">${calls.length} llamada${calls.length > 1 ? 's' : ''} de trabajo abierta${calls.length > 1 ? 's' : ''}</span> en los libros, necesitando alrededor de <span class="k">${hands} manos</span>.${_scaleLine} Las llamadas de abajo se extraen en vivo del despacho del local — firma el libro correspondiente y llama al salón para confirmar antes de salir.`
+        : `${label}${place ? ' cubre ' + place : ''} y se monitorea aquí para ${workers} viajeros.${_scaleLine} No hay llamadas abiertas ahora mismo, pero esta página se actualiza a diario — guárdala y vuelve a revisar, o mira el <a href="${home}" style="color:var(--orange);font-weight:600">tablero en vivo</a> completo de todo el país.`)
+    : (hasCalls
+        ? `${label}${place ? ' out of ' + place : ''} currently has <span class="k">${calls.length} open job call${calls.length > 1 ? 's' : ''}</span> on the books, needing about <span class="k">${hands} hands</span>.${_scaleLine} Calls below are pulled live from the local's dispatch — sign the appropriate book and call the hall to confirm before you roll.`
+        : `${label}${place ? ' covers ' + place : ''} and is tracked here for traveling ${T.workers}.${_scaleLine} No calls are open right now, but this page updates daily — bookmark it and check back, or watch the full <a href="${home}" style="color:var(--orange);font-weight:600">live board</a> for the whole country.`);
 
-  // schema
+  // schema — always English-language facts, but localized names/urls
   const breadcrumb = {
     '@context': 'https://schema.org', '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: CANON + '/' },
-      { '@type': 'ListItem', position: 2, name: 'Locals', item: CANON + '/locals' },
+      { '@type': 'ListItem', position: 1, name: es ? 'Inicio' : 'Home', item: CANON + (es ? '/es' : '/') },
+      { '@type': 'ListItem', position: 2, name: es ? 'Locales' : 'Locals', item: CANON + localsHub },
       { '@type': 'ListItem', position: 3, name: label, item: url }
     ]
   };
-  const faq = {
-    '@context': 'https://schema.org', '@type': 'FAQPage',
+  const faq = es ? {
+    '@context': 'https://schema.org', '@type': 'FAQPage', inLanguage: 'es',
+    mainEntity: [
+      { '@type': 'Question', name: `¿${label} tiene llamadas de trabajo abiertas ahora mismo?`,
+        acceptedAnswer: { '@type': 'Answer', text: hasCalls
+          ? `Sí — ${label} tiene ${calls.length} llamada${calls.length > 1 ? 's' : ''} abierta${calls.length > 1 ? 's' : ''} necesitando alrededor de ${hands} manos al ${PRETTY_DATE_ES}. Los detalles están en esta página y se actualizan a diario.`
+          : `No por el momento. ${label} no tiene llamadas abiertas publicadas al ${PRETTY_DATE_ES}. Esta página se revisa a diario, así que vuelve a consultarla para ver nuevas llamadas.` } },
+      { '@type': 'Question', name: `¿Cuál es la escala de oficial en ${label}?`,
+        acceptedAnswer: { '@type': 'Answer', text: local.jw_scale != null
+          ? `La escala base de oficial en ${label} es de ${money(local.jw_scale)} por hora${local.hw != null ? ', más ' + money(local.hw) + ' de salud y bienestar' : ''}.`
+          : `La escala de ${label} aún no está confirmada en esta página. Contacta al despacho del local para conocer las tarifas salariales actuales.` } }
+    ]
+  } : {
+    '@context': 'https://schema.org', '@type': 'FAQPage', inLanguage: 'en',
     mainEntity: [
       { '@type': 'Question', name: `Does ${label} have open job calls right now?`,
         acceptedAnswer: { '@type': 'Answer', text: hasCalls
@@ -493,15 +548,43 @@ function localPage(local, calls) {
           : `Scale for ${label} isn't confirmed on this page yet. Contact the local's dispatch for current wage rates.` } }
     ]
   };
-  const jobLd = calls.map(c => jobPostingLd(local, c));
+  const jobLd = calls.map(c => { const o = jobPostingLd(local, c); o.inLanguage = lang; return o; });
   const ldBlocks = [breadcrumb, faq, ...jobLd]
     .map(o => `<script type="application/ld+json">${JSON.stringify(o)}</script>`).join('\n');
 
-  return `<!DOCTYPE html><html lang="en"><head>
+  const hrefAlts = `<link rel="alternate" hreflang="en" href="${urlEn}"><link rel="alternate" hreflang="es" href="${urlEs}"><link rel="alternate" hreflang="x-default" href="${urlEn}">`;
+  const H = es
+    ? { crumbHome: 'Tablero', crumbLocals: 'Locales', kick: `Llamadas de Trabajo de ${T.name} en Vivo`, h1b: 'Llamadas de Trabajo',
+        oc: 'LLAMADAS ABIERTAS', hn: 'MANOS NECESARIAS', sc: 'ESCALA OFICIAL / HR', vitalsH: 'Datos del local',
+        back1: '← Volver al tablero completo en vivo', back2: 'Todos los locales →' }
+    : { crumbHome: 'Board', crumbLocals: 'Locals', kick: `Live ${T.name} Job Calls`, h1b: 'Job Calls',
+        oc: 'OPEN CALLS', hn: 'HANDS NEEDED', sc: 'JW SCALE / HR', vitalsH: 'Local vitals',
+        back1: '← Back to the full live board', back2: 'All locals →' };
+  const hsub = es
+    ? `${place ? esc(place) + ' · ' : ''}${local.trade && local.trade !== 'IBEW' ? 'Información de contacto y llamadas de trabajo para ' + workers + ' viajeros — actualizado a diario.' : 'Llamadas abiertas de electricista interior, escala de oficial y despacho — actualizado a diario.'}`
+    : `${place ? esc(place) + ' · ' : ''}${local.trade && local.trade !== 'IBEW' ? 'Contact and job-call info for traveling ' + T.workers + ' — updated daily.' : 'Open inside-wireman calls, journeyman scale, and dispatch — updated daily.'}`;
+  const faqQ1 = es ? `¿${esc(label)} tiene llamadas abiertas ahora mismo?` : `Does ${esc(label)} have open calls right now?`;
+  const faqA1 = es
+    ? (hasCalls ? `Sí — ${calls.length} llamada${calls.length > 1 ? 's' : ''} abierta${calls.length > 1 ? 's' : ''} necesitando ~${hands} manos al ${esc(PRETTY_DATE_ES)}, listadas arriba y actualizadas a diario.` : `No por ahora. No hay llamadas abiertas publicadas al ${esc(PRETTY_DATE_ES)}. Esta página se revisa a diario.`)
+    : (hasCalls ? `Yes — ${calls.length} open call${calls.length > 1 ? 's' : ''} needing ~${hands} hands as of ${esc(PRETTY_DATE)}, listed above and updated daily.` : `Not right now. No open calls posted as of ${esc(PRETTY_DATE)}. This page is swept daily.`);
+  const faqQ2 = es ? `¿Cuál es la escala de oficial en ${esc(label)}?` : `What's the journeyman scale at ${esc(label)}?`;
+  const jwWord = es
+    ? (local.trade === 'LINEMAN' ? 'La escala base de lineman oficial' : 'La escala base de oficial')
+    : (local.trade === 'LINEMAN' ? 'Journeyman lineman' : (local.trade && local.trade !== 'IBEW' ? 'Journeyman' : 'Inside JW'));
+  const faqA2 = local.jw_scale != null
+    ? (es
+        ? `${jwWord} es ${money(local.jw_scale)}/hr${local.hw != null ? `, más ${money(local.hw)} de salud y bienestar` : ''}.`
+        : `${jwWord} base scale is ${money(local.jw_scale)}/hr${local.hw != null ? `, plus ${money(local.hw)} health &amp; welfare` : ''}.`)
+    : (es
+        ? `La escala aún no está confirmada aquí. Contacta al despacho del local para conocer las tarifas actuales.`
+        : `Scale isn't confirmed here yet. Contact the local's dispatch for current rates.`);
+
+  return `<!DOCTYPE html><html lang="${lang}"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${url}">
+${hrefAlts}
 <meta property="og:type" content="website"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${url}"><meta property="og:image" content="${CANON}/share-banner.png">
@@ -511,38 +594,45 @@ ${FONTS}${GA_TAG}
 <style>${CSS}</style>
 ${ldBlocks}
 </head><body>
-${topbar('')}
+${topbar('', lang, 'locals/' + slug)}
 <header><div class="hero-inner">
-<div class="crumbs"><a href="/">Board</a> › <a href="/locals">Locals</a> › ${esc(label)}</div>
-<div class="kick"><span class="dot"></span>Live ${T.name} Job Calls</div>
-<h1 class="lede">${esc(label)} <b>Job Calls</b></h1>
-<div class="hsub">${place ? esc(place) + ' · ' : ''}${local.trade && local.trade !== 'IBEW' ? 'Contact and job-call info for traveling ' + T.workers + ' — updated daily.' : 'Open inside-wireman calls, journeyman scale, and dispatch info — pulled live and updated daily.'}</div>
+<div class="crumbs"><a href="${home}">${H.crumbHome}</a> › <a href="${localsHub}">${H.crumbLocals}</a> › ${esc(label)}</div>
+<div class="kick"><span class="dot"></span>${H.kick}</div>
+<h1 class="lede">${esc(label)} <b>${H.h1b}</b></h1>
+<div class="hsub">${hsub}</div>
 <div class="hstats">
-<div class="hstat"><div class="n accent">${hasCalls ? calls.length : '0'}</div><div class="l">OPEN CALLS</div></div>
-<div class="hstat"><div class="n">${hands}</div><div class="l">HANDS NEEDED</div></div>
-${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_scale)}</div><div class="l">JW SCALE / HR</div></div>` : ''}
+<div class="hstat"><div class="n accent">${hasCalls ? calls.length : '0'}</div><div class="l">${H.oc}</div></div>
+<div class="hstat"><div class="n">${hands}</div><div class="l">${H.hn}</div></div>
+${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_scale)}</div><div class="l">${H.sc}</div></div>` : ''}
 </div>
 </div></header>
 <main class="wrap">
-${vitals ? `<div class="sec-h">Local vitals</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
+${vitals ? `<div class="sec-h">${H.vitalsH}</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
 ${contactCard}
 ${shareBlock}
 ${callsBlock}
 <p class="outlook">${outlook}</p>
 <div class="faq">
-<h3>Does ${esc(label)} have open calls right now?</h3>
-<p>${hasCalls ? `Yes — ${calls.length} open call${calls.length > 1 ? 's' : ''} needing ~${hands} hands as of ${esc(PRETTY_DATE)}, listed above and updated daily.` : `Not right now. No open calls posted as of ${esc(PRETTY_DATE)}. This page is swept daily — check back.`}</p>
-<h3>What's the journeyman scale at ${esc(label)}?</h3>
-<p>${local.jw_scale != null ? `${local.trade === 'LINEMAN' ? 'Journeyman lineman' : (local.trade && local.trade !== 'IBEW' ? 'Journeyman' : 'Inside JW')} base scale is ${money(local.jw_scale)}/hr${local.hw != null ? `, plus ${money(local.hw)} H&amp;W` : ''}.` : `Scale isn't confirmed here yet — contact dispatch for current rates.`}</p>
+<h3>${faqQ1}</h3>
+<p>${faqA1}</p>
+<h3>${faqQ2}</h3>
+<p>${faqA2}</p>
 </div>
-<div class="backbar"><a class="backbtn" href="/">← Back to the full live board</a> &nbsp; <a class="backbtn" href="/locals">All locals →</a></div>
+<div class="backbar"><a class="backbtn" href="${home}">${H.back1}</a> &nbsp; <a class="backbtn" href="${localsHub}">${H.back2}</a></div>
 </main>
-${footer()}
+${footer(lang)}
 </body></html>`;
 }
 
 /* ----------------------------- directory hub ------------------------------ */
-function hubPage(rows) {
+function hubPage(rows, lang) {
+  lang = lang || 'en';
+  const es = lang === 'es';
+  const HB = es
+    ? { title: 'Todos los Locales del IBEW y UA — Llamadas de Trabajo, Escala Salarial y Directorio de Despacho | TrampHereBro', crumbHome: 'Tablero', crumbLocals: 'Locales', kick: 'Directorio de Locales', h1a: 'Todos los ', h1b: 'Locales', oc: 'LLAMADAS ABIERTAS', al: 'LOCALES ACTIVOS', lt: 'LOCALES MONITOREADOS', ph: 'Busca por número de local, ciudad o estado…', open: 'abiertas', locals: 'locales' }
+    : { title: 'All IBEW & UA Locals — Job Calls, Wage Scale & Dispatch Directory | TrampHereBro', crumbHome: 'Board', crumbLocals: 'Locals', kick: 'Local Directory', h1a: 'All ', h1b: 'Locals', oc: 'OPEN CALLS', al: 'ACTIVE LOCALS', lt: 'LOCALS TRACKED', ph: 'Search by local number, city, or state…', open: 'open', locals: 'locals' };
+  const home = es ? '/es' : '/';
+  const hubUrl = CANON + (es ? '/es/locals' : '/locals');
   const byState = {};
   rows.forEach(r => { (byState[r.local.state] = byState[r.local.state] || []).push(r); });
   const totalCalls = rows.reduce((s, r) => s + r.calls.length, 0);
@@ -554,9 +644,9 @@ function hubPage(rows) {
     const links = list.map(r => {
       const num = localNumber(r.local.name), slug = slugFor(r.local.name, r.local.id, r.local.trade), cc = r.calls.length;
       const s = `${num || ''} ${(r.local.city || '').toLowerCase()} ${stateName(st).toLowerCase()} ${st.toLowerCase()}`;
-      return `<a class="hub-local" href="/locals/${slug}" data-s="${esc(s)} ${(r.local.trade||'ibew').toLowerCase()}"><span class="hl-name">${tradeOf(r.local).name} ${num || r.local.id}${r.local.city ? ' · ' + esc(r.local.city) : ''}</span><span class="hl-cc${cc > 0 ? ' hot' : ''}">${cc > 0 ? cc + ' open' : '—'}</span></a>`;
+      return `<a class="hub-local" href="${es ? '/es' : ''}/locals/${slug}" data-s="${esc(s)} ${(r.local.trade||'ibew').toLowerCase()}"><span class="hl-name">${tradeOf(r.local).name} ${num || r.local.id}${r.local.city ? ' · ' + esc(r.local.city) : ''}</span><span class="hl-cc${cc > 0 ? ' hot' : ''}">${cc > 0 ? cc + ' ' + HB.open : '—'}</span></a>`;
     }).join('');
-    return `<div class="hub-state" data-state="${st}"><button class="hub-state-h" onclick="toggleState(this)" aria-expanded="false"><span class="hs-name">${esc(stateName(st))}</span><span class="hs-meta">${oc > 0 ? `<span class="hs-oc">${oc} open</span>` : ''}<span>${list.length} local${list.length > 1 ? 's' : ''}</span></span><svg class="hs-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button><div class="hub-state-body"><div class="hub-state-in">${links}</div></div></div>`;
+    return `<div class="hub-state" data-state="${st}"><button class="hub-state-h" onclick="toggleState(this)" aria-expanded="false"><span class="hs-name">${esc(stateName(st))}</span><span class="hs-meta">${oc > 0 ? `<span class="hs-oc">${oc} ${HB.open}</span>` : ''}<span>${list.length} ${list.length > 1 ? HB.locals : (es ? 'local' : 'local')}</span></span><svg class="hs-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button><div class="hub-state-body"><div class="hub-state-in">${links}</div></div></div>`;
   }
 
   const byCountry = { 'United States': [], 'Canada': [] };
@@ -566,16 +656,19 @@ function hubPage(rows) {
     const sts = byCountry[c].sort((a, b) => stateName(a).localeCompare(stateName(b)));
     const locN = sts.reduce((s, st) => s + byState[st].length, 0);
     const ocN = sts.reduce((s, st) => s + byState[st].reduce((x, r) => x + r.calls.length, 0), 0);
-    return `<div class="hub-country"><div class="hub-country-h"><span class="hc-flag">${FLAG[c]}</span><span class="hc-name">${esc(c)}</span><span class="hc-meta">${ocN > 0 ? `<span class="hc-chip hot">${ocN} open</span>` : ''}<span class="hc-chip">${locN} locals</span></span></div>${sts.map(stateBlock).join('')}</div>`;
+    return `<div class="hub-country"><div class="hub-country-h"><span class="hc-flag">${FLAG[c]}</span><span class="hc-name">${esc(c)}</span><span class="hc-meta">${ocN > 0 ? `<span class="hc-chip hot">${ocN} ${HB.open}</span>` : ''}<span class="hc-chip">${locN} ${HB.locals}</span></span></div>${sts.map(stateBlock).join('')}</div>`;
   }).join('');
 
-  const title = 'All IBEW & UA Locals — Job Calls, Wage Scale & Dispatch Directory | TrampHereBro';
-  const desc = `Directory of ${rows.length} IBEW and UA locals with live job-call counts, journeyman scale and contact info for traveling tradesmen. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
-  return `<!DOCTYPE html><html lang="en"><head>
+  const title = HB.title;
+  const desc = es
+    ? `Directorio de ${rows.length} locales del IBEW y UA con conteos de llamadas de trabajo en vivo, escala de oficial e información de contacto para trabajadores viajeros. ${totalCalls} llamadas abiertas en ${activeLocals} locales activos. Actualizado ${PRETTY_DATE_ES}.`
+    : `Directory of ${rows.length} IBEW and UA locals with live job-call counts, journeyman scale and contact info for traveling tradesmen. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
+  return `<!DOCTYPE html><html lang="${lang}"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${CANON}/locals">
+<link rel="canonical" href="${hubUrl}">
+<link rel="alternate" hreflang="en" href="${CANON}/locals"><link rel="alternate" hreflang="es" href="${CANON}/es/locals"><link rel="alternate" hreflang="x-default" href="${CANON}/locals">
 <meta property="og:type" content="website"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
 <meta property="og:url" content="${CANON}/locals"><meta property="og:image" content="${CANON}/share-banner.png">
@@ -584,20 +677,20 @@ ${FAVICON_LINK}
 ${FONTS}${GA_TAG}
 <style>${CSS}</style>
 </head><body>
-${topbar('')}
+${topbar('', lang, 'locals')}
 <header><div class="hero-inner">
-<div class="crumbs"><a href="/">Board</a> › Locals</div>
-<div class="kick"><span class="dot"></span>Local Directory</div>
-<h1 class="lede">All <b>Locals</b></h1>
+<div class="crumbs"><a href="${home}">${HB.crumbHome}</a> › ${HB.crumbLocals}</div>
+<div class="kick"><span class="dot"></span>${HB.kick}</div>
+<h1 class="lede">${HB.h1a}<b>${HB.h1b}</b></h1>
 <div class="hsub">Every local we track. Search or tap a state to see its locals, live call counts, and wage info.</div>
 <div class="hstats">
-<div class="hstat"><div class="n accent">${totalCalls}</div><div class="l">OPEN CALLS</div></div>
-<div class="hstat"><div class="n">${activeLocals}</div><div class="l">ACTIVE LOCALS</div></div>
-<div class="hstat"><div class="n">${rows.length}</div><div class="l">LOCALS TRACKED</div></div>
+<div class="hstat"><div class="n accent">${totalCalls}</div><div class="l">${HB.oc}</div></div>
+<div class="hstat"><div class="n">${activeLocals}</div><div class="l">${HB.al}</div></div>
+<div class="hstat"><div class="n">${rows.length}</div><div class="l">${HB.lt}</div></div>
 </div>
 </div></header>
 <main class="wrap">
-<input class="hub-search" type="search" placeholder="Search by local number, city, or state…" oninput="filterHub(this.value)" aria-label="Search locals">
+<input class="hub-search" type="search" placeholder="${HB.ph}" oninput="filterHub(this.value)" aria-label="Search locals">
 <div id="hubwrap">${body}</div>
 <div class="hub-empty" id="hubEmpty" hidden>No locals match that search.</div>
 <div class="backbar" style="margin-top:30px"><a class="backbtn" href="/">← Back to the live board</a></div>
@@ -615,7 +708,7 @@ function filterHub(q){q=(q||'').trim().toLowerCase();var any=false;
   document.getElementById('hubEmpty').hidden=any;
 }
 </script>
-${footer()}
+${footer(lang)}
 </body></html>`;
 }
 
@@ -635,8 +728,18 @@ function sitemap(rows) {
   lines.push(`  <url><loc>${CANON}/es</loc>${homeAlts}<lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`);
   // Spanish mirrors of translated core pages get their own sitemap entries
   CORE_PAGES.forEach(p => { if (TRANSLATED.has(p)) lines.push(entry(CANON + '/es/' + p, p)); });
-  lines.push(entry(CANON + '/locals'));
-  rows.forEach(r => lines.push(entry(`${CANON}/locals/${slugFor(r.local.name, r.local.id, r.local.trade)}`)));
+  // locals hub (en + es, reciprocal alternates)
+  const hubAlts = `<xhtml:link rel="alternate" hreflang="en" href="${CANON}/locals"/><xhtml:link rel="alternate" hreflang="es" href="${CANON}/es/locals"/><xhtml:link rel="alternate" hreflang="x-default" href="${CANON}/locals"/>`;
+  lines.push(`  <url><loc>${CANON}/locals</loc>${hubAlts}<lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`);
+  lines.push(`  <url><loc>${CANON}/es/locals</loc>${hubAlts}<lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`);
+  // every local page, both languages, each carrying reciprocal alternates
+  rows.forEach(r => {
+    const s = slugFor(r.local.name, r.local.id, r.local.trade);
+    const en = `${CANON}/locals/${s}`, esU = `${CANON}/es/locals/${s}`;
+    const a = `<xhtml:link rel="alternate" hreflang="en" href="${en}"/><xhtml:link rel="alternate" hreflang="es" href="${esU}"/><xhtml:link rel="alternate" hreflang="x-default" href="${en}"/>`;
+    lines.push(`  <url><loc>${en}</loc>${a}<lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`);
+    lines.push(`  <url><loc>${esU}</loc>${a}<lastmod>${ISO_DATE}</lastmod><changefreq>daily</changefreq></url>`);
+  });
   const body = lines.join('\n');
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${body}\n</urlset>\n`;
 }
@@ -1766,13 +1869,19 @@ ${footer()}
     catch (e) { console.log('  (favicon skipped)'); }
   }
 
+  const ES_LOCALS_DIR = path.join(SITE_DIR, 'es', 'locals');
+  if (!fs.existsSync(ES_LOCALS_DIR)) fs.mkdirSync(ES_LOCALS_DIR, { recursive: true });
+
   let written = 0, withCalls = 0;
   for (const r of rows) {
     const slug = slugFor(r.local.name, r.local.id, r.local.trade);
-    fs.writeFileSync(path.join(LOCALS_DIR, slug + '.html'), localPage(r.local, r.calls));
+    fs.writeFileSync(path.join(LOCALS_DIR, slug + '.html'), localPage(r.local, r.calls, 'en'));
+    fs.writeFileSync(path.join(ES_LOCALS_DIR, slug + '.html'), localPage(r.local, r.calls, 'es'));
     written++; if (r.calls.length) withCalls++;
   }
-  fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows));
+  fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows, 'en'));
+  fs.writeFileSync(path.join(ES_LOCALS_DIR, 'index.html'), hubPage(rows, 'es'));
+  console.log('  wrote es/locals/ (' + written + ' pages + hub)');
   if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText, snapTextLine)); console.log('  wrote snapshot.html'); }
   fs.writeFileSync(path.join(SITE_DIR, 'calculator.html'), calculatorPage(rows)); console.log('  wrote calculator.html');
   const ES_DIR = path.join(SITE_DIR, 'es');
