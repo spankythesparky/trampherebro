@@ -262,7 +262,7 @@ const GA_TAG = `<script async src="https://www.googletagmanager.com/gtag/js?id=G
 const LANGS = ['en', 'es'];
 // Pages that currently have a fully-translated /es/ mirror. Add a key here the
 // moment its Spanish version ships, and the toggle + nav + sitemap light up for it.
-const TRANSLATED = new Set(['unionretirement', 'unionhistory', 'ibewhistory', 'uahistory']);
+const TRANSLATED = new Set(['unionretirement', 'unionhistory', 'ibewhistory', 'uahistory', 'calculator']);
 // Spanish-formatted "updated" date for the footer
 const PRETTY_DATE_ES = TODAY.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 // localized href: point at /es/<page> only if that page is actually translated,
@@ -979,7 +979,48 @@ async function generateOutlook(local, calls) {
 
 
 /* -------------------- Paycheck Calculator page -------------------------- */
-function calculatorPage(rows) {
+function calculatorPage(rows, lang) {
+  lang = lang || 'en';
+  const es = lang === 'es';
+  const K = es
+    ? { crumb:'Calculadora de Pago', kick:'Calculadora de Pago', h1a:"¿Cuánto ", h1b:'realmente', h1c:' paga?',
+        hsub:'Ajusta tus horas, horas extra y viáticos, y mira lo que gana cada local del IBEW en ese escenario — ordenado, para que sepas dónde está el dinero. Elige tu local de casa para ver cuánto más ganarías en el camino.',
+        hours:'Horas / semana:', weeks:'Semanas trabajadas', otRate:'Tasa de horas extra',
+        ot15:'1.5&times; (tiempo y medio)', ot2:'2&times; (tiempo doble)', perDiem:'Viáticos ($/día)',
+        homeLocal:'Tu local de casa', pickPh:'Escribe un número de local o ciudad…', clear:'Limpiar',
+        trade:'Oficio', ibew:'IBEW Interior', lineman:'IBEW Lineman', rankBy:'Ordenar por',
+        totalPkg:'Paquete total', takeHome:'Salario neto', filterPh:'Filtra por número de local, ciudad o estado…',
+        note:'<b>Salario neto</b> = horas regulares a escala + horas sobre 40 a tu tasa de horas extra elegida + viáticos (×7 días). <b>Beneficios</b> = el paquete completo (Salud y Bienestar + pensiones + NEBF) pagado por cada hora trabajada. <b>Paquete total</b> = ambos combinados. Las cifras son estimados basados en datos publicados de escala y paquete (vía unionpayscales.com); siempre confirma los términos exactos con el salón. El ajuste por costo de vida viene pronto.' }
+    : { crumb:'Pay Calculator', kick:'Paycheck Calculator', h1a:"What's it ", h1b:'really', h1c:' pay?',
+        hsub:'Set your hours, overtime and per diem, then see what every IBEW local grosses for that scenario — ranked, so you know where the money is. Pick your home local to see how much more you\u2019d make on the road.',
+        hours:'Hours / week:', weeks:'Weeks worked', otRate:'Overtime rate',
+        ot15:'1.5&times; (time &amp; a half)', ot2:'2&times; (double time)', perDiem:'Per diem ($/day)',
+        homeLocal:'Your home local', pickPh:'Type a local number or city…', clear:'Clear',
+        trade:'Trade', ibew:'IBEW Indoor', lineman:'IBEW Lineman', rankBy:'Rank by',
+        totalPkg:'Total package', takeHome:'Take-home wages', filterPh:'Filter by local number, city, or state…',
+        note:'<b>Take-home wages</b> = regular hours at scale + hours over 40 at your chosen OT rate + per diem (\u00d77 days). <b>Benefits</b> = the full package (H&amp;W + pensions + NEBF) paid flat on every hour worked. <b>Total package</b> = both combined. Figures are estimates from published scale &amp; package data (via unionpayscales.com); always confirm exact terms with the hall. Cost-of-living adjustment coming soon.' };
+  // labels the client-side JS reads
+  const JSL = es
+    ? { hw:'Salud y Bienestar', pd:'Pensión Definida', pdc:'Anualidad / Pensión DC', nebf:'NEBF', k401:'401(k)', vac:'Vacaciones',
+        other:'Otras prestaciones (capacitación, etc.)', yourPick:'tu selección', hrsWk:'hrs/semana', wks:'semanas', hrsYr:'horas al año',
+        wagesSec:'Salario (a tu cheque)', regular:'Regular', overtime:'Horas extra', perDiem:'Viáticos',
+        takeHome:'Salario neto', benSec:'Beneficios pagados a tu nombre', totalBen:'Beneficios totales', grand:'Valor del paquete total',
+        noMatch:'Ningún local coincide con esa búsqueda.', showLess:'Ver menos \u25b2', showAll1:'Ver los ', showAll2:' locales \u25bc',
+        mnTotal:'paquete total (salario + beneficios)', mnWages:'salario neto',
+        hlA:'A <b>', hlB:' hrs/semana</b> durante <b>', hlC:' semanas</b>, por <b>', hlD:'</b>: mejor local <b>IBEW ', hlE:'</b> con <b>', hlF:'/año</b> — <b>', hlG:'</b> más que el más bajo.',
+        beat1:' <b>', beat2:'</b> locales ganan más que tu local de casa.',
+        wagesLbl:'salario', benefitsLbl:'beneficios', totalLbl:'total', scaleLbl:'/hr escala', benLbl:'/hr beneficios', yr:'/año', nomatch2:'Sin coincidencias' }
+    : { hw:'Health & Welfare', pd:'Defined Pension', pdc:'Annuity / DC Pension', nebf:'NEBF', k401:'401(k)', vac:'Vacation',
+        other:'Other fringes (training, etc.)', yourPick:'your pick', hrsWk:'hrs/week', wks:'weeks', hrsYr:'hours a year',
+        wagesSec:'Wages (to your check)', regular:'Regular', overtime:'Overtime', perDiem:'Per diem',
+        takeHome:'Take-home wages', benSec:'Benefits paid on your behalf', totalBen:'Total benefits', grand:'Total package value',
+        noMatch:'No locals match that search.', showLess:'Show less \u25b2', showAll1:'Show all ', showAll2:' locals \u25bc',
+        mnTotal:'total package (wages + benefits)', mnWages:'take-home wages',
+        hlA:'At <b>', hlB:' hrs/week</b> over <b>', hlC:' weeks</b>, by <b>', hlD:'</b>: top local <b>IBEW ', hlE:'</b> at <b>', hlF:'/yr</b> — <b>', hlG:'</b> more than the lowest.',
+        beat1:' <b>', beat2:'</b> locals out-earn your home local.',
+        wagesLbl:'wages', benefitsLbl:'benefits', totalLbl:'total', scaleLbl:'/hr scale', benLbl:'/hr benefits', yr:'/yr', nomatch2:'No match' };
+  const urlPath = (es ? '/es/' : '/') + 'calculator';
+  const localsPrefix = es ? '/es/locals/' : '/locals/';
   const buildPay = (trade, src) => rows.filter(r => (r.local.trade || 'IBEW') === trade).map(r => {
     const n = localNumber(r.local.name);
     const sc = src[n] || {};
@@ -996,8 +1037,10 @@ function calculatorPage(rows) {
   const payIbew = buildPay('IBEW', SCALE);
   const payLine = buildPay('LINEMAN', LINEMAN_SCALE);
 
-  const title = 'IBEW Paycheck Calculator — Compare Union Local Pay | TrampHereBro';
-  const desc = `Compare take-home pay across ${payIbew.length} IBEW inside and ${payLine.length} IBEW lineman locals. Set your hours, overtime and per diem to see which local pays the most. Updated ${PRETTY_DATE}.`;
+  const title = es ? 'Calculadora de Pago del IBEW — Compara el Pago de los Locales Sindicales | TrampHereBro' : 'IBEW Paycheck Calculator — Compare Union Local Pay | TrampHereBro';
+  const desc = es
+    ? `Compara el salario neto entre ${payIbew.length} locales interiores del IBEW y ${payLine.length} locales de lineman del IBEW. Ajusta tus horas, horas extra y viáticos, y mira qué local paga más. Gratis y actualizado a diario.`
+    : `Compare take-home pay across ${payIbew.length} IBEW inside and ${payLine.length} IBEW lineman locals. Set your hours, overtime and per diem, and see which local pays most. Free and updated daily.`;
   const DATA_IBEW = JSON.stringify(payIbew);
   const DATA_LINE = JSON.stringify(payLine);
 
@@ -1060,42 +1103,45 @@ function calculatorPage(rows) {
   @media(max-width:560px){.calc-controls{grid-template-columns:1fr}.calc-row{grid-template-columns:32px 1fr auto;gap:8px;row-gap:4px;padding:12px 14px}.calc-annual{grid-column:3;grid-row:1;text-align:right}.calc-delta{grid-column:3;grid-row:2;justify-self:end}.calc-name{grid-column:2;grid-row:1}}
   `;
 
-  return `<!DOCTYPE html><html lang="en"><head>
+  return `<!DOCTYPE html><html lang="${lang}"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${CANON}/calculator"><script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Union Paycheck Calculator","url":"${CANON}/calculator","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Free tool to compare union journeyman pay scale, benefits, and take-home across IBEW, lineman, and UA locals nationwide."}</script>
+<link rel="canonical" href="${CANON}${urlPath}">
+${hreflangTags('calculator')}<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Union Paycheck Calculator","url":"${CANON}/calculator","applicationCategory":"FinanceApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Free tool to compare union journeyman pay scale, benefits, and take-home across IBEW, lineman, and UA locals nationwide."}</script>
 <meta property="og:type" content="website"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
-<meta property="og:url" content="${CANON}/calculator"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta property="og:url" content="${CANON}${urlPath}"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
 ${FONTS}${GA_TAG}
 <style>${CSS}${CALC_CSS}</style>
 </head><body>
-${topbar('calculator')}
+${topbar('calculator', lang)}
 <header><div class="hero-inner">
-<div class="crumbs"><a href="/">Board</a> › Paycheck Calculator</div>
-<div class="kick"><span class="dot"></span>Paycheck Calculator</div>
-<h1 class="lede">What's it <b>really</b> pay?</h1>
-<div class="hsub">Set your hours, overtime and per diem, then see what every IBEW local grosses for that scenario — ranked, so you know where the money is. Pick your home local to see how much more you'd make on the road.</div>
+<div class="crumbs"><a href="${es ? '/es' : '/'}">${es ? 'Tablero' : 'Board'}</a> › ${K.crumb}</div>
+<div class="kick"><span class="dot"></span>${K.kick}</div>
+<h1 class="lede">${K.h1a}<b>${K.h1b}</b>${K.h1c}</h1>
+<div class="hsub">${K.hsub}</div>
 </div></header>
 <main class="wrap">
 <div class="calc-controls">
-<div class="calc-ctl"><label>Hours / week: <b id="c-hours-v">50</b></label><input type="range" id="c-hours" min="40" max="72" value="50"></div>
-<div class="calc-ctl"><label>Weeks worked</label><input type="number" id="c-weeks" value="50" min="1" max="52"></div>
-<div class="calc-ctl"><label>Overtime rate</label><select id="c-ot"><option value="1.5">1.5&times; (time &amp; a half)</option><option value="2">2&times; (double time)</option></select></div>
-<div class="calc-ctl"><label>Per diem ($/day)</label><input type="number" id="c-pd" value="0" min="0" step="5"></div>
+<div class="calc-ctl"><label>${K.hours} <b id="c-hours-v">50</b></label><input type="range" id="c-hours" min="40" max="72" value="50"></div>
+<div class="calc-ctl"><label>${K.weeks}</label><input type="number" id="c-weeks" value="50" min="1" max="52"></div>
+<div class="calc-ctl"><label>${K.otRate}</label><select id="c-ot"><option value="1.5">${K.ot15}</option><option value="2">${K.ot2}</option></select></div>
+<div class="calc-ctl"><label>${K.perDiem}</label><input type="number" id="c-pd" value="0" min="0" step="5"></div>
 </div>
-<div class="calc-baseline"><label>Your home local</label><div class="calc-picker"><input type="text" id="c-basein" placeholder="Type a local number or city…" autocomplete="off"><button type="button" id="c-baseclear" class="calc-clear" title="Clear">&times;</button><div class="calc-picker-list" id="c-baselist"></div></div><input type="hidden" id="c-base" value=""></div><div class="calc-detail" id="c-detail" hidden></div>
-<div class="calc-rankby"><span>Trade</span><button type="button" class="tb on" data-t="IBEW">IBEW Indoor</button><button type="button" class="tb" data-t="LINEMAN">IBEW Lineman</button></div>
-<div class="calc-rankby"><span>Rank by</span><button type="button" class="rb on" data-rb="total">Total package</button><button type="button" class="rb" data-rb="wages">Take-home wages</button></div>
+<div class="calc-baseline"><label>${K.homeLocal}</label><div class="calc-picker"><input type="text" id="c-basein" placeholder="${K.pickPh}" autocomplete="off"><button type="button" id="c-baseclear" class="calc-clear" title="${K.clear}">&times;</button><div class="calc-picker-list" id="c-baselist"></div></div><input type="hidden" id="c-base" value=""></div><div class="calc-detail" id="c-detail" hidden></div>
+<div class="calc-rankby"><span>${K.trade}</span><button type="button" class="tb on" data-t="IBEW">${K.ibew}</button><button type="button" class="tb" data-t="LINEMAN">${K.lineman}</button></div>
+<div class="calc-rankby"><span>${K.rankBy}</span><button type="button" class="rb on" data-rb="total">${K.totalPkg}</button><button type="button" class="rb" data-rb="wages">${K.takeHome}</button></div>
 <div class="calc-headline" id="c-headline"></div>
-<input class="calc-search" id="c-search" type="search" placeholder="Filter by local number, city, or state…">
+<input class="calc-search" id="c-search" type="search" placeholder="${K.filterPh}">
 <div class="calc-board" id="c-board"></div><div class="calc-more" id="c-more"></div>
-<div class="calc-note"><b>Take-home wages</b> = regular hours at scale + hours over 40 at your chosen OT rate + per diem (\u00d77 days). <b>Benefits</b> = the full package (H&amp;W + pensions + NEBF) paid flat on every hour worked. <b>Total package</b> = both combined. Figures are estimates from published scale &amp; package data (via unionpayscales.com); always confirm exact terms with the hall. Cost-of-living adjustment coming soon.</div>
+<div class="calc-note">${K.note}</div>
 </main>
 <script>
+var L = ${JSON.stringify(JSL)};
+var LOCALS_PREFIX = ${JSON.stringify(localsPrefix)};
 var PAY_IBEW = ${DATA_IBEW};
 var PAY_LINEMAN = ${DATA_LINE};
 var curTrade = 'IBEW';
@@ -1105,21 +1151,21 @@ function fmt(n){ return '$' + Math.round(n).toLocaleString(); }
 function detailHtml(p, hrs, wks, mult, pd, reg, ot){
   var totHrs = hrs*wks, regHrs = reg*wks, otHrs = ot*wks;
   var regW = reg*p.scale*wks, otW = ot*p.scale*mult*wks, pdW = pd*7*wks, wages = regW+otW+pdW;
-  var comps = [['Health & Welfare',p.hw],['Defined Pension',p.pd],['Annuity / DC Pension',p.pdc],['NEBF',p.nebf],['401(k)',p.k401],['Vacation',p.vac]].filter(function(x){return x[1]>0;});
+  var comps = [[L.hw,p.hw],[L.pd,p.pd],[L.pdc,p.pdc],[L.nebf,p.nebf],[L.k401,p.k401],[L.vac,p.vac]].filter(function(x){return x[1]>0;});
   var itemsSum = 0; comps.forEach(function(x){ itemsSum += x[1]; });
   var benTotal = p.ben*totHrs, otherPerHr = Math.max(0, p.ben - itemsSum);
   var lines = comps.map(function(x){ return '<div class="cd-line"><span>'+x[0]+' ($'+x[1].toFixed(2)+'/hr)</span><span>'+fmt(x[1]*totHrs)+'</span></div>'; }).join('');
-  if(otherPerHr > 0.01){ lines += '<div class="cd-line"><span>Other fringes (training, etc.)</span><span>'+fmt(otherPerHr*totHrs)+'</span></div>'; }
-  return '<h3>IBEW '+p.n+(p.c?' \u00b7 '+p.c+', '+p.s:'')+' \u2014 your pick</h3>'
-    +'<div class="cd-scn">'+hrs+' hrs/week \u00b7 '+wks+' weeks \u00b7 '+Math.round(totHrs).toLocaleString()+' hours a year</div>'
-    +'<div class="cd-sec">Wages (to your check)</div>'
-    +'<div class="cd-line"><span>Regular ('+Math.round(regHrs).toLocaleString()+' hrs @ $'+p.scale.toFixed(2)+')</span><span>'+fmt(regW)+'</span></div>'
-    +(otHrs>0?'<div class="cd-line"><span>Overtime ('+Math.round(otHrs).toLocaleString()+' hrs @ $'+(p.scale*mult).toFixed(2)+')</span><span>'+fmt(otW)+'</span></div>':'')
-    +(pdW>0?'<div class="cd-line"><span>Per diem</span><span>'+fmt(pdW)+'</span></div>':'')
-    +'<div class="cd-line cd-tot"><span>Take-home wages</span><span>'+fmt(wages)+'</span></div>'
-    +'<div class="cd-sec">Benefits paid on your behalf ('+Math.round(totHrs).toLocaleString()+' hrs)</div>'+lines
-    +'<div class="cd-line cd-tot"><span>Total benefits</span><span>'+fmt(benTotal)+'</span></div>'
-    +'<div class="cd-grand"><span>Total package value</span><span>'+fmt(wages+benTotal)+'</span></div>';
+  if(otherPerHr > 0.01){ lines += '<div class="cd-line"><span>'+L.other+'</span><span>'+fmt(otherPerHr*totHrs)+'</span></div>'; }
+  return '<h3>IBEW '+p.n+(p.c?' \u00b7 '+p.c+', '+p.s:'')+' \u2014 '+L.yourPick+'</h3>'
+    +'<div class="cd-scn">'+hrs+' '+L.hrsWk+' \u00b7 '+wks+' '+L.wks+' \u00b7 '+Math.round(totHrs).toLocaleString()+' '+L.hrsYr+'</div>'
+    +'<div class="cd-sec">'+L.wagesSec+'</div>'
+    +'<div class="cd-line"><span>'+L.regular+' ('+Math.round(regHrs).toLocaleString()+' hrs @ $'+p.scale.toFixed(2)+')</span><span>'+fmt(regW)+'</span></div>'
+    +(otHrs>0?'<div class="cd-line"><span>'+L.overtime+' ('+Math.round(otHrs).toLocaleString()+' hrs @ $'+(p.scale*mult).toFixed(2)+')</span><span>'+fmt(otW)+'</span></div>':'')
+    +(pdW>0?'<div class="cd-line"><span>'+L.perDiem+'</span><span>'+fmt(pdW)+'</span></div>':'')
+    +'<div class="cd-line cd-tot"><span>'+L.takeHome+'</span><span>'+fmt(wages)+'</span></div>'
+    +'<div class="cd-sec">'+L.benSec+' ('+Math.round(totHrs).toLocaleString()+' hrs)</div>'+lines
+    +'<div class="cd-line cd-tot"><span>'+L.totalBen+'</span><span>'+fmt(benTotal)+'</span></div>'
+    +'<div class="cd-grand"><span>'+L.grand+'</span><span>'+fmt(wages+benTotal)+'</span></div>';
 }
 var rankBy = 'total', expanded = false;
 function toggleExpand(){ expanded = !expanded; compute(); }
@@ -1143,25 +1189,25 @@ function compute(){
     var r = list[j];
     if(q && (''+r.p.n).indexOf(q)===-1 && r.p.c.toLowerCase().indexOf(q)===-1 && r.p.s.toLowerCase().indexOf(q)===-1) continue;
     var delta = '';
-    if(baseVal!=null && r.p.n!=base){ var d = r[key] - baseVal; delta = '<span class="calc-delta ' + (d>=0?'pos':'neg') + '">' + (d>=0?'+':'\u2212') + fmt(Math.abs(d)) + '/yr</span>'; }
-    var sec = key==='total' ? ('wages ' + fmt(r.wages) + ' \u00b7 benefits ' + fmt(r.benefits)) : ('+ ' + fmt(r.benefits) + ' benefits = ' + fmt(r.total) + ' total');
-    out.push('<a class="calc-row' + (base==r.p.n?' me':'') + '" href="/locals/' + (curTrade==='LINEMAN'?'lineman':'ibew') + '-local-' + r.p.n + '"><span class="calc-rank">' + (j+1) + '</span><span class="calc-name">IBEW ' + r.p.n + (r.p.c? ' \u00b7 ' + r.p.c + ', ' + r.p.s : '') + '<span class="calc-sub">$' + r.p.scale.toFixed(2) + '/hr scale \u00b7 $' + (r.p.ben||0).toFixed(2) + '/hr benefits</span></span><span class="calc-annual">' + fmt(r[key]) + '/yr<span class="calc-sub2">' + sec + '</span></span>' + delta + '</a>');
+    if(baseVal!=null && r.p.n!=base){ var d = r[key] - baseVal; delta = '<span class="calc-delta ' + (d>=0?'pos':'neg') + '">' + (d>=0?'+':'\u2212') + fmt(Math.abs(d)) + L.yr + '</span>'; }
+    var sec = key==='total' ? (L.wagesLbl + ' ' + fmt(r.wages) + ' \u00b7 ' + L.benefitsLbl + ' ' + fmt(r.benefits)) : ('+ ' + fmt(r.benefits) + ' ' + L.benefitsLbl + ' = ' + fmt(r.total) + ' ' + L.totalLbl);
+    out.push('<a class="calc-row' + (base==r.p.n?' me':'') + '" href="' + LOCALS_PREFIX + (curTrade==='LINEMAN'?'lineman':'ibew') + '-local-' + r.p.n + '"><span class="calc-rank">' + (j+1) + '</span><span class="calc-name">IBEW ' + r.p.n + (r.p.c? ' \u00b7 ' + r.p.c + ', ' + r.p.s : '') + '<span class="calc-sub">$' + r.p.scale.toFixed(2) + L.scaleLbl + ' \u00b7 $' + (r.p.ben||0).toFixed(2) + '/hr benefits</span></span><span class="calc-annual">' + fmt(r[key]) + L.yr + '<span class="calc-sub2">' + sec + '</span></span>' + delta + '</a>');
   }
   var _total = out.length, _N = 12, _showAll = q || expanded;
-  $('c-board').innerHTML = (_showAll ? out : out.slice(0, _N)).join('') || '<div style="padding:30px;text-align:center;color:var(--slate)">No locals match that search.</div>';
-  $('c-more').innerHTML = (!q && _total > _N) ? '<button type="button" class="calc-morebtn" onclick="toggleExpand()">' + (expanded ? 'Show less \u25b2' : 'Show all ' + _total + ' locals \u25bc') + '</button>' : '';
+  $('c-board').innerHTML = (_showAll ? out : out.slice(0, _N)).join('') || '<div style="padding:30px;text-align:center;color:var(--slate)">'+L.noMatch+'</div>';
+  $('c-more').innerHTML = (!q && _total > _N) ? '<button type="button" class="calc-morebtn" onclick="toggleExpand()">' + (expanded ? L.showLess : L.showAll1 + _total + L.showAll2) + '</button>' : '';
   var _byPay = list.slice().sort(function(a,b){ return b[key] - a[key]; }); var top = _byPay[0], bot = _byPay[_byPay.length-1];
   if(top){
-    var mn = key==='total' ? 'total package (wages + benefits)' : 'take-home wages';
-    var hl = 'At <b>' + hrs + ' hrs/week</b> over <b>' + wks + ' weeks</b>, by <b>' + mn + '</b>: top local <b>IBEW ' + top.p.n + (top.p.c? ' (' + top.p.c + ', ' + top.p.s + ')':'') + '</b> at <b>' + fmt(top[key]) + '/yr</b> — <b>' + fmt(top[key] - bot[key]) + '</b> more than the lowest.';
-    if(baseVal!=null){ var beat = 0; for(var k=0;k<list.length;k++){ if(list[k][key] > baseVal) beat++; } hl += ' <b>' + beat + '</b> locals out-earn your home local.'; }
+    var mn = key==='total' ? L.mnTotal : L.mnWages;
+    var hl = L.hlA + hrs + L.hlB + wks + L.hlC + mn + L.hlD + top.p.n + (top.p.c? ' (' + top.p.c + ', ' + top.p.s + ')':'') + L.hlE + fmt(top[key]) + L.hlF + fmt(top[key] - bot[key]) + L.hlG;
+    if(baseVal!=null){ var beat = 0; for(var k=0;k<list.length;k++){ if(list[k][key] > baseVal) beat++; } hl += L.beat1 + beat + L.beat2; }
     $('c-headline').innerHTML = hl;
   }
 }
 (function(){
   var bin=$('c-basein'), blist=$('c-baselist'), bhid=$('c-base'), pick=document.querySelector('.calc-picker'), bclr=$('c-baseclear');
   function draw(q){ q=(q||'').toLowerCase(); var m=PAY.slice().sort(function(a,b){return a.n-b.n;}).filter(function(p){ return !q || (''+p.n).indexOf(q)>-1 || p.c.toLowerCase().indexOf(q)>-1 || p.s.toLowerCase().indexOf(q)>-1; }).slice(0,40);
-    blist.innerHTML = m.length ? m.map(function(p){ return '<button type="button" data-n="'+p.n+'">IBEW '+p.n+(p.c?' \u00b7 '+p.c+', '+p.s:'')+'</button>'; }).join('') : '<button type="button" disabled style="color:#94a3b8">No match</button>';
+    blist.innerHTML = m.length ? m.map(function(p){ return '<button type="button" data-n="'+p.n+'">IBEW '+p.n+(p.c?' \u00b7 '+p.c+', '+p.s:'')+'</button>'; }).join('') : '<button type="button" disabled style="color:#94a3b8">'+L.nomatch2+'</button>';
     blist.classList.add('open'); }
   bin.addEventListener('focus',function(){ draw(bin.value); });
   bin.addEventListener('input',function(){ draw(bin.value); });
@@ -1174,7 +1220,7 @@ Array.prototype.forEach.call(document.querySelectorAll('.calc-rankby .rb'), func
 Array.prototype.forEach.call(document.querySelectorAll('.calc-rankby .tb'), function(btn){ btn.addEventListener('click', function(){ Array.prototype.forEach.call(document.querySelectorAll('.calc-rankby .tb'), function(b){ b.classList.remove('on'); }); btn.classList.add('on'); curTrade = btn.getAttribute('data-t'); PAY = (curTrade==='LINEMAN') ? PAY_LINEMAN : PAY_IBEW; var bh=$('c-base'), bi=$('c-basein'), pk=document.querySelector('.calc-picker'); if(bh)bh.value=''; if(bi)bi.value=''; if(pk)pk.classList.remove('has'); expanded=false; compute(); }); });
 compute();
 </script>
-${footer()}
+${footer(lang)}
 </body></html>`;
 }
 
@@ -1883,10 +1929,10 @@ ${footer()}
   fs.writeFileSync(path.join(ES_LOCALS_DIR, 'index.html'), hubPage(rows, 'es'));
   console.log('  wrote es/locals/ (' + written + ' pages + hub)');
   if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText, snapTextLine)); console.log('  wrote snapshot.html'); }
-  fs.writeFileSync(path.join(SITE_DIR, 'calculator.html'), calculatorPage(rows)); console.log('  wrote calculator.html');
   const ES_DIR = path.join(SITE_DIR, 'es');
   if (!fs.existsSync(ES_DIR)) fs.mkdirSync(ES_DIR, { recursive: true });
   const BILINGUAL = [
+    ['calculator', l => calculatorPage(rows, l)],
     ['unionhistory', historyPage],
     ['ibewhistory', ibewHistoryPage],
     ['uahistory', uaHistoryPage],
