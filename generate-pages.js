@@ -152,7 +152,16 @@ a{color:inherit;text-decoration:none}
 .navdd{position:relative;display:inline-flex;align-items:center}.navdd>a{display:inline-flex;align-items:center;gap:4px}.navdd .caret{width:9px;height:9px;transition:transform .18s}.navdd .ddmenu{position:absolute;top:100%;left:-14px;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 26px rgba(7,37,84,.14);padding:6px;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all .16s;z-index:60}.navdd:hover .ddmenu{opacity:1;visibility:visible;transform:translateY(0)}.navdd:hover .caret{transform:rotate(180deg)}.navdd .ddmenu a{display:block;padding:9px 12px;border-radius:7px;font-size:13.5px}.navdd .ddmenu a:hover{background:rgba(255,107,0,.08);color:var(--navy)}@media(max-width:640px){.navdd{display:block;width:100%}.navdd>a{width:100%}.navdd .caret{display:none}.navdd .ddmenu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:none;border-radius:0;padding:0;margin:0;min-width:0}.navdd .ddmenu a{padding:11px 20px 11px 36px;font-size:14px;color:var(--slate);background:rgba(7,37,84,.02)}}
 .navtoggle{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:8px;margin-left:auto}
 .navtoggle span{display:block;width:22px;height:2.5px;background:var(--navy);border-radius:2px}
-@media(max-width:640px){.navtoggle{display:flex}.nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:0 12px 26px rgba(7,37,84,.12);padding:6px 0;z-index:40}.nav.open{display:flex}.nav a{font-size:15px;padding:13px 20px;width:100%;box-sizing:border-box}}
+/* language toggle — sibling of .nav, so it stays visible on mobile instead of
+   collapsing into the hamburger dropdown */
+.nav{margin-left:auto}
+.langtog{display:inline-flex;align-items:stretch;border:1.5px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0;order:3;line-height:1}
+.langtog a{display:flex;align-items:center;padding:7px 10px;font-size:12.5px;font-weight:700;color:var(--slate);text-decoration:none;letter-spacing:.03em;background:#fff;transition:background .15s,color .15s}
+.langtog a+a{border-left:1.5px solid var(--line)}
+.langtog a.on{background:var(--orange);color:#fff}
+.langtog a:not(.on):hover{background:rgba(7,37,84,.06);color:var(--navy)}
+.brand{order:1}.nav{order:2}.navtoggle{order:4}
+@media(max-width:640px){.navtoggle{display:flex;margin-left:0;order:4}.langtog{margin-left:auto;order:3}.nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:0 12px 26px rgba(7,37,84,.12);padding:6px 0;z-index:40;margin-left:0}.nav.open{display:flex}.nav a{font-size:15px;padding:13px 20px;width:100%;box-sizing:border-box}.nav .langtog{display:none}}
 .nav a:hover,.nav a.on{color:var(--navy)}
 header{position:relative;margin:0 calc(50% - 50vw);padding:56px max(28px,calc(50vw - 492px)) 46px;background:linear-gradient(180deg,#05122b 0%,#071e46 55%,#0b2a5c 100%);overflow:hidden;color:#EAF0FA;border-bottom:3px solid var(--orange)}
 header::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:radial-gradient(circle at 68% 30%,#000,transparent 72%);mask-image:radial-gradient(circle at 68% 30%,#000,transparent 72%);opacity:.55}
@@ -286,20 +295,22 @@ function topbar(active, lang, togglePath) {
   const T = lang === 'es'
     ? { board:'Tablero', daily:'Reporte Diario', calc:'Calculadora de Pago', res:'Recursos', ret:'Jubilación Sindical', hist:'Historia', uh:'Historia Sindical', ibew:'Historia del IBEW', ua:'Historia del UA', contact:'Contacto', join:'Únete a JNCTN' }
     : { board:'Board', daily:'Daily Update', calc:'Pay Calculator', res:'Resources', ret:'Union Retirement', hist:'History', uh:'Union History', ibew:'IBEW History', ua:'UA History', contact:'Contact', join:'Join JNCTN' };
-  // EN/ES toggle — only shown on pages that actually have a mirror, so it never 404s
-  const togStyle = 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 11px;border:1.5px solid var(--orange);color:var(--orange);border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.03em';
-  let toggle = '';
-  // togglePath (e.g. 'locals/ibew-local-237') lets pages with no nav key still offer the switch
+  // Segmented EN|ES control. Lives OUTSIDE <nav> so it stays visible on mobile
+  // rather than collapsing into the hamburger menu.
   const tp = togglePath || (TRANSLATED.has(active) ? active : null);
+  let toggle = '';
   if (tp) {
-    toggle = lang === 'es'
-      ? `<a href="/${tp}" hreflang="en" aria-label="View in English" style="${togStyle}">EN</a>`
-      : `<a href="/es/${tp}" hreflang="es" aria-label="Ver en Español" style="${togStyle}">ES</a>`;
+    const enHref = '/' + tp;
+    const esHref = '/es/' + tp;
+    toggle = `<div class="langtog" role="group" aria-label="Language / Idioma">`
+      + `<a href="${enHref}" hreflang="en"${lang === 'en' ? ' class="on" aria-current="true"' : ''} aria-label="English">EN</a>`
+      + `<a href="${esHref}" hreflang="es"${lang === 'es' ? ' class="on" aria-current="true"' : ''} aria-label="Español">ES</a>`
+      + `</div>`;
   }
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="${lhref('', lang)}">Tramp<span class="b">Here</span>Bro</a>
-<button class="navtoggle" aria-label="Menu" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a>${toggle}<a href="${lhref('jnctn', lang)}" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">${T.join}</a></nav>
+${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
+<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="${lhref('jnctn', lang)}" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">${T.join}</a></nav>
 </div></div>`;
 }
 function footer(lang) {
@@ -822,18 +833,17 @@ function makeSpanishHome() {
   h = h.replace(/<meta property="og:url" content="[^"]*"/, '<meta property="og:url" content="' + CANON + '/es"');
 
   // --- nav: labels, localized hrefs, EN toggle pill ---
-  const togStyle = 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 11px;border:1.5px solid var(--orange);color:var(--orange);border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.03em';
   const esNav = '<nav class="nav"><a href="/es" class="on">Tablero de Trabajo</a>' +
     '<a href="/snapshot">Reporte Diario</a>' +
-    '<a href="/calculator">Calculadora de Pago</a>' +
-    '<a href="/resources">Recursos</a>' +
+    '<a href="/es/calculator">Calculadora de Pago</a>' +
+    '<a href="/es/resources">Recursos</a>' +
     '<a href="/es/unionretirement">Jubilación Sindical</a>' +
     '<span class="navdd"><a href="/es/unionhistory">Historia<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a>' +
     '<span class="ddmenu"><a href="/es/unionhistory">Historia Sindical</a><a href="/es/ibewhistory">Historia del IBEW</a><a href="/es/uahistory">Historia del UA</a></span></span>' +
-    '<a href="/contact">Contacto</a>' +
-    '<a href="/" hreflang="en" aria-label="View in English" style="' + togStyle + '">EN</a>' +
-    '<a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Únete a JNCTN</a></nav>';
+    '<a href="/es/contact">Contacto</a>' +
+    '<a href="/es/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Únete a JNCTN</a></nav>';
   h = h.replace(/<nav class="nav">[\s\S]*?<\/nav>/, esNav);
+  h = placeLangTog(h, 'home', 'es');
   // brand + logo link back to the Spanish home
   h = h.replace('<a href="/" aria-label="TrampHereBro home"', '<a href="/es" aria-label="TrampHereBro inicio"');
 
@@ -891,13 +901,55 @@ function makeSpanishHome() {
   return true;
 }
 
-/* ---- hand-authored static pages (resources, jnctn, contact) ----
+/* ---- hand-authored static pages (index, resources, jnctn, contact) ----
    These files aren't generated by a page function, so we build their Spanish
    twins FROM the English source on every build. Edit the English file and the
    Spanish one follows automatically on the next run. */
-const ES_TOG_STYLE = 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 11px;border:1.5px solid var(--orange);color:var(--orange);border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.03em';
 
-// Nav shared by the static pages, rendered in Spanish with an EN pill
+// These pages carry their OWN inline CSS, so the toggle styles must be injected.
+const LANGTOG_CSS = `<style id="langtog-css">
+.topbar .inner{gap:12px}
+.topbar .brand,.topbar .inner>a:first-child{order:1}
+.topbar .nav{order:2;margin-left:auto}
+.langtog{order:3;display:inline-flex;align-items:stretch;border:1.5px solid var(--line,#e2e8f0);border-radius:8px;overflow:hidden;flex-shrink:0;line-height:1}
+.langtog a{display:flex;align-items:center;padding:7px 10px;font-size:12.5px;font-weight:700;color:var(--slate,#64748b);text-decoration:none;letter-spacing:.03em;background:#fff;transition:background .15s,color .15s}
+.langtog a+a{border-left:1.5px solid var(--line,#e2e8f0)}
+.langtog a.on{background:var(--orange,#FF6B00);color:#fff}
+.langtog a:not(.on):hover{background:rgba(7,37,84,.06);color:var(--navy,#072554)}
+.topbar .navtoggle{order:4}
+@media(max-width:640px){.langtog{margin-left:auto;order:3}.topbar .navtoggle{margin-left:0;order:4}.topbar .nav{margin-left:0}.nav .langtog{display:none}}
+</style>`;
+
+// Segmented EN|ES control for the static pages
+function langTogHtml(key, lang) {
+  const enHref = key === 'home' ? '/' : '/' + key;
+  const esHref = key === 'home' ? '/es' : '/es/' + key;
+  return `<div class="langtog" role="group" aria-label="Language / Idioma">`
+    + `<a href="${enHref}" hreflang="en"${lang === 'en' ? ' class="on" aria-current="true"' : ''} aria-label="English">EN</a>`
+    + `<a href="${esHref}" hreflang="es"${lang === 'es' ? ' class="on" aria-current="true"' : ''} aria-label="Español">ES</a>`
+    + `</div>`;
+}
+
+// Strip any previously-injected pill that lived INSIDE the nav, plus old css block
+function stripOldToggle(html) {
+  return html
+    .replace(/<a href="\/(es\/)?[a-z-]*"\s+hreflang="(es|en)"[^>]*style="display:inline-flex;align-items:center;justify-content:center;min-width:36px[^"]*">(ES|EN)<\/a>/g, '')
+    .replace(/<div class="langtog"[\s\S]*?<\/div>/g, '')
+    .replace(/<style id="langtog-css">[\s\S]*?<\/style>/g, '');
+}
+
+// Place the toggle as a SIBLING of <nav> (never inside it) + inject its CSS.
+function placeLangTog(html, key, lang) {
+  let o = stripOldToggle(html);
+  if (!o.includes('id="langtog-css"')) o = o.replace('</head>', LANGTOG_CSS + '</head>');
+  const tog = langTogHtml(key, lang);
+  // insert before the hamburger if there is one, otherwise before <nav>
+  if (/<button class="navtoggle"/.test(o)) o = o.replace(/<button class="navtoggle"/, tog + '<button class="navtoggle"');
+  else o = o.replace(/<nav class="nav">/, tog + '<nav class="nav">');
+  return o;
+}
+
+// Spanish nav for the static pages (no toggle inside — it's a sibling now)
 function esStaticNav(activeKey) {
   const on = k => activeKey === k ? ' class="on"' : '';
   return '<nav class="nav"><a href="/es"' + on('home') + '>Tablero de Trabajo</a>' +
@@ -905,24 +957,19 @@ function esStaticNav(activeKey) {
     '<a href="/es/calculator"' + on('calculator') + '>Calculadora de Pago</a>' +
     '<a href="/es/resources"' + on('resources') + '>Recursos</a>' +
     '<a href="/es/contact"' + on('contact') + '>Contacto</a>' +
-    '<a href="/' + activeKey + '" hreflang="en" aria-label="View in English" style="' + ES_TOG_STYLE + '">EN</a>' +
     '<a href="/es/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Únete a JNCTN</a></nav>';
 }
 
-// Add hreflang + an ES pill to the English original (idempotent — safe every build)
+// Keep the English original's hreflang + toggle current (idempotent every build)
 function addEnglishToggle(html, key) {
   let o = html;
-  if (!o.includes('hreflang="es"')) {
-    const tags = `<link rel="alternate" hreflang="en" href="${CANON}/${key}"><link rel="alternate" hreflang="es" href="${CANON}/es/${key}"><link rel="alternate" hreflang="x-default" href="${CANON}/${key}">`;
+  if (!o.includes('hreflang="es" href=')) {
+    const enU = key === 'home' ? CANON + '/' : `${CANON}/${key}`;
+    const esU = key === 'home' ? CANON + '/es' : `${CANON}/es/${key}`;
+    const tags = `<link rel="alternate" hreflang="en" href="${enU}"><link rel="alternate" hreflang="es" href="${esU}"><link rel="alternate" hreflang="x-default" href="${enU}">`;
     o = o.replace(/(<link rel="canonical" href="[^"]*"\s*\/?>)/, '$1' + tags);
   }
-  if (!o.includes('>ES</a>')) {
-    o = o.replace(
-      /<a href="\/jnctn" style="background:var\(--orange\)[^"]*">Join JNCTN<\/a>/,
-      `<a href="/es/${key}" hreflang="es" aria-label="Ver en Español" style="${ES_TOG_STYLE}">ES</a>$&`
-    );
-  }
-  return o;
+  return placeLangTog(o, key, 'en');
 }
 
 function makeSpanishStatic(key, pairs, meta) {
@@ -940,10 +987,10 @@ function makeSpanishStatic(key, pairs, meta) {
   h = h.replace(/<link rel="canonical" href="[^"]*"\s*\/?>/, `<link rel="canonical" href="${CANON}/es/${key}">`);
   h = h.replace(/<meta property="og:url" content="[^"]*"/, `<meta property="og:url" content="${CANON}/es/${key}"`);
   h = h.replace(/<nav class="nav">[\s\S]*?<\/nav>/, esStaticNav(key));
+  h = placeLangTog(h, key, 'es');
   h = h.replace('<a href="/" aria-label="TrampHereBro home"', '<a href="/es" aria-label="TrampHereBro inicio"');
 
   // metadata lives in FOUR places: <title>, og:title, twitter:title, and JSON-LD.
-  // Same for descriptions. Swap them everywhere, not just the <title> tag.
   if (meta) {
     if (meta.titleEn && meta.titleEs) h = h.split(meta.titleEn).join(meta.titleEs);
     if (meta.schemaNameEn && meta.schemaNameEs) h = h.split(meta.schemaNameEn).join(meta.schemaNameEs);
@@ -1099,18 +1146,11 @@ function syncHomepageMap(rows, coords, snapText, snapTextLine) {
   // Ensure the English homepage advertises its Spanish twin (idempotent: safe on every build)
   const ensureEnglishHomeToggle = html => {
     let o = html;
-    if (!o.includes('hreflang="es"')) {
+    if (!o.includes('hreflang="es" href=')) {
       const tags = `<link rel="alternate" hreflang="en" href="${CANON}/"><link rel="alternate" hreflang="es" href="${CANON}/es"><link rel="alternate" hreflang="x-default" href="${CANON}/">`;
       o = o.replace(/(<link rel="canonical" href="[^"]*"\s*\/?>)/, '$1' + tags);
     }
-    if (!o.includes('>ES</a>')) {
-      const tog = 'display:inline-flex;align-items:center;justify-content:center;min-width:36px;padding:6px 11px;border:1.5px solid var(--orange);color:var(--orange);border-radius:8px;font-weight:700;font-size:13px;text-decoration:none;letter-spacing:.03em';
-      o = o.replace(
-        '<a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Join JNCTN</a>',
-        `<a href="/es" hreflang="es" aria-label="Ver en Español" style="${tog}">ES</a><a href="/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Join JNCTN</a>`
-      );
-    }
-    return o;
+    return placeLangTog(o, 'home', 'en');
   };
   return syncHomepageMapInner(rows, coords, snapText, snapTextLine, ensureEnglishHomeToggle);
 }
