@@ -262,7 +262,7 @@ const GA_TAG = `<script async src="https://www.googletagmanager.com/gtag/js?id=G
 const LANGS = ['en', 'es'];
 // Pages that currently have a fully-translated /es/ mirror. Add a key here the
 // moment its Spanish version ships, and the toggle + nav + sitemap light up for it.
-const TRANSLATED = new Set(['unionretirement']);
+const TRANSLATED = new Set(['unionretirement', 'unionhistory', 'ibewhistory', 'uahistory']);
 // Spanish-formatted "updated" date for the footer
 const PRETTY_DATE_ES = TODAY.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 // localized href: point at /es/<page> only if that page is actually translated,
@@ -1019,9 +1019,86 @@ function snapTradeBlock(text, textLine){
   return picker + panels + script;
 }
 
-function historyPage() {
-  const title = 'The History of Organized Labor | TrampHereBro';
-  const desc = 'The 40-hour week, the weekend, workplace safety, overtime — every benefit workers carry today was won by organized labor. A timeline of the labor movement, built for the traveling trades.';
+function historyPage(lang) {
+  lang = lang || 'en';
+  const EN = {
+    title: 'The History of Organized Labor | TrampHereBro',
+    desc: 'The 40-hour week, the weekend, workplace safety, overtime — every benefit workers carry today was won by organized labor. A timeline of the labor movement, built for the traveling trades.',
+    crumb: 'History', kick: 'The Fight Behind the Trade',
+    h1a: 'The History of ', h1b: 'Organized Labor',
+    hsub: 'Every hand on the road today stands on ground that was fought for. Here’s how it was won — and why the book you sign still matters.',
+    lead: 'The 40-hour work week. The weekend. Workplace safety. Overtime. Health coverage. A pension you can retire on. <b>Every one of these was fought for — and won — by workers who organized.</b> None of it was handed down. It was bargained for at the table, walked for on the line, and in more cases than anyone should have to remember, bled for on the job.',
+    stats: [['150+','Years fighting for workers'],['16M+','Workers repped by unions'],['~18%','Union wage premium'],['$0','To join an apprenticeship']],
+    tlSecA: 'A ', tlSecAccent: 'Timeline', tlSecB: ' of the Labor Movement',
+    tlSub: 'From the first trade societies to the laws that still protect you on the job today.',
+    wonSecA: 'What ', wonSecAccent: 'Unions Won', wonSecB: ' for Every American',
+    wonSub: 'Union or not, your life is better because organized workers refused to take less.',
+    closeHa: 'You’re part of ', closeHb: 'that story', closeHc: ' now.',
+    closeP: 'Every call you chase, every book you sign, every mile you tramp — you’re carrying a 150-year tradition of skilled hands looking out for each other. That’s the brotherhood and sisterhood that makes the road possible.',
+    closeA: 'See who’s hiring →',
+    TL: [
+      ['1794','The First American Trade Union','The Federal Society of Journeymen Cordwainers — shoemakers — organizes in Philadelphia, widely counted as the first sustained trade union in the country. Skilled hands, banding together for fair pay. Sound familiar?'],
+      ['1869','The Knights of Labor','One of the first major labor organizations, and radical for its day — it opened its ranks broadly across skill, race, and gender when almost nothing else did.'],
+      ['1886','Haymarket & the 8-Hour Day','Workers across the country walked for the eight-hour day. The events at Chicago’s Haymarket became a rallying point that pushed the eight-hour standard around the world — the workday you clock today.'],
+      ['1886','The AFL Is Founded','Samuel Gompers builds the American Federation of Labor, organizing skilled craft workers into trade unions — the craft-union model the building trades still run on.'],
+      ['1911','The Triangle Shirtwaist Fire','146 garment workers, most of them young immigrant women, died when locked exits trapped them inside a burning factory. The outrage drove landmark fire-code and workplace-safety reform.'],
+      ['1935','The Wagner Act','The National Labor Relations Act guarantees private-sector workers the right to organize, join a union, and bargain collectively. The legal backbone of everything that followed.'],
+      ['1938','The Fair Labor Standards Act','The federal minimum wage. The 40-hour week. Time-and-a-half overtime. Hard limits on child labor. One law, and unions put it there.'],
+      ['1947','Taft-Hartley','Congress rolls back parts of the Wagner Act, restricting certain union tactics. A reminder that the fight never really ends — it just changes shape.'],
+      ['1955','The AFL-CIO Merger','The two largest labor federations merge into one, consolidating the national voice of American labor.'],
+      ['1970','OSHA','The Occupational Safety and Health Act creates enforceable federal safety standards. Those rules — the ones that gripe you on a Monday morning safety brief — are why more of us make it home.'],
+      ['Today','The Building Trades Right Now','Registered apprenticeships, project labor agreements, and a data-center and energy boom driving record demand for skilled union hands. The road’s as busy as it’s been in a generation — and you’re on it.'],
+    ],
+    WON: [
+      ['The weekend','Two days off wasn’t a gift. It was won.'],
+      ['The 8-hour day','Before the fight, 12–16 hour days were normal.'],
+      ['Overtime pay','Time-and-a-half past 40 — codified in 1938.'],
+      ['Workplace safety','OSHA, fire codes, and the right to refuse unsafe work.'],
+      ['Child labor laws','Kids belong in school, not in the mill.'],
+      ['Employer health & pensions','Benefits bargained at the table, not begged for.'],
+    ]
+  };
+  const ES = {
+    title: 'La Historia del Trabajo Organizado | TrampHereBro',
+    desc: 'La semana de 40 horas, el fin de semana, la seguridad laboral, las horas extra — cada beneficio que los trabajadores tienen hoy lo ganó el movimiento obrero organizado. Una cronología del movimiento obrero, hecha para los oficios viajeros.',
+    crumb: 'Historia', kick: 'La Lucha Detrás del Oficio',
+    h1a: 'La Historia del ', h1b: 'Trabajo Organizado',
+    hsub: 'Cada trabajador en el camino hoy pisa terreno que se conquistó con lucha. Así se ganó — y por qué el libro que firmas todavía importa.',
+    lead: 'La semana laboral de 40 horas. El fin de semana. La seguridad laboral. Las horas extra. La cobertura de salud. Una pensión con la que puedes jubilarte. <b>Cada una de estas se luchó — y se ganó — por trabajadores que se organizaron.</b> Nada de esto se regaló. Se negoció en la mesa, se marchó en la línea de piquete, y en más casos de los que nadie debería tener que recordar, se pagó con sangre en el trabajo.',
+    stats: [['150+','Años luchando por los trabajadores'],['16M+','Trabajadores representados por sindicatos'],['~18%','Ventaja salarial sindical'],['$0','Para entrar a un aprendizaje']],
+    tlSecA: 'Una ', tlSecAccent: 'Cronología', tlSecB: ' del Movimiento Obrero',
+    tlSub: 'Desde las primeras sociedades de oficio hasta las leyes que aún te protegen en el trabajo hoy.',
+    wonSecA: 'Lo que los ', wonSecAccent: 'Sindicatos Ganaron', wonSecB: ' para Todos',
+    wonSub: 'Seas sindicalizado o no, tu vida es mejor porque los trabajadores organizados se negaron a aceptar menos.',
+    closeHa: 'Ahora eres parte de ', closeHb: 'esa historia', closeHc: '.',
+    closeP: 'Cada llamada que persigues, cada libro que firmas, cada milla que recorres — cargas con una tradición de 150 años de manos calificadas que se cuidan entre sí. Esa es la hermandad que hace posible el camino.',
+    closeA: 'Mira quién está contratando →',
+    TL: [
+      ['1794','El Primer Sindicato Obrero de EE.UU.','La Sociedad Federal de Zapateros Oficiales — los cordwainers — se organiza en Filadelfia, ampliamente reconocida como el primer sindicato obrero sostenido del país. Manos con oficio, uniéndose por un pago justo. ¿Te suena?'],
+      ['1869','Los Caballeros del Trabajo','Una de las primeras grandes organizaciones obreras, y radical para su época — abrió sus filas ampliamente sin importar el oficio, la raza o el género, cuando casi nada más lo hacía.'],
+      ['1886','Haymarket y la Jornada de 8 Horas','Trabajadores de todo el país marcharon por la jornada de ocho horas. Los sucesos de Haymarket, en Chicago, se convirtieron en un punto de unión que impulsó el estándar de las ocho horas en todo el mundo — la jornada que registras hoy.'],
+      ['1886','Se Funda la AFL','Samuel Gompers construye la Federación Americana del Trabajo (AFL), organizando a los trabajadores calificados de oficio en sindicatos — el modelo de sindicato de oficio sobre el que aún funcionan los oficios de la construcción.'],
+      ['1911','El Incendio de Triangle Shirtwaist','146 trabajadores de la costura, en su mayoría mujeres jóvenes inmigrantes, murieron cuando las salidas cerradas con llave las dejaron atrapadas dentro de una fábrica en llamas. La indignación impulsó reformas históricas de códigos contra incendios y de seguridad laboral.'],
+      ['1935','La Ley Wagner','La Ley Nacional de Relaciones Laborales garantiza a los trabajadores del sector privado el derecho a organizarse, afiliarse a un sindicato y negociar colectivamente. La columna vertebral legal de todo lo que siguió.'],
+      ['1938','La Ley de Normas Justas de Trabajo','El salario mínimo federal. La semana de 40 horas. El pago de horas extra a tiempo y medio. Límites estrictos al trabajo infantil. Una sola ley — y los sindicatos la pusieron ahí.'],
+      ['1947','Taft-Hartley','El Congreso revierte partes de la Ley Wagner, restringiendo ciertas tácticas sindicales. Un recordatorio de que la lucha nunca termina del todo — solo cambia de forma.'],
+      ['1955','La Fusión AFL-CIO','Las dos federaciones laborales más grandes se fusionan en una sola, consolidando la voz nacional del movimiento obrero estadounidense.'],
+      ['1970','OSHA','La Ley de Seguridad y Salud Ocupacional crea normas federales de seguridad de cumplimiento obligatorio. Esas reglas — las mismas de las que te quejas en la charla de seguridad del lunes por la mañana — son la razón por la que más de nosotros llegamos a casa.'],
+      ['Hoy','Los Oficios de la Construcción Hoy','Aprendizajes registrados, acuerdos laborales de proyecto (PLA), y un auge de centros de datos y energía que impulsa una demanda récord de manos sindicales calificadas. El camino está tan activo como no lo estaba en una generación — y tú estás en él.'],
+    ],
+    WON: [
+      ['El fin de semana','Dos días libres no fueron un regalo. Se ganaron.'],
+      ['La jornada de 8 horas','Antes de la lucha, las jornadas de 12 a 16 horas eran normales.'],
+      ['El pago de horas extra','Tiempo y medio después de 40 horas — codificado en 1938.'],
+      ['La seguridad laboral','OSHA, los códigos contra incendios, y el derecho a rechazar trabajo inseguro.'],
+      ['Las leyes contra el trabajo infantil','Los niños pertenecen a la escuela, no a la fábrica.'],
+      ['Salud y pensiones del empleador','Beneficios negociados en la mesa, no mendigados.'],
+    ]
+  };
+  const D = lang === 'es' ? ES : EN;
+  const title = D.title;
+  const desc = D.desc;
+  const urlPath = (lang === 'es' ? '/es/' : '/') + 'unionhistory';
   const HS = `
   .h-lead{font-size:18px;line-height:1.7;margin:0 0 8px}.h-lead b{color:var(--navy)}
   .h-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 44px}
@@ -1046,70 +1123,102 @@ function historyPage() {
   .h-close p{color:#c6d6ef;font-size:15px;max-width:560px;margin:0 auto 18px;line-height:1.6}
   .h-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
   @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}.h-won{grid-template-columns:1fr}}`;
-  const TL = [
-    ['1794','The First American Trade Union','The Federal Society of Journeymen Cordwainers \u2014 shoemakers \u2014 organizes in Philadelphia, widely counted as the first sustained trade union in the country. Skilled hands, banding together for fair pay. Sound familiar?'],
-    ['1869','The Knights of Labor','One of the first major labor organizations, and radical for its day \u2014 it opened its ranks broadly across skill, race, and gender when almost nothing else did.'],
-    ['1886','Haymarket & the 8-Hour Day','Workers across the country walked for the eight-hour day. The events at Chicago\u2019s Haymarket became a rallying point that pushed the eight-hour standard around the world \u2014 the workday you clock today.'],
-    ['1886','The AFL Is Founded','Samuel Gompers builds the American Federation of Labor, organizing skilled craft workers into trade unions \u2014 the craft-union model the building trades still run on.'],
-    ['1911','The Triangle Shirtwaist Fire','146 garment workers, most of them young immigrant women, died when locked exits trapped them inside a burning factory. The outrage drove landmark fire-code and workplace-safety reform.'],
-    ['1935','The Wagner Act','The National Labor Relations Act guarantees private-sector workers the right to organize, join a union, and bargain collectively. The legal backbone of everything that followed.'],
-    ['1938','The Fair Labor Standards Act','The federal minimum wage. The 40-hour week. Time-and-a-half overtime. Hard limits on child labor. One law, and unions put it there.'],
-    ['1947','Taft-Hartley','Congress rolls back parts of the Wagner Act, restricting certain union tactics. A reminder that the fight never really ends \u2014 it just changes shape.'],
-    ['1955','The AFL-CIO Merger','The two largest labor federations merge into one, consolidating the national voice of American labor.'],
-    ['1970','OSHA','The Occupational Safety and Health Act creates enforceable federal safety standards. Those rules \u2014 the ones that gripe you on a Monday morning safety brief \u2014 are why more of us make it home.'],
-    ['Today','The Building Trades Right Now','Registered apprenticeships, project labor agreements, and a data-center and energy boom driving record demand for skilled union hands. The road\u2019s as busy as it\u2019s been in a generation \u2014 and you\u2019re on it.'],
-  ];
-  const WON = [
-    ['The weekend','Two days off wasn\u2019t a gift. It was won.'],
-    ['The 8-hour day','Before the fight, 12\u201316 hour days were normal.'],
-    ['Overtime pay','Time-and-a-half past 40 \u2014 codified in 1938.'],
-    ['Workplace safety','OSHA, fire codes, and the right to refuse unsafe work.'],
-    ['Child labor laws','Kids belong in school, not in the mill.'],
-    ['Employer health & pensions','Benefits bargained at the table, not begged for.'],
-  ];
-  const tl = TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
-  const won = WON.map(w => `<div class="h-w"><div class="h">${esc(w[0])}</div><div class="d">${esc(w[1])}</div></div>`).join('');
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
+  const won = D.WON.map(w => `<div class="h-w"><div class="h">${esc(w[0])}</div><div class="d">${esc(w[1])}</div></div>`).join('');
+  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${CANON}/unionhistory">
+<link rel="canonical" href="${CANON}${urlPath}">
+${hreflangTags('unionhistory')}
 <meta property="og:type" content="article"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
-<meta property="og:url" content="${CANON}/unionhistory"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta property="og:url" content="${CANON}${urlPath}"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
 ${FONTS}${GA_TAG}
 <style>${CSS}${HS}</style>
 </head><body>
-${topbar('history')}
+${topbar('unionhistory', lang)}
 <header><div class="hero-inner">
-<div class="crumbs"><a href="/">Board</a> \u203a History</div>
-<div class="kick"><span class="dot"></span>The Fight Behind the Trade</div>
-<h1 class="lede">The History of <b>Organized Labor</b></h1>
-<div class="hsub">Every hand on the road today stands on ground that was fought for. Here\u2019s how it was won \u2014 and why the book you sign still matters.</div>
+<div class="crumbs"><a href="${lhref('', lang)}">${lang === 'es' ? 'Tablero' : 'Board'}</a> \u203a ${D.crumb}</div>
+<div class="kick"><span class="dot"></span>${D.kick}</div>
+<h1 class="lede">${D.h1a}<b>${D.h1b}</b></h1>
+<div class="hsub">${D.hsub}</div>
 </div></header>
 <main class="wrap">
-<p class="h-lead">The 40-hour work week. The weekend. Workplace safety. Overtime. Health coverage. A pension you can retire on. <b>Every one of these was fought for \u2014 and won \u2014 by workers who organized.</b> None of it was handed down. It was bargained for at the table, walked for on the line, and in more cases than anyone should have to remember, bled for on the job.</p>
-<div class="h-stats">
-<div class="h-stat"><div class="n">150+</div><div class="l">Years fighting for workers</div></div>
-<div class="h-stat"><div class="n">16M+</div><div class="l">Workers repped by unions</div></div>
-<div class="h-stat"><div class="n">~18%</div><div class="l">Union wage premium</div></div>
-<div class="h-stat"><div class="n">$0</div><div class="l">To join an apprenticeship</div></div>
-</div>
-<div class="h-sect">A <span class="accent">Timeline</span> of the Labor Movement</div>
-<div class="h-sub">From the first trade societies to the laws that still protect you on the job today.</div>
+<p class="h-lead">${D.lead}</p>
+<div class="h-stats">${D.stats.map(s => `<div class="h-stat"><div class="n">${s[0]}</div><div class="l">${esc(s[1])}</div></div>`).join('')}</div>
+<div class="h-sect">${D.tlSecA}<span class="accent">${D.tlSecAccent}</span>${D.tlSecB}</div>
+<div class="h-sub">${D.tlSub}</div>
 <div class="h-tl">${tl}</div>
-<div class="h-sect" style="margin-top:40px">What <span class="accent">Unions Won</span> for Every American</div>
-<div class="h-sub">Union or not, your life is better because organized workers refused to take less.</div>
+<div class="h-sect" style="margin-top:40px">${D.wonSecA}<span class="accent">${D.wonSecAccent}</span>${D.wonSecB}</div>
+<div class="h-sub">${D.wonSub}</div>
 <div class="h-won">${won}</div>
-<div class="h-close"><h3>You\u2019re part of <b>that story</b> now.</h3><p>Every call you chase, every book you sign, every mile you tramp \u2014 you\u2019re carrying a 150-year tradition of skilled hands looking out for each other. That\u2019s the brotherhood and sisterhood that makes the road possible.</p><a href="/">See who\u2019s hiring \u2192</a></div>
+<div class="h-close"><h3>${D.closeHa}<b>${D.closeHb}</b>${D.closeHc}</h3><p>${D.closeP}</p><a href="${lhref('', lang)}">${D.closeA}</a></div>
 </main>
-${footer()}
+${footer(lang)}
 </body></html>`;
 }
 
-function ibewHistoryPage() {
-  const title = 'The History of the IBEW — Wired for the Long Haul | TrampHereBro';
-  const desc = 'From a boarding-house room above a St. Louis dance hall in 1891 to over 900,000 members today. Henry Miller, the founding, the Reid-Murphy split, the Council on Industrial Relations, the AT&T breakup, and the data-center boom — the story of the Brotherhood.';
+function ibewHistoryPage(lang) {
+  lang = lang || 'en';
+  const EN = {
+    title: 'The History of the IBEW — Wired for the Long Haul | TrampHereBro',
+    desc: 'From a boarding-house room above a St. Louis dance hall in 1891 to over 900,000 members today. Henry Miller, the founding, the Reid-Murphy split, the Council on Industrial Relations, the AT&T breakup, and the data-center boom — the story of the Brotherhood.',
+    crumb: 'IBEW History', kick: 'Wired for the Long Haul',
+    h1a: 'The History of the ', h1b: 'IBEW',
+    hsub: 'From a boarding-house room above a St. Louis dance hall to nearly a million members — the story of the Brotherhood you carry a card in.',
+    lead: 'In 1891, a traveling lineman named <b>Henry Miller</b> rode the rails city to city — tools and a spare shirt in a carpetbag — organizing electrical workers wherever he found them. That November, ten delegates representing 286 members met in a rented room above Stolley’s Dance Hall in a poor section of St. Louis and founded what became the <b>International Brotherhood of Electrical Workers</b>. It was a humble start for a trade so dangerous that Miller himself would be dead within five years — killed by a fall after an electric shock. But the Brotherhood he built is now the largest electrical union in the world.',
+    stats: [['1891','Founded in St. Louis'],['900K+','Members today'],['10','Founding delegates'],['130+','Years of the Brotherhood']],
+    pull: '“No man could have done more for our union in its first years than he did.” — J.T. Kelly, first Secretary, on Henry Miller',
+    tlSecA: 'A ', tlSecAccent: 'Timeline', tlSecB: ' of the Brotherhood',
+    tlSub: 'From ten men in a rented room to the trade powering the modern grid.',
+    closeHa: 'You carry ', closeHb: 'that card', closeHc: ' now.',
+    closeP: 'Every hot day in the ditch, every night shift at the data center, every mile you tramp to the next call — you’re part of a 130-year line that runs straight back to ten men in a rented room who refused to take less. Wire it up, brother.',
+    closeA: 'See who’s hiring →',
+    TL: [
+      ['1890','The Spark in St. Louis','Electricians working the St. Louis Exposition, tired of long dangerous days for meager pay, charter AFL Federal Labor Union No. 5221 with help from the AFL. A young lineman, Henry Miller, is elected president — but he knows a single local isn’t enough.'],
+      ['1891','The Brotherhood Is Born','On November 21, ten delegates representing 286 members convene in St. Louis and found the National Brotherhood of Electrical Workers. They work day and night for a week drafting the first constitution and the emblem you still see — a fist grasping lightning bolts. Miller is elected first Grand President.'],
+      ['1896','Miller Falls','Henry Miller dies at 38 after an electric shock causes him to fall from a pole. He gave the trade its union and, in the end, his life to the same dangers the Brotherhood was built to fight.'],
+      ['1899','“International”','As locals charter across Canada as well as the U.S., the union becomes the International Brotherhood of Electrical Workers — the name it carries today.'],
+      ['1908','The Reid-Murphy Split','A bitter internal war — rooted in the old tension between wiremen and linemen — fractures the Brotherhood into two rival IBEWs for six years. At one point the breakaway faction claimed three-quarters of all organized electrical workers. It nearly ended the union.'],
+      ['1912','Made Whole Again','A court declares the breakaway 1908 convention illegal, and the Brotherhood reunites. The near-death experience left a lasting lesson about the cost of division.'],
+      ['1919-20','The Council on Industrial Relations','Membership explodes from 23,500 in 1913 to over 148,000 by 1919. The IBEW and electrical contractors create the Council on Industrial Relations — a joint body to settle disputes without strikes, a labor-management model that still runs today. Headquarters moves to Washington, D.C.'],
+      ['1941','National Apprenticeship Standards','The IBEW helps set national apprenticeship standards — the earn-while-you-learn training model that made the union electrician synonymous with skill and safety.'],
+      ['1980s','The AT&T Breakup','The court-ordered breakup of the Bell System guts tens of thousands of IBEW telecom jobs almost overnight — one of the hardest blows the Brotherhood ever absorbed, and a hard lesson in adapting to a changing industry.'],
+      ['Today','Wired for What’s Next','Over 900,000 members across the U.S., Canada, and beyond. The data-center and clean-energy boom is driving the biggest demand for skilled electrical labor in a generation — and the Brotherhood is chasing one million members again. The road’s wide open, and you’re on it.'],
+    ]
+  };
+  const ES = {
+    title: 'La Historia del IBEW — Conectados para el Largo Camino | TrampHereBro',
+    desc: 'Desde un cuarto de pensión sobre un salón de baile en San Luis en 1891 hasta más de 900,000 miembros hoy. Henry Miller, la fundación, la división Reid-Murphy, el Consejo de Relaciones Industriales, la disolución de AT&T, y el auge de los centros de datos — la historia de la Hermandad.',
+    crumb: 'Historia del IBEW', kick: 'Conectados para el Largo Camino',
+    h1a: 'La Historia del ', h1b: 'IBEW',
+    hsub: 'Desde un cuarto de pensión sobre un salón de baile en San Luis hasta casi un millón de miembros — la historia de la Hermandad cuya tarjeta cargas.',
+    lead: 'En 1891, un lineman viajero llamado <b>Henry Miller</b> recorría los rieles de ciudad en ciudad — con sus herramientas y una camisa de repuesto en un maletín — organizando a los trabajadores eléctricos dondequiera que los encontraba. Ese noviembre, diez delegados que representaban a 286 miembros se reunieron en un cuarto rentado sobre el Salón de Baile Stolley, en una zona pobre de San Luis, y fundaron lo que se convirtió en la <b>Hermandad Internacional de Trabajadores Eléctricos (IBEW)</b>. Fue un comienzo humilde para un oficio tan peligroso que el propio Miller estaría muerto en cinco años — por una caída tras una descarga eléctrica. Pero la Hermandad que construyó es hoy el sindicato eléctrico más grande del mundo.',
+    stats: [['1891','Fundada en San Luis'],['900K+','Miembros hoy'],['10','Delegados fundadores'],['130+','Años de la Hermandad']],
+    pull: '“Ningún hombre pudo haber hecho más por nuestro sindicato en sus primeros años de lo que él hizo.” — J.T. Kelly, primer Secretario, sobre Henry Miller',
+    tlSecA: 'Una ', tlSecAccent: 'Cronología', tlSecB: ' de la Hermandad',
+    tlSub: 'Desde diez hombres en un cuarto rentado hasta el oficio que impulsa la red eléctrica moderna.',
+    closeHa: 'Ahora tú cargas ', closeHb: 'esa tarjeta', closeHc: '.',
+    closeP: 'Cada día caluroso en la zanja, cada turno de noche en el centro de datos, cada milla que recorres hacia la próxima llamada — eres parte de una línea de 130 años que llega directo hasta diez hombres en un cuarto rentado que se negaron a aceptar menos. A conectar, hermano.',
+    closeA: 'Mira quién está contratando →',
+    TL: [
+      ['1890','La Chispa en San Luis','Electricistas que trabajaban en la Exposición de San Luis, cansados de jornadas largas y peligrosas por una paga miserable, forman la Unión Federal del Trabajo No. 5221 de la AFL con ayuda de la AFL. Un joven lineman, Henry Miller, es elegido presidente — pero sabe que un solo local no basta.'],
+      ['1891','Nace la Hermandad','El 21 de noviembre, diez delegados que representan a 286 miembros se reúnen en San Luis y fundan la Hermandad Nacional de Trabajadores Eléctricos. Trabajan día y noche durante una semana redactando la primera constitución y el emblema que aún ves — un puño sujetando rayos. Miller es elegido primer Gran Presidente.'],
+      ['1896','Cae Miller','Henry Miller muere a los 38 años tras una descarga eléctrica que lo hace caer de un poste. Le dio al oficio su sindicato y, al final, su vida a los mismos peligros que la Hermandad fue construida para combatir.'],
+      ['1899','“Internacional”','A medida que se forman locales en Canadá además de EE.UU., el sindicato se convierte en la Hermandad Internacional de Trabajadores Eléctricos — el nombre que lleva hoy.'],
+      ['1908','La División Reid-Murphy','Una amarga guerra interna — con raíces en la vieja tensión entre wiremen y linemen — fractura la Hermandad en dos IBEW rivales durante seis años. En un punto, la facción separatista afirmaba tener tres cuartas partes de todos los trabajadores eléctricos organizados. Estuvo a punto de acabar con el sindicato.'],
+      ['1912','De Nuevo Unida','Un tribunal declara ilegal la convención separatista de 1908, y la Hermandad se reúne. La experiencia cercana a la muerte dejó una lección duradera sobre el costo de la división.'],
+      ['1919-20','El Consejo de Relaciones Industriales','La membresía explota de 23,500 en 1913 a más de 148,000 para 1919. El IBEW y los contratistas eléctricos crean el Consejo de Relaciones Industriales — un cuerpo conjunto para resolver disputas sin huelgas, un modelo de relación obrero-patronal que aún funciona hoy. La sede se traslada a Washington, D.C.'],
+      ['1941','Normas Nacionales de Aprendizaje','El IBEW ayuda a establecer normas nacionales de aprendizaje — el modelo de aprender-mientras-ganas que hizo del electricista sindical un sinónimo de destreza y seguridad.'],
+      ['Años 80','La Disolución de AT&T','La disolución ordenada por un tribunal del sistema Bell elimina decenas de miles de empleos de telecomunicaciones del IBEW casi de la noche a la mañana — uno de los golpes más duros que la Hermandad jamás absorbió, y una dura lección sobre adaptarse a una industria cambiante.'],
+      ['Hoy','Conectados para lo que Viene','Más de 900,000 miembros en EE.UU., Canadá y más allá. El auge de los centros de datos y la energía limpia impulsa la mayor demanda de mano de obra eléctrica calificada en una generación — y la Hermandad va de nuevo tras el millón de miembros. El camino está abierto de par en par, y tú estás en él.'],
+    ]
+  };
+  const D = lang === 'es' ? ES : EN;
+  const title = D.title;
+  const desc = D.desc;
+  const urlPath = (lang === 'es' ? '/es/' : '/') + 'ibewhistory';
   const HS = `
   .h-lead{font-size:18px;line-height:1.7;margin:0 0 8px}.h-lead b{color:var(--navy)}
   .h-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 30px}
@@ -1131,52 +1240,36 @@ function ibewHistoryPage() {
   .h-close p{color:#c6d6ef;font-size:15px;max-width:580px;margin:0 auto 18px;line-height:1.6}
   .h-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
   @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}}`;
-  const TL = [
-    ['1890','The Spark in St. Louis','Electricians working the St. Louis Exposition, tired of long dangerous days for meager pay, charter AFL Federal Labor Union No. 5221 with help from the AFL. A young lineman, Henry Miller, is elected president \u2014 but he knows a single local isn\u2019t enough.'],
-    ['1891','The Brotherhood Is Born','On November 21, ten delegates representing 286 members convene in St. Louis and found the National Brotherhood of Electrical Workers. They work day and night for a week drafting the first constitution and the emblem you still see \u2014 a fist grasping lightning bolts. Miller is elected first Grand President.'],
-    ['1896','Miller Falls','Henry Miller dies at 38 after an electric shock causes him to fall from a pole. He gave the trade its union and, in the end, his life to the same dangers the Brotherhood was built to fight.'],
-    ['1899','\u201CInternational\u201D','As locals charter across Canada as well as the U.S., the union becomes the International Brotherhood of Electrical Workers \u2014 the name it carries today.'],
-    ['1908','The Reid-Murphy Split','A bitter internal war \u2014 rooted in the old tension between wiremen and linemen \u2014 fractures the Brotherhood into two rival IBEWs for six years. At one point the breakaway faction claimed three-quarters of all organized electrical workers. It nearly ended the union.'],
-    ['1912','Made Whole Again','A court declares the breakaway 1908 convention illegal, and the Brotherhood reunites. The near-death experience left a lasting lesson about the cost of division.'],
-    ['1919-20','The Council on Industrial Relations','Membership explodes from 23,500 in 1913 to over 148,000 by 1919. The IBEW and electrical contractors create the Council on Industrial Relations \u2014 a joint body to settle disputes without strikes, a labor-management model that still runs today. Headquarters moves to Washington, D.C.'],
-    ['1941','National Apprenticeship Standards','The IBEW helps set national apprenticeship standards \u2014 the earn-while-you-learn training model that made the union electrician synonymous with skill and safety.'],
-    ['1980s','The AT&T Breakup','The court-ordered breakup of the Bell System guts tens of thousands of IBEW telecom jobs almost overnight \u2014 one of the hardest blows the Brotherhood ever absorbed, and a hard lesson in adapting to a changing industry.'],
-    ['Today','Wired for What\u2019s Next','Over 900,000 members across the U.S., Canada, and beyond. The data-center and clean-energy boom is driving the biggest demand for skilled electrical labor in a generation \u2014 and the Brotherhood is chasing one million members again. The road\u2019s wide open, and you\u2019re on it.'],
-  ];
-  const tl = TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
+  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<link rel="canonical" href="${CANON}/ibewhistory">
+<link rel="canonical" href="${CANON}${urlPath}">
+${hreflangTags('ibewhistory')}
 <meta property="og:type" content="article"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
-<meta property="og:url" content="${CANON}/ibewhistory"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta property="og:url" content="${CANON}${urlPath}"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 ${FAVICON_LINK}
 ${FONTS}${GA_TAG}
 <style>${CSS}${HS}</style>
 </head><body>
-${topbar('ibewhistory')}
+${topbar('ibewhistory', lang)}
 <header><div class="hero-inner">
-<div class="crumbs"><a href="/">Board</a> \u203a IBEW History</div>
-<div class="kick"><span class="dot"></span>Wired for the Long Haul</div>
-<h1 class="lede">The History of the <b>IBEW</b></h1>
-<div class="hsub">From a boarding-house room above a St. Louis dance hall to nearly a million members \u2014 the story of the Brotherhood you carry a card in.</div>
+<div class="crumbs"><a href="${lhref('', lang)}">${lang === 'es' ? 'Tablero' : 'Board'}</a> \u203a ${D.crumb}</div>
+<div class="kick"><span class="dot"></span>${D.kick}</div>
+<h1 class="lede">${D.h1a}<b>${D.h1b}</b></h1>
+<div class="hsub">${D.hsub}</div>
 </div></header>
 <main class="wrap">
-<p class="h-lead">In 1891, a traveling lineman named <b>Henry Miller</b> rode the rails city to city \u2014 tools and a spare shirt in a carpetbag \u2014 organizing electrical workers wherever he found them. That November, ten delegates representing 286 members met in a rented room above Stolley\u2019s Dance Hall in a poor section of St. Louis and founded what became the <b>International Brotherhood of Electrical Workers</b>. It was a humble start for a trade so dangerous that Miller himself would be dead within five years \u2014 killed by a fall after an electric shock. But the Brotherhood he built is now the largest electrical union in the world.</p>
-<div class="h-stats">
-<div class="h-stat"><div class="n">1891</div><div class="l">Founded in St. Louis</div></div>
-<div class="h-stat"><div class="n">900K+</div><div class="l">Members today</div></div>
-<div class="h-stat"><div class="n">10</div><div class="l">Founding delegates</div></div>
-<div class="h-stat"><div class="n">130+</div><div class="l">Years of the Brotherhood</div></div>
-</div>
-<div class="h-pull">\u201CNo man could have done more for our union in its first years than he did.\u201D \u2014 J.T. Kelly, first Secretary, on Henry Miller</div>
-<div class="h-sect">A <span class="accent">Timeline</span> of the Brotherhood</div>
-<div class="h-sub">From ten men in a rented room to the trade powering the modern grid.</div>
+<p class="h-lead">${D.lead}</p>
+<div class="h-stats">${D.stats.map(s => `<div class="h-stat"><div class="n">${s[0]}</div><div class="l">${esc(s[1])}</div></div>`).join('')}</div>
+<div class="h-pull">${D.pull}</div>
+<div class="h-sect">${D.tlSecA}<span class="accent">${D.tlSecAccent}</span>${D.tlSecB}</div>
+<div class="h-sub">${D.tlSub}</div>
 <div class="h-tl">${tl}</div>
-<div class="h-close"><h3>You carry <b>that card</b> now.</h3><p>Every hot day in the ditch, every night shift at the data center, every mile you tramp to the next call \u2014 you\u2019re part of a 130-year line that runs straight back to ten men in a rented room who refused to take less. Wire it up, brother.</p><a href="/">See who\u2019s hiring \u2192</a></div>
+<div class="h-close"><h3>${D.closeHa}<b>${D.closeHb}</b>${D.closeHc}</h3><p>${D.closeP}</p><a href="${lhref('', lang)}">${D.closeA}</a></div>
 </main>
-${footer()}
+${footer(lang)}
 </body></html>`;
 }
 
@@ -1334,9 +1427,64 @@ ${footer(lang)}
 </body></html>`;
 }
 
-function uaHistoryPage() {
-  const title = 'The History of the UA — Plumbers & Pipefitters Union History | TrampHereBro';
-  const desc = 'How the United Association was built, in plain English. From its 1889 Washington founding and the Steamfitters War to the 1936 federal apprenticeship, Veterans in Piping, and today\u2019s LNG and data-center boom \u2014 the story of the pipe trades for the traveling brotherhood.';
+function uaHistoryPage(lang) {
+  lang = lang || 'en';
+  const EN = {
+    title: 'The History of the UA — Plumbers & Pipefitters Union History | TrampHereBro',
+    desc: 'How the United Association was built, in plain English. From its 1889 Washington founding and the Steamfitters War to the 1936 federal apprenticeship, Veterans in Piping, and today’s LNG and data-center boom — the story of the pipe trades for the traveling brotherhood.',
+    keywords: 'UA history, United Association history, plumbers union history, pipefitters union history, pipe trades, steamfitters, union apprenticeship, traveling pipefitter',
+    crumb: 'UA History', kick: 'The Pipe Trades’ Long Brotherhood',
+    h1a: 'The History of the ', h1b: 'UA',
+    hsub: 'From a war between plumbers and steamfitters to the trade building the LNG terminals and data centers — the story of the United Association.',
+    lead: 'In 1889, delegates from a handful of feuding local pipe-trades unions met in Washington, D.C., and founded the <b>United Association of Journeymen Plumbers, Gas Fitters, Steam Fitters, and Steam Fitters’ Helpers</b>. The goal was simple and enormous: bind every pipe-trades local in North America into one body that could standardize the craft, protect traveling members, and bargain on equal footing with employers. It would take two decades and a brutal jurisdictional war to secure — but once it did, the UA became one of the most durable building-trades unions on the continent.',
+    stats: [['1889','Founded in Washington, D.C.'],['396K+','Members today'],['~274','Local unions'],['130+','Years of the trade']],
+    pull: '“Every fitting, every weld, every line that moves water, steam, or gas through a building — a UA hand put it there.”',
+    tlSecA: 'A ', tlSecAccent: 'Timeline', tlSecB: ' of the Pipe Trades',
+    tlSub: 'From feuding city locals to the backbone of the energy build-out.',
+    closeHa: 'You keep it ', closeHb: 'flowing', closeHc: '.',
+    closeP: 'Every mile you tramp to the next call, you’re part of a 130-year brotherhood that started with feuding city locals and built the pipe that runs a continent. Water, steam, gas, and now the energy of the future — the pipe trades move it all.',
+    closeA: 'See who’s hiring →',
+    ldHeadline: 'The History of the UA — Plumbers & Pipefitters Union History',
+    TL: [
+      ['Pre-1889','Three Crafts, Many Wars','Plumbers, steamfitters, and gas fitters organized city by city as America laid its first sewer systems and piped in gas and steam heat. Independent locals, no national body, and constant friction over who did which work.'],
+      ['1889','The United Association Is Born','Delegates meet in Washington, D.C., and charter the United Association of Journeymen Plumbers, Gas Fitters, Steam Fitters, and Steam Fitters’ Helpers — uniting every pipe-trades local under one national banner: standardized craft, protected travelers, shared apprenticeship.'],
+      ['1890s-1900s','P.J. Quinlan & the Steamfitters’ War','A bitter jurisdictional fight between plumbers and steamfitters nearly tore the young union apart. It took the intervention of the American Federation of Labor — and leaders like P.J. Quinlan — to finally settle who controlled pipe work and bind the crafts together for good.'],
+      ['1936','Federal Apprenticeship Standards','The UA helps establish federally recognized apprenticeship — the earn-while-you-learn model that made the union pipefitter and plumber a byword for skill, and still trains the trade today.'],
+      ['Postwar','The Peak of the Pipe Trades','The postwar building boom — refineries, power plants, high-rises, industrial expansion — drove the UA to its peak. Pipefitters and welders became indispensable to America’s heavy industry.'],
+      ['2008','Veterans in Piping','The UA launches the Veterans in Piping (VIP) program, placing thousands of transitioning service members directly into journey-track careers in welding and the pipe trades — one of the most respected veteran-to-trade pipelines in the country.'],
+      ['Today','Building the Energy Transition','Around 396,000 members across roughly 274 locals. The UA’s welders and pipefitters are building the LNG export terminals, the data centers, the semiconductor fabs, and the energy infrastructure of the modern era. Quietly, the pipe trades shape the physical backbone of what comes next.'],
+    ]
+  };
+  const ES = {
+    title: 'La Historia de la UA — Historia del Sindicato de Plomeros y Pipefitters | TrampHereBro',
+    desc: 'Cómo se construyó la United Association, en palabras claras. Desde su fundación en Washington en 1889 y la Guerra de los Steamfitters hasta el aprendizaje federal de 1936, Veteranos en la Tubería (VIP), y el auge actual del GNL y los centros de datos — la historia de los oficios de la tubería para la hermandad viajera.',
+    keywords: 'historia de la UA, historia United Association, historia sindicato plomeros, historia sindicato pipefitters, oficios de la tubería, steamfitters, aprendizaje sindical, pipefitter viajero',
+    crumb: 'Historia de la UA', kick: 'La Larga Hermandad de los Oficios de la Tubería',
+    h1a: 'La Historia de la ', h1b: 'UA',
+    hsub: 'Desde una guerra entre plomeros y steamfitters hasta el oficio que construye las terminales de GNL y los centros de datos — la historia de la United Association.',
+    lead: 'En 1889, delegados de un puñado de sindicatos locales de los oficios de la tubería en pugna se reunieron en Washington, D.C., y fundaron la <b>United Association of Journeymen Plumbers, Gas Fitters, Steam Fitters, and Steam Fitters’ Helpers</b>. La meta era simple y enorme: unir a cada local de los oficios de la tubería en Norteamérica en un solo cuerpo que pudiera estandarizar el oficio, proteger a los miembros viajeros, y negociar en igualdad de condiciones con los empleadores. Tomaría dos décadas y una brutal guerra jurisdiccional lograrlo — pero una vez que lo hizo, la UA se convirtió en uno de los sindicatos de la construcción más duraderos del continente.',
+    stats: [['1889','Fundada en Washington, D.C.'],['396K+','Miembros hoy'],['~274','Sindicatos locales'],['130+','Años del oficio']],
+    pull: '“Cada conexión, cada soldadura, cada línea que mueve agua, vapor o gas por un edificio — una mano de la UA la puso ahí.”',
+    tlSecA: 'Una ', tlSecAccent: 'Cronología', tlSecB: ' de los Oficios de la Tubería',
+    tlSub: 'Desde locales urbanos en pugna hasta la columna vertebral de la expansión energética.',
+    closeHa: 'Tú lo mantienes ', closeHb: 'fluyendo', closeHc: '.',
+    closeP: 'Cada milla que recorres hacia la próxima llamada, eres parte de una hermandad de 130 años que empezó con locales urbanos en pugna y construyó la tubería que hace funcionar un continente. Agua, vapor, gas, y ahora la energía del futuro — los oficios de la tubería lo mueven todo.',
+    closeA: 'Mira quién está contratando →',
+    ldHeadline: 'La Historia de la UA — Historia del Sindicato de Plomeros y Pipefitters',
+    TL: [
+      ['Antes de 1889','Tres Oficios, Muchas Guerras','Plomeros, steamfitters y gasfitters se organizaban ciudad por ciudad mientras Estados Unidos tendía sus primeros sistemas de alcantarillado y llevaba gas y calefacción por vapor. Locales independientes, sin cuerpo nacional, y fricción constante sobre quién hacía cuál trabajo.'],
+      ['1889','Nace la United Association','Los delegados se reúnen en Washington, D.C., y fundan la United Association of Journeymen Plumbers, Gas Fitters, Steam Fitters, and Steam Fitters’ Helpers — uniendo a cada local de los oficios de la tubería bajo una sola bandera nacional: oficio estandarizado, viajeros protegidos, aprendizaje compartido.'],
+      ['1890s-1900s','P.J. Quinlan y la Guerra de los Steamfitters','Una amarga pelea jurisdiccional entre plomeros y steamfitters casi destroza al joven sindicato. Hizo falta la intervención de la Federación Americana del Trabajo — y de líderes como P.J. Quinlan — para finalmente definir quién controlaba el trabajo de tubería y unir los oficios para siempre.'],
+      ['1936','Normas Federales de Aprendizaje','La UA ayuda a establecer el aprendizaje reconocido a nivel federal — el modelo de aprender-mientras-ganas que hizo del pipefitter y plomero sindical un sinónimo de destreza, y que aún entrena al oficio hoy.'],
+      ['Posguerra','El Auge de los Oficios de la Tubería','El auge de la construcción de posguerra — refinerías, plantas de energía, rascacielos, expansión industrial — llevó a la UA a su punto máximo. Los pipefitters y soldadores se volvieron indispensables para la industria pesada de Estados Unidos.'],
+      ['2008','Veteranos en la Tubería (VIP)','La UA lanza el programa Veterans in Piping (VIP), colocando a miles de militares en transición directamente en carreras de camino al oficial en soldadura y los oficios de la tubería — uno de los caminos de veterano-a-oficio más respetados del país.'],
+      ['Hoy','Construyendo la Transición Energética','Alrededor de 396,000 miembros en unos 274 locales. Los soldadores y pipefitters de la UA están construyendo las terminales de exportación de GNL, los centros de datos, las fábricas de semiconductores, y la infraestructura energética de la era moderna. Silenciosamente, los oficios de la tubería dan forma a la espina dorsal física de lo que viene.'],
+    ]
+  };
+  const D = lang === 'es' ? ES : EN;
+  const title = D.title;
+  const desc = D.desc;
+  const urlPath = (lang === 'es' ? '/es/' : '/') + 'uahistory';
   const HS = `
   .h-lead{font-size:18px;line-height:1.7;margin:0 0 8px}.h-lead b{color:var(--navy)}
   .h-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 30px}
@@ -1358,60 +1506,48 @@ function uaHistoryPage() {
   .h-close p{color:#c6d6ef;font-size:15px;max-width:580px;margin:0 auto 18px;line-height:1.6}
   .h-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
   @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}}`;
-  const TL = [
-    ['Pre-1889','Three Crafts, Many Wars','Plumbers, steamfitters, and gas fitters organized city by city as America laid its first sewer systems and piped in gas and steam heat. Independent locals, no national body, and constant friction over who did which work.'],
-    ['1889','The United Association Is Born','Delegates meet in Washington, D.C., and charter the United Association of Journeymen Plumbers, Gas Fitters, Steam Fitters, and Steam Fitters\u2019 Helpers \u2014 uniting every pipe-trades local under one national banner: standardized craft, protected travelers, shared apprenticeship.'],
-    ['1890s-1900s','P.J. Quinlan & the Steamfitters\u2019 War','A bitter jurisdictional fight between plumbers and steamfitters nearly tore the young union apart. It took the intervention of the American Federation of Labor \u2014 and leaders like P.J. Quinlan \u2014 to finally settle who controlled pipe work and bind the crafts together for good.'],
-    ['1936','Federal Apprenticeship Standards','The UA helps establish federally recognized apprenticeship \u2014 the earn-while-you-learn model that made the union pipefitter and plumber a byword for skill, and still trains the trade today.'],
-    ['Postwar','The Peak of the Pipe Trades','The postwar building boom \u2014 refineries, power plants, high-rises, industrial expansion \u2014 drove the UA to its peak. Pipefitters and welders became indispensable to America\u2019s heavy industry.'],
-    ['2008','Veterans in Piping','The UA launches the Veterans in Piping (VIP) program, placing thousands of transitioning service members directly into journey-track careers in welding and the pipe trades \u2014 one of the most respected veteran-to-trade pipelines in the country.'],
-    ['Today','Building the Energy Transition','Around 396,000 members across roughly 274 locals. The UA\u2019s welders and pipefitters are building the LNG export terminals, the data centers, the semiconductor fabs, and the energy infrastructure of the modern era. Quietly, the pipe trades shape the physical backbone of what comes next.'],
-  ];
-  const tl = TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
+  const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
   const ld = {
     "@context":"https://schema.org","@type":"Article",
-    "headline":"The History of the UA \u2014 Plumbers & Pipefitters Union History",
+    "headline":D.ldHeadline,
+    "inLanguage":lang,
     "about":["United Association","UA union history","plumbers and pipefitters union","pipe trades history"],
     "author":{"@type":"Person","name":"Noah \u2014 Spanky The Sparky"},
     "publisher":{"@type":"Organization","name":"TrampHereBro"},
-    "mainEntityOfPage":CANON+"/uahistory",
+    "mainEntityOfPage":CANON+urlPath,
     "description":desc
   };
-  return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
-<meta name="keywords" content="UA history, United Association history, plumbers union history, pipefitters union history, pipe trades, steamfitters, union apprenticeship, traveling pipefitter">
-<link rel="canonical" href="${CANON}/uahistory">
+<meta name="keywords" content="${esc(D.keywords)}">
+<link rel="canonical" href="${CANON}${urlPath}">
+${hreflangTags('uahistory')}
 <meta property="og:type" content="article"><meta property="og:site_name" content="TrampHereBro">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
-<meta property="og:url" content="${CANON}/uahistory"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta property="og:url" content="${CANON}${urlPath}"><meta property="og:image" content="${CANON}/share-banner.png">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 ${FAVICON_LINK}
 ${FONTS}${GA_TAG}
 <style>${CSS}${HS}</style>
 </head><body>
-${topbar('uahistory')}
+${topbar('uahistory', lang)}
 <header><div class="hero-inner">
-<div class="crumbs"><a href="/">Board</a> \u203a UA History</div>
-<div class="kick"><span class="dot"></span>The Pipe Trades\u2019 Long Brotherhood</div>
-<h1 class="lede">The History of the <b>UA</b></h1>
-<div class="hsub">From a war between plumbers and steamfitters to the trade building the LNG terminals and data centers \u2014 the story of the United Association.</div>
+<div class="crumbs"><a href="${lhref('', lang)}">${lang === 'es' ? 'Tablero' : 'Board'}</a> \u203a ${D.crumb}</div>
+<div class="kick"><span class="dot"></span>${D.kick}</div>
+<h1 class="lede">${D.h1a}<b>${D.h1b}</b></h1>
+<div class="hsub">${D.hsub}</div>
 </div></header>
 <main class="wrap">
-<p class="h-lead">In 1889, delegates from a handful of feuding local pipe-trades unions met in Washington, D.C., and founded the <b>United Association of Journeymen Plumbers, Gas Fitters, Steam Fitters, and Steam Fitters\u2019 Helpers</b>. The goal was simple and enormous: bind every pipe-trades local in North America into one body that could standardize the craft, protect traveling members, and bargain on equal footing with employers. It would take two decades and a brutal jurisdictional war to secure \u2014 but once it did, the UA became one of the most durable building-trades unions on the continent.</p>
-<div class="h-stats">
-<div class="h-stat"><div class="n">1889</div><div class="l">Founded in Washington, D.C.</div></div>
-<div class="h-stat"><div class="n">396K+</div><div class="l">Members today</div></div>
-<div class="h-stat"><div class="n">~274</div><div class="l">Local unions</div></div>
-<div class="h-stat"><div class="n">130+</div><div class="l">Years of the trade</div></div>
-</div>
-<div class="h-pull">\u201CEvery fitting, every weld, every line that moves water, steam, or gas through a building \u2014 a UA hand put it there.\u201D</div>
-<div class="h-sect">A <span class="accent">Timeline</span> of the Pipe Trades</div>
-<div class="h-sub">From feuding city locals to the backbone of the energy build-out.</div>
+<p class="h-lead">${D.lead}</p>
+<div class="h-stats">${D.stats.map(s => `<div class="h-stat"><div class="n">${s[0]}</div><div class="l">${esc(s[1])}</div></div>`).join('')}</div>
+<div class="h-pull">${D.pull}</div>
+<div class="h-sect">${D.tlSecA}<span class="accent">${D.tlSecAccent}</span>${D.tlSecB}</div>
+<div class="h-sub">${D.tlSub}</div>
 <div class="h-tl">${tl}</div>
-<div class="h-close"><h3>You keep it <b>flowing</b>.</h3><p>Every mile you tramp to the next call, you\u2019re part of a 130-year brotherhood that started with feuding city locals and built the pipe that runs a continent. Water, steam, gas, and now the energy of the future \u2014 the pipe trades move it all.</p><a href="/">See who\u2019s hiring \u2192</a></div>
+<div class="h-close"><h3>${D.closeHa}<b>${D.closeHb}</b>${D.closeHc}</h3><p>${D.closeP}</p><a href="${lhref('', lang)}">${D.closeA}</a></div>
 </main>
-${footer()}
+${footer(lang)}
 </body></html>`;
 }
 
@@ -1522,15 +1658,20 @@ ${footer()}
   fs.writeFileSync(path.join(LOCALS_DIR, 'index.html'), hubPage(rows));
   if (snapText) { fs.writeFileSync(path.join(SITE_DIR, 'snapshot.html'), snapshotPage(snapText, snapTextLine)); console.log('  wrote snapshot.html'); }
   fs.writeFileSync(path.join(SITE_DIR, 'calculator.html'), calculatorPage(rows)); console.log('  wrote calculator.html');
-  fs.writeFileSync(path.join(SITE_DIR, 'unionhistory.html'), historyPage()); console.log('  wrote unionhistory.html');
-  fs.writeFileSync(path.join(SITE_DIR, 'ibewhistory.html'), ibewHistoryPage()); console.log('  wrote ibewhistory.html');
-  fs.writeFileSync(path.join(SITE_DIR, 'uahistory.html'), uaHistoryPage()); console.log('  wrote uahistory.html');
   const ES_DIR = path.join(SITE_DIR, 'es');
   if (!fs.existsSync(ES_DIR)) fs.mkdirSync(ES_DIR, { recursive: true });
+  const BILINGUAL = [
+    ['unionhistory', historyPage],
+    ['ibewhistory', ibewHistoryPage],
+    ['uahistory', uaHistoryPage],
+    ['unionretirement', retirementPage],
+  ];
   for (const lang of LANGS) {
     const outDir = lang === 'es' ? ES_DIR : SITE_DIR;
-    fs.writeFileSync(path.join(outDir, 'unionretirement.html'), retirementPage(lang));
-    console.log('  wrote ' + (lang === 'es' ? 'es/' : '') + 'unionretirement.html');
+    for (const [name, fn] of BILINGUAL) {
+      fs.writeFileSync(path.join(outDir, name + '.html'), fn(lang));
+      console.log('  wrote ' + (lang === 'es' ? 'es/' : '') + name + '.html');
+    }
   }
   const totalOpen = rows.reduce((s, r) => s + r.calls.length, 0);
   const activeN = rows.filter(r => r.calls.length > 0).length;
