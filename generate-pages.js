@@ -147,9 +147,10 @@ a{color:inherit;text-decoration:none}
 .topbar .inner{max-width:1040px;margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative}
 .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--navy);letter-spacing:-.02em}
 .brand .b{color:var(--orange)}
-.nav{display:flex;gap:22px;align-items:center}
-.nav a{font-size:14px;font-weight:600;color:var(--slate);transition:color .15s}
-.navdd{position:relative;display:inline-flex;align-items:center}.navdd>a{display:inline-flex;align-items:center;gap:4px}.navdd .caret{width:9px;height:9px;transition:transform .18s}.navdd .ddmenu{position:absolute;top:100%;left:-14px;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 26px rgba(7,37,84,.14);padding:6px;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all .16s;z-index:60}.navdd:hover .ddmenu{opacity:1;visibility:visible;transform:translateY(0)}.navdd:hover .caret{transform:rotate(180deg)}.navdd .ddmenu a{display:block;padding:9px 12px;border-radius:7px;font-size:13.5px}.navdd .ddmenu a:hover{background:rgba(255,107,0,.08);color:var(--navy)}@media(max-width:640px){.navdd{display:block;width:100%}.navdd>a{width:100%}.navdd .caret{display:none}.navdd .ddmenu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:none;border-radius:0;padding:0;margin:0;min-width:0}.navdd .ddmenu a{padding:11px 20px 11px 36px;font-size:14px;color:var(--slate);background:rgba(7,37,84,.02)}}
+.nav{display:flex;gap:17px;align-items:center}
+.nav a{font-size:14px;font-weight:600;color:var(--slate);transition:color .15s;white-space:nowrap}
+@media(max-width:1120px) and (min-width:641px){.topbar .inner{padding-left:16px;padding-right:16px}.nav{gap:13px}.nav a{font-size:13px}}
+.navdd{position:relative;display:inline-flex;align-items:center}.navdd>a{display:inline-flex;align-items:center;gap:4px}.navdd .caret{width:9px;height:9px;transition:transform .18s}.navdd .ddmenu{position:absolute;top:100%;left:-14px;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 26px rgba(7,37,84,.14);padding:6px;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all .16s;z-index:60}.navdd:hover .ddmenu{opacity:1;visibility:visible;transform:translateY(0)}.navdd:hover .caret{transform:rotate(180deg)}.navdd .ddmenu a{display:block;padding:9px 12px;border-radius:7px;font-size:13.5px}.navdd .ddmenu a:hover{background:rgba(255,107,0,.08);color:var(--navy)}@media(max-width:640px){.navdd{display:block;width:100%}.navdd>a{width:100%;justify-content:space-between}.navdd .caret{display:inline-block;width:12px;height:12px;flex-shrink:0;transition:transform .2s}.navdd.open>a .caret{transform:rotate(180deg)}.navdd .ddmenu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:none;border-radius:0;padding:0;margin:0;min-width:0;display:none}.navdd.open .ddmenu{display:block}.navdd:hover .ddmenu{display:none}.navdd.open:hover .ddmenu{display:block}.navdd .ddmenu a{padding:11px 20px 11px 36px;font-size:14px;color:var(--slate);background:rgba(7,37,84,.02)}}
 .navtoggle{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:8px;margin-left:auto}
 .navtoggle span{display:block;width:22px;height:2.5px;background:var(--navy);border-radius:2px}
 /* language toggle — sibling of .nav, so it stays visible on mobile instead of
@@ -289,6 +290,12 @@ function hreflangTags(page) {
 }
 /* ========================================================================= */
 
+/* On mobile the History dropdown starts collapsed; tapping it expands rather
+   than navigating away. Desktop keeps its hover behaviour untouched. */
+const NAV_JS = `<script id="nav-dd-js">(function(){function w(){return window.matchMedia('(max-width:640px)').matches;}
+document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('.navdd>a'):null;if(!a||!w())return;
+e.preventDefault();var dd=a.parentNode;dd.classList.toggle('open');},false);})();<\/script>`;
+
 function topbar(active, lang, togglePath) {
   lang = lang || 'en';
   const on = p => active === p ? ' class="on"' : '';
@@ -311,7 +318,7 @@ function topbar(active, lang, togglePath) {
 <a class="brand" href="${lhref('', lang)}">Tramp<span class="b">Here</span>Bro</a>
 ${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
 <nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="${lhref('jnctn', lang)}" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">${T.join}</a></nav>
-</div></div>`;
+</div></div>${NAV_JS}`;
 }
 function footer(lang) {
   lang = lang || 'en';
@@ -910,15 +917,29 @@ function makeSpanishHome() {
 const LANGTOG_CSS = `<style id="langtog-css">
 .topbar .inner{gap:12px}
 .topbar .brand,.topbar .inner>a:first-child{order:1}
-.topbar .nav{order:2;margin-left:auto}
+.topbar .nav{order:2;margin-left:auto;gap:17px}
+.topbar .nav a{white-space:nowrap}
 .langtog{order:3;display:inline-flex;align-items:stretch;border:1.5px solid var(--line,#e2e8f0);border-radius:8px;overflow:hidden;flex-shrink:0;line-height:1}
 .langtog a{display:flex;align-items:center;padding:7px 10px;font-size:12.5px;font-weight:700;color:var(--slate,#64748b);text-decoration:none;letter-spacing:.03em;background:#fff;transition:background .15s,color .15s}
 .langtog a+a{border-left:1.5px solid var(--line,#e2e8f0)}
 .langtog a.on{background:var(--orange,#FF6B00);color:#fff}
 .langtog a:not(.on):hover{background:rgba(7,37,84,.06);color:var(--navy,#072554)}
 .topbar .navtoggle{order:4}
-@media(max-width:640px){.langtog{margin-left:auto;order:3}.topbar .navtoggle{margin-left:0;order:4}.topbar .nav{margin-left:0}.nav .langtog{display:none}}
+@media(max-width:1120px) and (min-width:641px){.topbar .inner{padding-left:16px;padding-right:16px}.topbar .nav{gap:13px}.topbar .nav a{font-size:13px}}
+@media(max-width:640px){
+.langtog{margin-left:auto;order:3}.topbar .navtoggle{margin-left:0;order:4}.topbar .nav{margin-left:0}.nav .langtog{display:none}
+.navdd>a{justify-content:space-between}
+.navdd .caret{display:inline-block!important;width:12px;height:12px;flex-shrink:0;transition:transform .2s}
+.navdd.open>a .caret{transform:rotate(180deg)}
+.navdd .ddmenu{display:none!important}
+.navdd.open .ddmenu{display:block!important}
+}
 </style>`;
+
+/* Mobile: History starts collapsed and expands on tap instead of navigating. */
+const NAV_JS_STATIC = `<script id="nav-dd-js">(function(){function w(){return window.matchMedia('(max-width:640px)').matches;}
+document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('.navdd>a'):null;if(!a||!w())return;
+e.preventDefault();a.parentNode.classList.toggle('open');},false);})();<\/script>`;
 
 // Segmented EN|ES control for the static pages
 function langTogHtml(key, lang) {
@@ -935,13 +956,15 @@ function stripOldToggle(html) {
   return html
     .replace(/<a href="\/(es\/)?[a-z-]*"\s+hreflang="(es|en)"[^>]*style="display:inline-flex;align-items:center;justify-content:center;min-width:36px[^"]*">(ES|EN)<\/a>/g, '')
     .replace(/<div class="langtog"[\s\S]*?<\/div>/g, '')
-    .replace(/<style id="langtog-css">[\s\S]*?<\/style>/g, '');
+    .replace(/<style id="langtog-css">[\s\S]*?<\/style>/g, '')
+    .replace(/<script id="nav-dd-js">[\s\S]*?<\/script>/g, '');
 }
 
 // Place the toggle as a SIBLING of <nav> (never inside it) + inject its CSS.
 function placeLangTog(html, key, lang) {
   let o = stripOldToggle(html);
   if (!o.includes('id="langtog-css"')) o = o.replace('</head>', LANGTOG_CSS + '</head>');
+  if (!o.includes('id="nav-dd-js"')) o = o.replace('</body>', NAV_JS_STATIC + '</body>');
   const tog = langTogHtml(key, lang);
   // insert before the hamburger if there is one, otherwise before <nav>
   if (/<button class="navtoggle"/.test(o)) o = o.replace(/<button class="navtoggle"/, tog + '<button class="navtoggle"');
