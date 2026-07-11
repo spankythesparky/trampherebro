@@ -262,7 +262,7 @@ const GA_TAG = `<script async src="https://www.googletagmanager.com/gtag/js?id=G
 const LANGS = ['en', 'es'];
 // Pages that currently have a fully-translated /es/ mirror. Add a key here the
 // moment its Spanish version ships, and the toggle + nav + sitemap light up for it.
-const TRANSLATED = new Set(['unionretirement', 'unionhistory', 'ibewhistory', 'uahistory', 'calculator', 'resources', 'jnctn']);
+const TRANSLATED = new Set(['unionretirement', 'unionhistory', 'ibewhistory', 'uahistory', 'calculator', 'resources', 'jnctn', 'contact']);
 // Spanish-formatted "updated" date for the footer
 const PRETTY_DATE_ES = TODAY.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 // localized href: point at /es/<page> only if that page is actually translated,
@@ -1048,6 +1048,51 @@ const ES_JNCTN = [
   ['>Download on the<', '>Descárgala en el<'],
   ['>Get it on<', '>Consíguela en<'],
   ['Visit jnctn-inc.com →', 'Visita jnctn-inc.com →'],
+];
+
+const META_CONTACT = {
+  titleEn: 'Contact TrampHereBro — Add a Hall, Partnerships & More',
+  titleEs: 'Contacta a TrampHereBro — Agrega un Salón, Alianzas y Más',
+  schemaNameEn: 'Contact TrampHereBro',
+  schemaNameEs: 'Contacta a TrampHereBro',
+  descEn: 'Get in touch with TrampHereBro. Add a union hall with public job calls, report a site issue, discuss a partnership, or send a general inquiry.',
+  descEs: 'Ponte en contacto con TrampHereBro. Agrega un salón sindical con llamadas de trabajo públicas, reporta un problema del sitio, habla de una alianza, o envía una consulta general.'
+};
+
+const ES_CONTACT = [
+  ['Add a hall, report a correction, or reach out about partnerships.', 'Agrega un salón, reporta una corrección, o comunícate sobre alianzas.'],
+  ['<div class="kick"><span class="dot"></span>Contact</div>', '<div class="kick"><span class="dot"></span>Contacto</div>'],
+  ['>Let’s get<', '>Vamos a<'],
+  ['>trampin’<', '>viajar<'],
+  ['A hall to add, a busted link, a partnership, or a question — drop us a line. Every message gets read.',
+   'Un salón que agregar, un enlace roto, una alianza, o una pregunta — escríbenos. Cada mensaje se lee.'],
+  // form fields
+  ['>Name<', '>Nombre<'],
+  ['>Email<', '>Correo<'],
+  ['>Subject<', '>Asunto<'],
+  ['>Choose a topic…<', '>Elige un tema…<'],
+  ['>Add a Hall<', '>Agregar un Salón<'],
+  ['>Issues With Site<', '>Problemas con el Sitio<'],
+  ['>Partnership<', '>Alianza<'],
+  ['>General Inquiry<', '>Consulta General<'],
+  ['>Message<', '>Mensaje<'],
+  ['<button type="submit" class="cd-submit">Send message <svg', '<button type="submit" class="cd-submit">Enviar mensaje <svg'],
+  // form JS feedback — a Spanish visitor must not get English confirmations
+  ["'Sending\\u2026'", "'Enviando\\u2026'"],
+  ["'Sending…'", "'Enviando…'"],
+  ["'Thanks \\u2014 your message is on its way.'", "'Gracias \\u2014 tu mensaje va en camino.'"],
+  ['Thanks — your message is on its way.', 'Gracias — tu mensaje va en camino.'],
+  ["'Something went wrong. Try again or email directly.'", "'Algo salió mal. Intenta de nuevo o escríbenos directamente por correo.'"],
+  ['Something went wrong. Try again or email directly.', 'Algo salió mal. Intenta de nuevo o escríbenos directamente por correo.'],
+  ["'Network error. Please try again.'", "'Error de red. Por favor intenta de nuevo.'"],
+  ['Network error. Please try again.', 'Error de red. Por favor intenta de nuevo.'],
+  // cards
+  ['>Add a hall<', '>Agregar un salón<'],
+  ['Send a public dispatch link and we’ll add the local.', 'Envía un enlace público de despacho y agregamos el local.'],
+  ['>Partnerships<', '>Alianzas<'],
+  ['Building for the trades? We’re open to the right partners.', '¿Construyes para los oficios? Estamos abiertos a los socios correctos.'],
+  ['>Follow along<', '>Síguenos<'],
+  ['"Updated daily"', '"Actualizado a diario"'],
 ];
 
 function syncHomepageMap(rows, coords, snapText, snapTextLine) {
@@ -2128,6 +2173,7 @@ TrampHereBro aggregates publicly posted union job calls so traveling inside wire
   if (makeSpanishHome()) console.log('  wrote es/index.html');
   if (makeSpanishStatic('resources', ES_RESOURCES, META_RESOURCES)) console.log('  wrote es/resources.html');
   if (makeSpanishStatic('jnctn', ES_JNCTN, META_JNCTN)) console.log('  wrote es/jnctn.html');
+  if (makeSpanishStatic('contact', ES_CONTACT, META_CONTACT)) console.log('  wrote es/contact.html');
 
   console.log(`\n✓ Wrote ${written} local pages (${withCalls} with open calls, ${written - withCalls} evergreen)`);
   console.log(`✓ Wrote locals/index.html hub`);
