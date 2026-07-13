@@ -1165,7 +1165,7 @@ const ES_CONTACT = [
   ['"Updated daily"', '"Actualizado a diario"'],
 ];
 
-function syncHomepageMap(rows, coords, snapText, snapTextLine) {
+function syncHomepageMap(rows, coords, snapText, snapTextLine, snapTextUA) {
   // Ensure the English homepage advertises its Spanish twin (idempotent: safe on every build)
   const ensureEnglishHomeToggle = html => {
     let o = html;
@@ -1175,10 +1175,10 @@ function syncHomepageMap(rows, coords, snapText, snapTextLine) {
     }
     return placeLangTog(o, 'home', 'en');
   };
-  return syncHomepageMapInner(rows, coords, snapText, snapTextLine, ensureEnglishHomeToggle);
+  return syncHomepageMapInner(rows, coords, snapText, snapTextLine, ensureEnglishHomeToggle, snapTextUA);
 }
 
-function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix) {
+function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix, snapTextUA) {
   let html;
   try { html = fs.readFileSync(INDEX_HTML, 'utf8'); } catch (e) { return false; }
   if (!html.includes('/*MAPLOCALS_START*/') || !html.includes('/*MAPLOCALS_END*/')) return false;
@@ -1208,6 +1208,7 @@ function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix) {
     const snaps = { IBEW: snapshotMd(snapText) };
     const kicks = { IBEW: "Today's Trampin Snapshot" };
     if (snapTextLine) { snaps.LINEMAN = snapshotMd(snapTextLine); kicks.LINEMAN = "Today's Trampin Snapshot"; }
+    if (snapTextUA) { snaps.UA = snapshotMd(snapTextUA); kicks.UA = "Today's Trampin Snapshot"; }
     const safeJson = o => JSON.stringify(o).replace(/<\/script/gi, '<\\/script');
     const snapHtml = `<section class="homesnap" id="homesnap"><div class="homesnap-inner"><div class="hs-kick"><span class="hs-dot"></span><span id="hs-kick-label">Today's Trampin Snapshot</span> · ${esc(PRETTY_DATE)}</div><div class="hs-body" id="hs-body">${snapshotMd(snapText)}</div><button class="hs-toggle" onclick="document.getElementById('homesnap').classList.toggle('collapsed')"></button><a class="hs-more" href="/snapshot">See the full daily update →</a></div></section><script>window.SNAPS=${safeJson(snaps)};window.SNAP_KICK=${safeJson(kicks)};</script>`;
     out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + snapHtml + '<!--HS_END-->');
@@ -2240,7 +2241,7 @@ TrampHereBro aggregates publicly posted union job calls so traveling inside wire
 
   // keep the homepage map + browse board in sync with Supabase
   const coords = await resolveCoords(rows);
-  const mapCount = syncHomepageMap(rows, coords, snapText, snapTextLine);
+  const mapCount = syncHomepageMap(rows, coords, snapText, snapTextLine, snapTextUA);
   if (makeSpanishHome()) console.log('  wrote es/index.html');
   if (makeSpanishStatic('resources', ES_RESOURCES, META_RESOURCES)) console.log('  wrote es/resources.html');
   if (makeSpanishStatic('jnctn', ES_JNCTN, META_JNCTN)) console.log('  wrote es/jnctn.html');
