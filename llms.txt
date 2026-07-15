@@ -1,5 +1,5 @@
 # TrampHereBro
-> Live union job-call board for traveling tradespeople — IBEW inside wiremen, IBEW linemen, and UA plumbers & pipefitters. 1405 open calls across 186 active locals right now, plus journeyman wage scale and hall contact info for 691 locals across the US and Canada. Updated daily from hall dispatch pages.
+> Live union job-call board for traveling tradespeople — IBEW inside wiremen, IBEW linemen, and UA plumbers & pipefitters. 1405 open calls across 186 active locals right now, plus journeyman wage scale and hall contact info for 692 locals across the US and Canada. Updated daily from hall dispatch pages.
 
 ## Key pages
 - [Live board](https://www.trampherebro.com/): all open job calls, top locals, and today's snapshot
