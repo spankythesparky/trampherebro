@@ -209,6 +209,11 @@ main{padding:34px 0 10px}
 .ocall-pay{color:var(--navy);font-weight:700}
 .ocall-note{color:var(--slate)}
 .ocall-dot{color:#cdd5e0;margin:0 1px}
+.donate{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:26px 0;padding:20px 24px;background:linear-gradient(135deg,var(--navy),#12294a);border-radius:16px;color:#fff}
+.donate-h{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px}
+.donate-s{font-size:13.5px;color:#b9c7dd;margin-top:4px;max-width:52ch}
+.donate-btn{flex:none;background:var(--orange);color:#fff;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;text-decoration:none;white-space:nowrap}
+.donate-btn:hover{filter:brightness(1.05)}
 /* ===== redesigned call row (cr-*) ===== */
 .cr{display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-top:1px solid var(--line2)}
 .cr-hands{flex:none;width:46px;height:46px;border-radius:11px;background:rgba(255,107,0,.10);
@@ -675,6 +680,13 @@ ${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_s
 ${vitals ? `<div class="sec-h">${H.vitalsH}</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
 ${contactCard}
 ${shareBlock}
+${(() => {
+  const D = es
+    ? { head: 'Este tablero es gratis y siempre lo será.', sub: 'Si te ahorró una noche llamando a los salones, echa unos dólares para mantenerlo funcionando.', btn: 'Apoya el tablero' }
+    : { head: "This board is free — and always will be.", sub: 'If it saved you a night of calling halls, chip in to keep it running.', btn: 'Support the board' };
+  return `<div class="donate"><div class="donate-txt"><div class="donate-h">${D.head}</div><div class="donate-s">${D.sub}</div></div><a class="donate-btn" href="https://www.buymeacoffee.com/trampherebro" target="_blank" rel="noopener">${D.btn}</a></div>`;
+})()}
+
 ${callsBlock}
 <p class="outlook">${outlook}</p>
 <div class="faq">
