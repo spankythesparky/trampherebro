@@ -205,6 +205,26 @@ main{padding:34px 0 10px}
 .ocall-pay{color:var(--navy);font-weight:700}
 .ocall-note{color:var(--slate)}
 .ocall-dot{color:#cdd5e0;margin:0 1px}
+/* ===== redesigned call row (cr-*) ===== */
+.cr{display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-top:1px solid var(--line2)}
+.cr-hands{flex:none;width:46px;height:46px;border-radius:11px;background:rgba(255,107,0,.10);
+  color:var(--orange);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif}
+.cr-hands-empty{background:#f1f4f8;color:#9aa6b6}
+.cr-n{font-size:19px;font-weight:700;line-height:1}
+.cr-u{font-size:9px;letter-spacing:.05em;text-transform:uppercase;margin-top:2px;font-weight:700}
+.cr-body{flex:1;min-width:0}
+.cr-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cr-who{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--navy);font-size:15px}
+.cr-type{font-size:11px;font-weight:600;color:var(--slate);background:#eef2f8;padding:2px 8px;border-radius:20px}
+.cr-strike{font-size:11px;font-weight:700;color:#fff;background:#c0392b;padding:2px 8px;border-radius:20px;letter-spacing:.03em}
+.cr-meta{font-size:13.5px;color:var(--slate);margin-top:4px;line-height:1.45}
+.cr-pay{color:var(--navy);font-weight:700}
+.cr-dot{color:#cdd5e0;margin:0 2px}
+.cr-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
+.cr-tag{font-size:11.5px;color:var(--slate);background:#f3f6fa;border:1px solid var(--line2);padding:2px 8px;border-radius:6px}
+.cr-tag-note{background:#fff;border-color:var(--line2);color:var(--slate)}
+.cr-tag-dc{background:rgba(255,107,0,.10);border-color:#ffd9c2;color:#c2530f;font-weight:600}
 .snap-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:16px;box-shadow:var(--shadow-lg);padding:28px 30px;font-size:15.5px;line-height:1.7;color:var(--charcoal)}
 .snap-card p{margin:0 0 16px}.snap-card p:last-child{margin-bottom:0}
 .snap-card b{color:var(--navy);font-family:'Space Grotesk',sans-serif;font-weight:700}
@@ -351,18 +371,41 @@ function callDetail(c) {
 function callRow(c, lang) {
   const es = lang === 'es';
   const cls = String(c.call_type || 'JW').replace(/inside\s*/i, '').trim() || 'JW';
-  const parts = [];
-  if (c.contractor) parts.push(`<b>${esc(c.contractor)}</b>`);
-  if (c.num_needed) parts.push(`${c.num_needed} ${esc(cls)}`);
-  const loc = [c.job_name, c.location].filter(Boolean).map(esc).join(' ');
-  if (loc) parts.push(loc);
-  if (c.duration) parts.push(esc(c.duration));
-  const pay = (c.scale != null && c.scale !== '') ? '$' + Number(c.scale).toFixed(2) + '/hr'
-            : (c.per_diem ? (es ? 'viáticos ' : 'per diem ') + esc(c.per_diem) : (es ? 'escala' : 'scale'));
-  parts.push(`<span class="ocall-pay">${pay}</span>`);
-  if (c.per_diem && c.scale != null && c.scale !== '') parts.push((es ? 'viáticos ' : 'per diem ') + esc(c.per_diem));
-  if (c.notes) parts.push(`<span class="ocall-note">${esc(String(c.notes).replace(/\s+/g, ' ').slice(0, 90))}</span>`);
-  return `<div class="ocall">${parts.join(' <span class="ocall-dot">·</span> ')}</div>`;
+  const n = Number(c.num_needed) || 0;
+
+  // hands chip (left). No count -> a small dash so the row still aligns.
+  const chip = n > 0
+    ? `<div class="cr-hands"><span class="cr-n">${n}</span><span class="cr-u">${es ? 'manos' : n === 1 ? 'hand' : 'hands'}</span></div>`
+    : `<div class="cr-hands cr-hands-empty"><span class="cr-n">–</span></div>`;
+
+  // contractor + class pill (top line)
+  const who = c.contractor ? esc(c.contractor) : (es ? 'Contratista por confirmar' : 'Contractor TBD');
+  const strike = c.strike === true || /^(yes|true|1)$/i.test(String(c.strike || '').trim());
+  const strikeTag = strike ? `<span class="cr-strike">${es ? 'Huelga' : 'Strike'}</span>` : '';
+  const top = `<div class="cr-top"><span class="cr-who">${who}</span><span class="cr-type">${esc(cls)}</span>${strikeTag}</div>`;
+
+  // meta line: location · duration · pay
+  const loc = [c.job_name, c.location].filter(Boolean).map(esc).join(', ');
+  const pay = (c.scale != null && c.scale !== '') ? '$' + Number(c.scale).toFixed(2) + '/hr' : null;
+  const metaBits = [];
+  if (loc) metaBits.push(loc);
+  if (c.duration) metaBits.push(esc(c.duration));
+  if (pay) metaBits.push(`<span class="cr-pay">${pay}</span>`);
+  else if (c.per_diem) metaBits.push((es ? 'viáticos ' : 'per diem ') + esc(c.per_diem));
+  const meta = metaBits.length ? `<div class="cr-meta">${metaBits.join(' <span class="cr-dot">·</span> ')}</div>` : '';
+
+  // tags: data-center flag, per-diem (when there's also a scale), schedule/reqs from notes
+  const tags = [];
+  const hay = (String(c.job_name || '') + ' ' + String(c.location || '') + ' ' + String(c.notes || '')).toLowerCase();
+  if (/data ?cent(er|re)|hyperscale/.test(hay)) tags.push(`<span class="cr-tag cr-tag-dc">${es ? 'Centro de datos' : 'Data center'}</span>`);
+  if (c.per_diem && pay) tags.push(`<span class="cr-tag">${(es ? 'viáticos ' : 'per diem ') + esc(c.per_diem)}</span>`);
+  if (c.notes) {
+    const note = esc(String(c.notes).replace(/\s+/g, ' ').slice(0, 80));
+    tags.push(`<span class="cr-tag cr-tag-note">${note}</span>`);
+  }
+  const tagRow = tags.length ? `<div class="cr-tags">${tags.join('')}</div>` : '';
+
+  return `<div class="cr">${chip}<div class="cr-body">${top}${meta}${tagRow}</div></div>`;
 }
 
 function jobPostingLd(local, c) {

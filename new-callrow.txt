@@ -1,0 +1,39 @@
+function callRow(c, lang) {
+  const es = lang === 'es';
+  const cls = String(c.call_type || 'JW').replace(/inside\s*/i, '').trim() || 'JW';
+  const n = Number(c.num_needed) || 0;
+
+  // hands chip (left). No count -> a small dash so the row still aligns.
+  const chip = n > 0
+    ? `<div class="cr-hands"><span class="cr-n">${n}</span><span class="cr-u">${es ? 'manos' : n === 1 ? 'hand' : 'hands'}</span></div>`
+    : `<div class="cr-hands cr-hands-empty"><span class="cr-n">–</span></div>`;
+
+  // contractor + class pill (top line)
+  const who = c.contractor ? esc(c.contractor) : (es ? 'Contratista por confirmar' : 'Contractor TBD');
+  const strike = /strike/i.test(String(c.notes || '')) || c.strike === true || /yes/i.test(String(c.strike || ''));
+  const strikeTag = strike ? `<span class="cr-strike">${es ? 'Huelga' : 'Strike'}</span>` : '';
+  const top = `<div class="cr-top"><span class="cr-who">${who}</span><span class="cr-type">${esc(cls)}</span>${strikeTag}</div>`;
+
+  // meta line: location · duration · pay
+  const loc = [c.job_name, c.location].filter(Boolean).map(esc).join(', ');
+  const pay = (c.scale != null && c.scale !== '') ? '$' + Number(c.scale).toFixed(2) + '/hr' : null;
+  const metaBits = [];
+  if (loc) metaBits.push(loc);
+  if (c.duration) metaBits.push(esc(c.duration));
+  if (pay) metaBits.push(`<span class="cr-pay">${pay}</span>`);
+  else if (c.per_diem) metaBits.push((es ? 'viáticos ' : 'per diem ') + esc(c.per_diem));
+  const meta = metaBits.length ? `<div class="cr-meta">${metaBits.join(' <span class="cr-dot">·</span> ')}</div>` : '';
+
+  // tags: data-center flag, per-diem (when there's also a scale), schedule/reqs from notes
+  const tags = [];
+  const hay = (String(c.job_name || '') + ' ' + String(c.location || '') + ' ' + String(c.notes || '')).toLowerCase();
+  if (/data ?cent(er|re)|hyperscale/.test(hay)) tags.push(`<span class="cr-tag cr-tag-dc">${es ? 'Centro de datos' : 'Data center'}</span>`);
+  if (c.per_diem && pay) tags.push(`<span class="cr-tag">${(es ? 'viáticos ' : 'per diem ') + esc(c.per_diem)}</span>`);
+  if (c.notes) {
+    const note = esc(String(c.notes).replace(/\s+/g, ' ').slice(0, 80));
+    tags.push(`<span class="cr-tag cr-tag-note">${note}</span>`);
+  }
+  const tagRow = tags.length ? `<div class="cr-tags">${tags.join('')}</div>` : '';
+
+  return `<div class="cr">${chip}<div class="cr-body">${top}${meta}${tagRow}</div></div>`;
+}
