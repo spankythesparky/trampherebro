@@ -48,10 +48,14 @@ header::after{content:"";position:absolute;inset:0;background-image:linear-gradi
 h1.lede{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:44px;color:#F2F6FC;line-height:1.04;letter-spacing:-.03em}
 h1.lede b{color:var(--orange)}
 .hsub{margin-top:12px;color:#A6BAD8;font-size:16px;max-width:56ch}
-.hstats{display:flex;gap:40px;margin-top:26px;flex-wrap:wrap}
-.hstat .n{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;color:#fff;line-height:1;letter-spacing:-.03em}
+.hstats{display:inline-flex;gap:0;margin-top:26px;flex-wrap:wrap;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.10);border-radius:14px;overflow:hidden}
+.hstat{padding:15px 26px;border-right:1px solid rgba(255,255,255,.08)}
+.hstat:last-child{border-right:none}
+.hstat .n{font-family:'Space Grotesk',sans-serif;font-size:32px;font-weight:700;color:#fff;line-height:1;letter-spacing:-.03em}
 .hstat .n.accent{color:var(--orange)}
-.hstat .l{font-size:11.5px;color:#849ABC;margin-top:7px;font-weight:500}
+.hstat.hero .n{font-size:40px}
+.hstat .l{font-size:10.5px;color:#849ABC;margin-top:8px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+@media(max-width:520px){.hstat{padding:13px 18px}.hstat .n{font-size:26px}.hstat.hero .n{font-size:32px}}
 main{padding:34px 0 10px}
 .sec-h{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--navy);margin:6px 0 14px;letter-spacing:-.01em}
 .vitcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:26px}
@@ -186,7 +190,7 @@ e.preventDefault();var dd=a.parentNode;dd.classList.toggle('open');},false);})()
 <div class="hsub">Buffalo, NY · Open inside-wireman calls, journeyman scale, and dispatch — updated daily.</div>
 <div class="hstats">
 <div class="hstat"><div class="n accent">14</div><div class="l">OPEN CALLS</div></div>
-<div class="hstat"><div class="n">40</div><div class="l">HANDS NEEDED</div></div>
+<div class="hstat hero"><div class="n accent">40</div><div class="l">HANDS NEEDED</div></div>
 <div class="hstat"><div class="n">$44.50</div><div class="l">JW SCALE / HR</div></div>
 </div>
 </div></header>
