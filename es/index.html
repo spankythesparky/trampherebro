@@ -813,10 +813,10 @@ function buildMap(){
   const cluster=L.markerClusterGroup({maxClusterRadius:45,showCoverageOnHover:false,iconCreateFunction:c=>L.divIcon({html:'<div class="cluster" style="width:'+(30+Math.min(c.getChildCount(),40))+'px;height:'+(30+Math.min(c.getChildCount(),40))+'px">'+c.getChildCount()+'</div>',className:'',iconSize:null})});
   MAPLOCALS.forEach(loc=>{
     if(loc.trade!==tradeFilter) return;
-    const icon=L.divIcon({className:'',html:'<div class="'+((loc.trade==='UA'?'pin-ua-':(loc.trade==='LINEMAN'?'pin-lineman-':'pin-'))+(loc.active?'active':'tracked'))+'"></div>',iconSize:loc.active?[16,16]:[12,12],iconAnchor:loc.active?[8,8]:[6,6]});
+    const _h=loc.active?handsFor(loc.id,'all'):0;const _sz=loc.active?Math.max(14,Math.min(34,14+Math.round(_h/6))):12;const icon=L.divIcon({className:'',html:'<div class="'+((loc.trade==='UA'?'pin-ua-':(loc.trade==='LINEMAN'?'pin-lineman-':'pin-'))+(loc.active?'active':'tracked'))+'" style="width:'+_sz+'px;height:'+_sz+'px"></div>',iconSize:[_sz,_sz],iconAnchor:[_sz/2,_sz/2]});
     const m=L.marker([loc.lat,loc.lng],{icon});
     if(loc.active){const D=LOCALS[loc.id];const n=callsFor(loc.id,'all').length;const hands=handsFor(loc.id,'all');
-      m.bindPopup('<div class="pop-id">'+loc.name+'</div><div class="pop-city">'+loc.city+', '+loc.state+'</div><div class="pop-row"><b>'+n+'</b> open calls \u00b7 <b>'+hands+'</b> hands</div><div class="pop-row">JW scale <b>$'+D.scale+'</b></div><button class="pop-btn" onclick="openLocalFromMap('+loc.id+')">View calls</button>');
+      const _cs=callsFor(loc.id,'all').slice().sort((a,b)=>(b.need||0)-(a.need||0));const _top=_cs[0]?('<div class="pop-row" style="color:#5b6b82">Top: '+_cs[0].contractor+' \u00d7'+(_cs[0].need||1)+'</div>'):'';m.bindPopup('<div class="pop-id">'+loc.name+'</div><div class="pop-city">'+loc.city+', '+loc.state+'</div><div class="pop-row"><b>'+n+'</b> open calls \u00b7 <b>'+hands+'</b> hands</div>'+_top+'<div class="pop-row">JW scale <b>$'+D.scale+'</b></div><button class="pop-btn" onclick="openLocalFromMap('+loc.id+')">View calls</button>');
     } else { m.bindPopup('<div class="pop-id">'+loc.name+'</div><div class="pop-city">'+loc.city+', '+loc.state+'</div><div class="pop-quiet">No open calls posted right now.</div>'); }
     cluster.addLayer(m);
   });
