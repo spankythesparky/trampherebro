@@ -359,7 +359,7 @@ function topbar(active, lang, togglePath) {
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="${lhref('', lang)}">Tramp<span class="b">Here</span>Bro</a>
 ${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="${lhref('jnctn', lang)}" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">${T.join}</a></nav>
+<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a></nav>
 </div></div>${NAV_JS}`;
 }
 function footer(lang) {
@@ -921,7 +921,7 @@ function makeSpanishHome() {
     '<span class="navdd"><a href="/es/unionhistory">Historia<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a>' +
     '<span class="ddmenu"><a href="/es/unionhistory">Historia Sindical</a><a href="/es/ibewhistory">Historia del IBEW</a><a href="/es/uahistory">Historia del UA</a></span></span>' +
     '<a href="/es/contact">Contacto</a>' +
-    '<a href="/es/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Únete a JNCTN</a></nav>';
+    '</nav>';
   h = h.replace(/<nav class="nav">[\s\S]*?<\/nav>/, esNav);
   h = placeLangTog(h, 'home', 'es');
   // brand + logo link back to the Spanish home
