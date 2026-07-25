@@ -175,10 +175,10 @@
   .maplegend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
   .pin-active{background:var(--orange);width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(255,107,0,.5)}
   .pin-tracked{background:var(--navy);width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(7,37,84,.4)}
-  .pin-ua-active{background:#94A3B8;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(100,116,139,.4)}
-  .pin-ua-tracked{background:#94A3B8;width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(100,116,139,.35);opacity:.82}
-  .pin-lineman-active{background:#7C3AED;width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(124,58,237,.5)}
-  .pin-lineman-tracked{background:#7C3AED;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(124,58,237,.4)}
+  .pin-ua-active{background:#DC2626;width:14px;height:14px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(220,38,38,.45)}
+  .pin-ua-tracked{background:#DC2626;width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(220,38,38,.35);opacity:.82}
+  .pin-lineman-active{background:#2563EB;width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 6px rgba(37,99,235,.5)}
+  .pin-lineman-tracked{background:#2563EB;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(37,99,235,.4)}
   .cluster{background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;border:3px solid #fff;box-shadow:0 2px 8px rgba(7,37,84,.4)}
   .leaflet-popup-content-wrapper{border-radius:12px;box-shadow:var(--shadow-lg)}
   .leaflet-popup-content{margin:14px 16px;font-family:'Inter',sans-serif}
@@ -490,7 +490,7 @@
   <div class="sec-h" style="margin:36px 0 10px">Explore locals on the map <span class="sub-c">tap a pin for calls, scale &amp; contact</span></div>
   <div id="mapview">
     <div id="map"></div>
-    <div class="maplegend"><span><i class="pin-active" style="width:11px;height:11px;border:none;box-shadow:none"></i>IBEW — open calls</span><span><i class="pin-tracked" style="width:11px;height:11px;border:none;box-shadow:none"></i>IBEW — tracked</span><span style="opacity:.75"><i class="pin-ua-tracked" style="width:11px;height:11px;border:none;box-shadow:none;opacity:1"></i>UA — plumbers &amp; pipefitters (coming soon)</span><span><i class="pin-lineman-tracked" style="width:11px;height:11px;border:none;box-shadow:none"></i>IBEW Lineman (outside)</span></div>
+    <div class="maplegend"><span><i class="pin-active" style="width:11px;height:11px;border:none;box-shadow:none"></i>IBEW Indoor</span><span><i class="pin-lineman-active" style="width:11px;height:11px;border:none;box-shadow:none"></i>IBEW Outdoor</span><span><i class="pin-ua-active" style="width:11px;height:11px;border:none;box-shadow:none"></i>UA — Plumbers &amp; Pipefitters</span></div>
   </div>
   
   </div>
@@ -812,7 +812,7 @@ function buildMap(){
   map.fitBounds([[24.5,-125],[49.5,-66.5]]);
   const cluster=L.markerClusterGroup({maxClusterRadius:45,showCoverageOnHover:false,iconCreateFunction:c=>L.divIcon({html:'<div class="cluster" style="width:'+(30+Math.min(c.getChildCount(),40))+'px;height:'+(30+Math.min(c.getChildCount(),40))+'px">'+c.getChildCount()+'</div>',className:'',iconSize:null})});
   MAPLOCALS.forEach(loc=>{
-    if(loc.trade!==tradeFilter) return;
+    /* map shows ALL trades color-coded; list below still filters by chip */
     const _h=loc.active?handsFor(loc.id,'all'):0;const _sz=loc.active?Math.max(14,Math.min(34,14+Math.round(_h/6))):12;const icon=L.divIcon({className:'',html:'<div class="'+((loc.trade==='UA'?'pin-ua-':(loc.trade==='LINEMAN'?'pin-lineman-':'pin-'))+(loc.active?'active':'tracked'))+'" style="width:'+_sz+'px;height:'+_sz+'px"></div>',iconSize:[_sz,_sz],iconAnchor:[_sz/2,_sz/2]});
     const m=L.marker([loc.lat,loc.lng],{icon});
     if(loc.active){const D=LOCALS[loc.id];const n=callsFor(loc.id,'all').length;const hands=handsFor(loc.id,'all');
