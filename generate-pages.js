@@ -1233,7 +1233,7 @@ const ES_CONTACT = [
   ['>Add a hall<', '>Agregar un salón<'],
   ['Send a public dispatch link and we’ll add the local.', 'Envía un enlace público de despacho y agregamos el local.'],
   ['>Partnerships<', '>Alianzas<'],
-  ['Building for the trades? We’re open to the right partners.', '¿Construyes para los oficios? Estamos abiertos a los socios correctos.'],
+  ['We reach a fast-growing audience of traveling union tradespeople — IBEW inside &amp; lineman, UA, across 200+ locals nationwide. Got something that fits the trades? Tell us what you have in mind.', 'Llegamos a una audiencia creciente de trabajadores sindicalizados viajeros — IBEW inside y lineman, UA, en más de 200 locales a nivel nacional. ¿Tienes algo que encaje con los oficios? Cuéntanos qué tienes en mente.'],
   ['>Follow along<', '>Síguenos<'],
   ['"Updated daily"', '"Actualizado a diario"'],
 ];
