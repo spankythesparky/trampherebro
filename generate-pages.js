@@ -1246,7 +1246,7 @@ const ES_CONTACT = [
   ['>Choose a topic…<', '>Elige un tema…<'],
   ['>Add a Hall<', '>Agregar un Salón<'],
   ['>Update Local&#39;s Wage<', '>Actualizar Salario del Local<'],
-  ['Attachment <span style="font-weight:400;color:var(--slate);font-size:12.5px">(optional &mdash; wage sheet, PDF, or photo)</span>', 'Adjunto <span style="font-weight:400;color:var(--slate);font-size:12.5px">(opcional &mdash; hoja de salarios, PDF o foto)</span>'],
+  ['Have a wage sheet to send? Pick <b>Actualizar Salario del Local</b> above and submit &mdash; we&#39;ll reply by email so you can attach your PDF or photo.', '\u00bfTienes una hoja de salarios para enviar? Elige <b>Actualizar Salario del Local</b> arriba y env\u00eda &mdash; te responderemos por correo para que adjuntes tu PDF o foto.'],
   ['>Issues With Site<', '>Problemas con el Sitio<'],
   ['>Partnership<', '>Alianza<'],
   ['>General Inquiry<', '>Consulta General<'],
