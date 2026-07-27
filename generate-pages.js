@@ -27,7 +27,7 @@ const SITE_DIR = '/Users/Owner/Desktop/trampherebro';   // your site repo folder
 const CANON    = 'https://www.trampherebro.com';        // canonical origin — matches your live redirect (apex → www)
 const SUPA_URL = 'https://cpyhqsfkvtkangjfddis.supabase.co';
 const SUPA_KEY = 'sb_publishable_lBCUtgCBIR7IkuwKt5I0Mg_-sb9vLMM';
-const CORE_PAGES = ['', 'snapshot', 'calculator', 'jnctn', 'resources', 'contact', 'unionhistory', 'ibewhistory', 'uahistory', 'unionretirement']; // existing top-level pages, added to sitemap
+const CORE_PAGES = ['', 'snapshot', 'calculator', 'jnctn', 'resources', 'contact', 'privacy', 'terms', 'unionhistory', 'ibewhistory', 'uahistory', 'unionretirement']; // existing top-level pages, added to sitemap
 /* =========================================================================== */
 
 const LOCALS_DIR = path.join(SITE_DIR, 'locals');
@@ -385,7 +385,7 @@ function footer(lang) {
   return `<footer><div class="inner"><div><b>TrampHereBro</b></div>
 <div class="foot-updated"><span class="fu-dot"></span>${F.updated}</div></div>
 <div class="foot-legal"><p style="margin-bottom:10px"><a href="${lhref('unionhistory', lang)}" style="color:var(--orange);font-weight:600;text-decoration:none">${F.histLink}</a></p><p>${F.disclaimer}</p>
-<p class="credit">${F.credit}</p><p class="copyright">© ${TODAY.getFullYear()} TrampHereBro. ${F.rights}</p></div></footer>`;
+<p style="margin:10px 0"><a href="/privacy" style="color:#9FB3D0;text-decoration:underline">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms" style="color:#9FB3D0;text-decoration:underline">Terms of Service</a></p><p class="credit">${F.credit}</p><p class="copyright">© ${TODAY.getFullYear()} TrampHereBro. ${F.rights}</p></div></footer>`;
 }
 
 /* --------------------------- per-local page ------------------------------- */
