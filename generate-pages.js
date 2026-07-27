@@ -41,6 +41,8 @@ let SCALE = {};
 try { SCALE = JSON.parse(fs.readFileSync(SCALE_FILE, 'utf8')); } catch (e) { SCALE = {}; }
 let LINEMAN_SCALE = {};
 try { LINEMAN_SCALE = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'lineman-scale.json'), 'utf8')); } catch (e) { LINEMAN_SCALE = {}; }
+let TELECOM = {};
+try { TELECOM = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'locals-telecom.json'), 'utf8')); } catch (e) { TELECOM = {}; }
 const UA_FILE = path.join(SITE_DIR, 'ua-locals.json');
 const TRADE = {
   IBEW: { name: 'IBEW', slug: 'ibew', worker: 'inside wireman', workers: 'inside wiremen' },
@@ -211,6 +213,11 @@ main{padding:34px 0 10px}
 .ocall-dot{color:#cdd5e0;margin:0 1px}
 .jobline-note{margin:10px 0 14px;padding:11px 14px;background:#fff8f0;border:1px solid #ffd9b3;border-left:3px solid var(--orange);border-radius:9px;font-size:12.5px;color:#7a4a1a;line-height:1.5}
 .jobline-note b{color:#0b1f3a}
+.pkghint{font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--orange);margin-bottom:9px}
+.pkgtabs{display:flex;gap:8px;margin-bottom:18px;background:#eef2f7;padding:5px;border-radius:12px}
+.pkgtab{flex:1;padding:12px 14px;border:2px solid transparent;background:transparent;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:13.5px;color:var(--slate);cursor:pointer;transition:all .15s}
+.pkgtab:hover{color:var(--navy)}
+.pkgtab.on{background:#fff;color:var(--navy);border-color:var(--orange);box-shadow:0 2px 8px rgba(7,37,84,.1)}
 .donate{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:26px 0;padding:20px 24px;background:linear-gradient(135deg,var(--navy),#12294a);border-radius:16px;color:#fff}
 .donate-h{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px}
 .donate-s{font-size:13.5px;color:#b9c7dd;margin-top:4px;max-width:52ch}
@@ -588,6 +595,26 @@ function localPage(local, calls, lang) {
         ? `<b>No hay llamadas abiertas publicadas ahora mismo.</b><br>Este local no muestra llamadas abiertas en este momento. La escala y la información de despacho abajo siguen vigentes — vuelve a revisar, el tablero se actualiza a diario.`
         : `<b>No open calls posted right now.</b><br>This local isn't showing open calls at the moment. Scale and dispatch info below stays current — check back, the board is swept daily.`}</div>`;
 
+  // Telecom (Sound & Communications) package — only for locals present in TELECOM
+  const _tel = TELECOM[n] || null;
+  let telecomCard = '';
+  if (_tel) {
+    const _tvit = [
+      _mp(_tel.scale) ? vit(V.jw, _mp(_tel.scale) + _hr) : '',
+      _mp(_tel.total) ? vit(V.total, _mp(_tel.total) + (isNaN(Number(_tel.total)) ? '' : _hr)) : '',
+      _mp(_tel.hw) ? vit(V.hw, _mp(_tel.hw)) : '',
+      _mp(_tel.pension_def) ? vit(V.pdef, _mp(_tel.pension_def)) : '',
+      _mp(_tel.pension_dc) ? vit(V.pdc, _mp(_tel.pension_dc)) : '',
+      _mp(_tel.nebf) ? vit(V.nebf, _mp(_tel.nebf)) : '',
+      _tel.vacation ? vit(V.vac, esc(_tel.vacation), true) : '',
+      _tel.dues ? vit(V.dues, esc(_tel.dues), true) : ''
+    ].filter(Boolean).join('');
+    const _tupd = _tel.updated
+      ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">${es ? 'Paquete salarial actualizado' : 'Wage package last updated'} ${esc(_tel.updated)}</div>`
+      : '';
+    telecomCard = `<div class="vitals">${_tvit}</div>${_tupd}`;
+  }
+
   const _scaleLine = local.jw_scale != null
     ? (es ? ` La escala de oficial es de <span class="k">${money(local.jw_scale)}/hr</span>.` : ` Journeyman scale runs <span class="k">${money(local.jw_scale)}/hr</span>.`)
     : '';
@@ -692,7 +719,9 @@ ${local.jw_scale != null ? `<div class="hstat"><div class="n">${money(local.jw_s
 </div>
 </div></header>
 <main class="wrap">
-${vitals ? `<div class="sec-h">${H.vitalsH}</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>` : ''}
+${vitals ? (telecomCard
+  ? `<div class="sec-h">${H.vitalsH}</div><div class="vitcard"><div class="pkghint">${es?'Este local tiene dos paquetes salariales \u2014 elige uno:':'This local has two wage packages \u2014 pick one:'}</div><div class="pkgtabs"><button class="pkgtab on" data-pkg="inside" onclick="pkgSwitch(this,'inside')">${es?'Paquete Interior':'Inside Journeyman Package'}</button><button class="pkgtab" data-pkg="telecom" onclick="pkgSwitch(this,'telecom')">${es?'Paquete Sonido y Com.':'Sound &amp; Comm Package'}</button></div><div class="pkgpane" data-pane="inside"><div class="vitals">${vitals}</div>${wageUpdated}</div><div class="pkgpane" data-pane="telecom" style="display:none">${telecomCard}</div></div><script>function pkgSwitch(btn,pkg){var card=btn.closest('.vitcard');card.querySelectorAll('.pkgtab').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-pkg')===pkg);});card.querySelectorAll('.pkgpane').forEach(function(p){p.style.display=p.getAttribute('data-pane')===pkg?'':'none';});}</scr`+`ipt>`
+  : `<div class="sec-h">${H.vitalsH}</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>`) : ''}
 ${contactCard}
 ${shareBlock}
 ${(() => {
