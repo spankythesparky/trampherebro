@@ -1245,6 +1245,8 @@ const ES_CONTACT = [
   ['>Subject<', '>Asunto<'],
   ['>Choose a topic…<', '>Elige un tema…<'],
   ['>Add a Hall<', '>Agregar un Salón<'],
+  ['>Update Local&#39;s Wage<', '>Actualizar Salario del Local<'],
+  ['Attachment <span style="font-weight:400;color:var(--slate);font-size:12.5px">(optional &mdash; wage sheet, PDF, or photo)</span>', 'Adjunto <span style="font-weight:400;color:var(--slate);font-size:12.5px">(opcional &mdash; hoja de salarios, PDF o foto)</span>'],
   ['>Issues With Site<', '>Problemas con el Sitio<'],
   ['>Partnership<', '>Alianza<'],
   ['>General Inquiry<', '>Consulta General<'],
