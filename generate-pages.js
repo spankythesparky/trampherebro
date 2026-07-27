@@ -538,6 +538,7 @@ function localPage(local, calls, lang) {
   const cWebsite = _ci.website || local.website || '';
   const vit = (l, v, small) => `<div class="vit"><div class="l">${l}</div><div class="v${small ? ' small' : ''}">${v}</div></div>`;
   const _m = v => (v != null && v !== '' && !isNaN(Number(v))) ? '$' + Number(v).toFixed(2) : null;
+  const _mp = v => (v == null || v === '') ? null : (!isNaN(Number(v)) ? '$' + Number(v).toFixed(2) : esc(String(v)));
   const _hr = '<span style="font-size:12px;color:var(--slate);font-weight:400">/hr</span>';
   const _scaleStr = _m(local.jw_scale);
   const _noPen = !_m(_sc.pension_def) && !_m(_sc.pension_dc) && !_m(_sc.nebf) && !_m(_sc.k401);
@@ -546,11 +547,11 @@ function localPage(local, calls, lang) {
     : { jw: 'Journeyman Scale', total: 'Total Package', hw: 'Health &amp; Welfare', pdef: 'Defined Pension', pdc: 'Contribution Pension', nebf: 'NEBF Pension', k401: '401(k)', pen: 'Pension', vac: 'Vacation', dues: 'Working Dues', books: 'Books', bk1: 'Bk1', bk2: 'Bk2' };
   const vitals = [
     _scaleStr ? vit(V.jw, _scaleStr + _hr) : '',
-    _m(_sc.total) ? vit(V.total, _m(_sc.total) + _hr) : '',
+    _mp(_sc.total) ? vit(V.total, _mp(_sc.total) + (isNaN(Number(_sc.total)) ? '' : _hr)) : '',
     _m(local.hw) ? vit(V.hw, _m(local.hw)) : '',
-    _m(_sc.pension_def) ? vit(V.pdef, _m(_sc.pension_def)) : '',
-    _m(_sc.pension_dc) ? vit(V.pdc, _m(_sc.pension_dc)) : '',
-    _m(_sc.nebf) ? vit(V.nebf, _m(_sc.nebf)) : '',
+    _mp(_sc.pension_def) ? vit(V.pdef, _mp(_sc.pension_def)) : '',
+    _mp(_sc.pension_dc) ? vit(V.pdc, _mp(_sc.pension_dc)) : '',
+    _mp(_sc.nebf) ? vit(V.nebf, _mp(_sc.nebf)) : '',
     _m(_sc.k401) ? vit(V.k401, _m(_sc.k401)) : '',
     (_noPen && local.pension != null) ? vit(V.pen, money(local.pension), true) : '',
     _sc.vacation ? vit(V.vac, esc(_sc.vacation), true) : '',
