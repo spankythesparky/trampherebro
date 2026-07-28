@@ -180,16 +180,16 @@
     "updated": "6/26/26"
   },
   "26": {
-    "scale": null,
-    "total": null,
-    "pension_def": null,
-    "pension_dc": null,
+    "scale": "62.00",
+    "total": "90.66",
+    "pension_def": "7.45",
+    "pension_dc": "5.40",
     "k401": null,
-    "vacation": "",
-    "hw": null,
-    "nebf": null,
-    "dues": "",
-    "updated": ""
+    "vacation": "$2.38",
+    "hw": "8.34",
+    "nebf": "1.86",
+    "dues": null,
+    "updated": "6/1/26"
   },
   "30": {
     "scale": null,
