@@ -306,7 +306,7 @@ const FAVICON_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAARXUlEQVR4nOW
 // posted text). Whisper can mangle a contractor name, so these pages carry a
 // "verify with the hall" note above the calls. Add a local's id here when you
 // transcribe its jobline.
-const JOBLINE_LOCALS = new Set([10008, 10014, 10025, 10043, 10058, 10086, 10159, 10234, 10242, 10294, 10309, 10575, 11141]);
+const JOBLINE_LOCALS = new Set([10008, 10014, 10025, 10043, 10058, 10086, 10159, 10234, 10242, 10294, 10309, 10332, 10575, 10649, 10743, 11141]);
 function joblineNote(localId, es) {
   if (!JOBLINE_LOCALS.has(localId)) return '';
   return `<div class="jobline-note">${es
