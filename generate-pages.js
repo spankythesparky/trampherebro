@@ -47,7 +47,8 @@ const UA_FILE = path.join(SITE_DIR, 'ua-locals.json');
 const TRADE = {
   IBEW: { name: 'IBEW', slug: 'ibew', worker: 'inside wireman', workers: 'inside wiremen' },
   UA:   { name: 'UA',   slug: 'ua',   worker: 'plumber & pipefitter', workers: 'plumbers, pipefitters & HVAC/R techs' },
-  LINEMAN: { name: 'IBEW Lineman', slug: 'lineman', worker: 'outside lineman', workers: 'outside linemen' }
+  LINEMAN: { name: 'IBEW Lineman', slug: 'lineman', worker: 'outside lineman', workers: 'outside linemen' },
+  IRONWORKER: { name: 'Ironworkers', slug: 'ironworker', worker: 'ironworker', workers: 'ironworkers' }
 };
 const tradeOf = local => TRADE[local && local.trade] || TRADE.IBEW;
 const OUTLOOK_CACHE = path.join(SITE_DIR, 'outlook-cache.json');
@@ -307,7 +308,12 @@ const FAVICON_B64 = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAARXUlEQVR4nOW
 // "verify with the hall" note above the calls. Add a local's id here when you
 // transcribe its jobline.
 const JOBLINE_LOCALS = new Set([10008, 10014, 10025, 10043, 10058, 10086, 10159, 10234, 10242, 10294, 10309, 10332, 10575, 10649, 10743, 11141]);
-function joblineNote(localId, es) {
+function joblineNote(localId, es, trade) {
+  if (trade === 'IRONWORKER') {
+    return `<div class="jobline-note">${es
+      ? '\u2699\uFE0F <b>Llamadas de la l\u00ednea nacional de Ironworkers.</b> Fuente: <a href="https://www.ironworkers.org/s/jobline" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600">ironworkers.org/s/jobline</a> \u2014 confirma con el local antes de salir.'
+      : '\u2699\uFE0F <b>Sourced from the Ironworkers national jobline.</b> From <a href="https://www.ironworkers.org/s/jobline" target="_blank" rel="noopener" style="color:var(--orange);font-weight:600">ironworkers.org/s/jobline</a> \u2014 verify with the local before you roll.'}</div>`;
+  }
   if (!JOBLINE_LOCALS.has(localId)) return '';
   return `<div class="jobline-note">${es
     ? '\u26A0\uFE0F <b>Transcrito de la l\u00ednea telef\u00f3nica del local.</b> Los detalles pueden contener errores \u2014 confirma siempre con el sal\u00f3n antes de salir.'
@@ -588,7 +594,7 @@ function localPage(local, calls, lang) {
     ? `<div class="sec-h">${es ? 'Panorama de Trabajo' : 'Work Outlook'}</div><div class="callcard">`
       + (local._outlook ? `<p class="outlook-lead">${esc(local._outlook)}</p>` : '')
       + `<div class="ocall-count">${es ? `${calls.length} llamada${calls.length > 1 ? 's' : ''} abierta${calls.length > 1 ? 's' : ''} · ${hands} manos necesarias` : `${calls.length} open call${calls.length > 1 ? 's' : ''} · ${hands} hands needed`}</div>`
-      + joblineNote(local.id, es)
+      + joblineNote(local.id, es, local.trade)
       + calls.map(c => callRow(c, lang)).join('')
       + `</div>`
     : `<div class="sec-h">${es ? 'Llamadas abiertas' : 'Open calls'}</div><div class="nocalls">${es
@@ -2248,8 +2254,11 @@ ${footer()}
   let LINE = [];
   try { LINE = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'lineman-locals.json'), 'utf8')); } catch (e) { LINE = []; }
   const lineRows = LINE.map(u => ({ local: { ...u, trade: 'LINEMAN' }, calls: (callsByLocal[u.id] || []) }));
-  const rows = [...ibewRows, ...uaRows, ...lineRows];
-  console.log(`  IBEW: ${ibewRows.length}   UA: ${uaRows.length}   Lineman: ${lineRows.length}   total pages: ${rows.length}`);
+  let IRON = [];
+  try { IRON = JSON.parse(fs.readFileSync(path.join(SITE_DIR, 'ironworker-locals.json'), 'utf8')); } catch (e) { IRON = []; }
+  const ironRows = IRON.map(u => ({ local: { ...u, trade: 'IRONWORKER' }, calls: (callsByLocal[u.id] || []) }));
+  const rows = [...ibewRows, ...uaRows, ...lineRows, ...ironRows];
+  console.log(`  IBEW: ${ibewRows.length}   UA: ${uaRows.length}   Lineman: ${lineRows.length}   Ironworker: ${ironRows.length}   total pages: ${rows.length}`);
 
   // never commit the API key
   try { const gi = path.join(SITE_DIR, '.gitignore'); let g = ''; try { g = fs.readFileSync(gi, 'utf8'); } catch (e) {} if (!/^\.env\s*$/m.test(g)) fs.writeFileSync(gi, (g ? g.replace(/\s*$/, '') + '\n' : '') + '.env\n'); } catch (e) {}

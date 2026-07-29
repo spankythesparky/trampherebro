@@ -1,0 +1,79 @@
+[
+  {
+    "id": 40001,
+    "name": "Ironworkers Local 1",
+    "city": "Forest Park",
+    "state": "IL",
+    "lat": 41.8781,
+    "lng": -87.6298,
+    "phone": "708-366-6695",
+    "website": "https://www.iwlocal1.com/",
+    "address": "7720 Industrial Drive, Forest Park, IL 60130"
+  },
+  {
+    "id": 40021,
+    "name": "Ironworkers Local 21",
+    "city": "Omaha",
+    "state": "NE",
+    "lat": 41.2565,
+    "lng": -95.9345,
+    "phone": "712-252-1761",
+    "website": "https://iw21.org/",
+    "address": "14515 Industrial Rd, Omaha, NE 68144"
+  },
+  {
+    "id": 40024,
+    "name": "Ironworkers Local 24",
+    "city": "Denver",
+    "state": "CO",
+    "lat": 39.7392,
+    "lng": -104.9903,
+    "phone": "303-623-5386",
+    "website": "https://ironworkers24.org/",
+    "address": "501 West 4th Ave., Denver, CO 80223"
+  },
+  {
+    "id": 40172,
+    "name": "Ironworkers Local 172",
+    "city": "Columbus",
+    "state": "OH",
+    "lat": 39.9612,
+    "lng": -82.9988,
+    "phone": "614-497-0550",
+    "website": "https://www.ironworkers172.com/",
+    "address": "2867 South High St., Columbus, OH 43207"
+  },
+  {
+    "id": 40383,
+    "name": "Ironworkers Local 383",
+    "city": "Madison",
+    "state": "WI",
+    "lat": 43.0731,
+    "lng": -89.4012,
+    "phone": "608-256-3162",
+    "website": "https://www.iron383.com/",
+    "address": "5501 Manufacturer's Dr., Madison, WI 53704"
+  },
+  {
+    "id": 40808,
+    "name": "Ironworkers Local 808",
+    "city": "Orlando",
+    "state": "FL",
+    "lat": 28.5383,
+    "lng": -81.3792,
+    "phone": "407-859-9366",
+    "website": "https://www.ironworkers808.com/",
+    "address": "200 East Landstreet Rd., Orlando, FL 32824"
+  },
+  {
+    "id": 40847,
+    "name": "Ironworkers Local 847",
+    "city": "Omaha",
+    "state": "NE",
+    "lat": 41.2565,
+    "lng": -95.9345,
+    "phone": "402-731-2490",
+    "website": "https://ironworkers847.org/",
+    "address": "4205 South 87th St., Omaha, NE 68127"
+  }
+]
