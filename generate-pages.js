@@ -167,6 +167,7 @@ a{color:inherit;text-decoration:none}
 .brand{order:1}.nav{order:2}.navtoggle{order:4}
 @media(max-width:640px){.navtoggle{display:flex;margin-left:0;order:4}.langtog{margin-left:auto;order:3}.nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:0 12px 26px rgba(7,37,84,.12);padding:6px 0;z-index:40;margin-left:0}.nav.open{display:flex}.nav a{font-size:15px;padding:13px 20px;width:100%;box-sizing:border-box}.nav .langtog{display:none}}
 .nav a:hover,.nav a.on{color:var(--navy)}
+.nav-spanky{background:var(--orange);color:#fff !important;padding:7px 14px;border-radius:8px;font-weight:700;margin-left:4px;transition:background .15s}.nav-spanky:hover{background:var(--orange-h);color:#fff !important}@media(max-width:640px){.nav-spanky{margin:6px 20px;padding:11px 14px;text-align:center;border-radius:8px}}
 header{position:relative;margin:0 calc(50% - 50vw);padding:56px max(28px,calc(50vw - 492px)) 46px;background:linear-gradient(180deg,#05122b 0%,#071e46 55%,#0b2a5c 100%);overflow:hidden;color:#EAF0FA;border-bottom:3px solid var(--orange)}
 header::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:46px 46px;-webkit-mask-image:radial-gradient(circle at 68% 30%,#000,transparent 72%);mask-image:radial-gradient(circle at 68% 30%,#000,transparent 72%);opacity:.55}
 .hero-inner{position:relative;z-index:1}
@@ -372,7 +373,7 @@ function topbar(active, lang, togglePath) {
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="${lhref('', lang)}">Tramp<span class="b">Here</span>Bro</a>
 ${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a></nav>
+<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
 </div></div>${NAV_JS}`;
 }
 function footer(lang) {
@@ -957,6 +958,7 @@ function makeSpanishHome() {
     '<span class="navdd"><a href="/es/unionhistory">Historia<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a>' +
     '<span class="ddmenu"><a href="/es/unionhistory">Historia Sindical</a><a href="/es/ibewhistory">Historia del IBEW</a><a href="/es/uahistory">Historia del UA</a></span></span>' +
     '<a href="/es/contact">Contacto</a>' +
+    '<a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a>' +
     '</nav>';
   h = h.replace(/<nav class="nav">[\s\S]*?<\/nav>/, esNav);
   h = placeLangTog(h, 'home', 'es');
@@ -1089,7 +1091,7 @@ function esStaticNav(activeKey) {
     '<a href="/es/calculator"' + on('calculator') + '>Calculadora de Pago</a>' +
     '<a href="/es/resources"' + on('resources') + '>Recursos</a>' +
     '<a href="/es/contact"' + on('contact') + '>Contacto</a>' +
-    '<a href="/es/jnctn" style="background:var(--orange);color:#fff;padding:6px 13px;border-radius:8px;font-weight:700;white-space:nowrap">Únete a JNCTN</a></nav>';
+    '<a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>';
 }
 
 // Keep the English original's hreflang + toggle current (idempotent every build)
