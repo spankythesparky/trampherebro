@@ -1536,16 +1536,17 @@
     "updated": "7/26/24"
   },
   "350": {
-    "scale": "34.50",
-    "total": "52.90",
-    "pension_def": null,
+    "scale": "40.00",
+    "total": "63.35",
+    "pension_def": "9.15",
     "pension_dc": null,
-    "k401": "8.63",
-    "vacation": "$2.42",
-    "hw": "6.32",
-    "nebf": "1.04",
-    "dues": "4.00%",
-    "updated": "10/21/22"
+    "k401": null,
+    "vacation": "7% OR $2.80",
+    "hw": "8.82",
+    "nebf": null,
+    "dues": null,
+    "note": "Separate DATA CENTER package: $51.79 scale / $88.23 total (pension 25% or $12.95, H&W $12.10 flat, vac 17% or $8.83; rollups to time-and-a-half on all OT). Contractors considering double-time on all OT.",
+    "updated": "8/5/26"
   },
   "351": {
     "scale": "51.00",
