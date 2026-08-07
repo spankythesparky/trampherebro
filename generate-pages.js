@@ -574,8 +574,9 @@ function localPage(local, calls, lang) {
       ? vit(V.books, `${local.book1 != null ? V.bk1 + ' ' + esc(local.book1) : ''}${(local.book1 != null && local.book2 != null) ? ' · ' : ''}${local.book2 != null ? V.bk2 + ' ' + esc(local.book2) : ''}` || '—', true)
       : ''
   ].filter(Boolean).join('');
+  const wageSource = _sc.source ? esc(_sc.source) : `<a href="https://www.unionpayscales.com" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline">unionpayscales.com</a>`;
   const wageUpdated = _sc.updated
-    ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">${es ? 'Paquete salarial actualizado por última vez' : 'Wage package last updated'} ${esc(_sc.updated)} · ${es ? 'Datos salariales vía' : 'Wage data via'} <a href="https://www.unionpayscales.com" target="_blank" rel="noopener" style="color:var(--slate);text-decoration:underline">unionpayscales.com</a></div>`
+    ? `<div style="font-size:11.5px;color:var(--slate);margin-top:16px;padding-top:12px;border-top:1px solid var(--line2)">${es ? 'Paquete salarial actualizado por última vez' : 'Wage package last updated'} ${esc(_sc.updated)} · ${es ? 'Datos salariales vía' : 'Wage data via'} ${wageSource}</div>`
     : '';
 
   const _telHref = cPhone.replace(/[^\d+]/g, '');
