@@ -492,7 +492,7 @@ function perDiemPage(rows, lang) {
     '<p style="color:var(--slate);font-size:13px;margin:0 0 22px"><b style="color:var(--navy)">' + hits.length + '</b> ' + T.count + '</p>' +
     '<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.35);border-radius:10px;padding:12px 16px;margin:0 0 22px;color:var(--charcoal);font-size:13px;line-height:1.5">\u26A0\uFE0F ' + T.disc + '</div>' +
     '<div id="pd-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px">' +
-    ['All','West Coast','Midwest','South','East Coast','Other'].map(function(rg){var lbl=es?({'All':'Todos','West Coast':'Costa Oeste','Midwest':'Medio Oeste','South':'Sur','East Coast':'Costa Este','Other':'Otro'})[rg]:rg;return '<button type="button" data-rg="'+rg+'" onclick="pdFilter(this)" style="padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:'+(rg==='All'?'var(--navy)':'#fff')+';color:'+(rg==='All'?'#fff':'var(--slate)')+';font-weight:700;font-size:13px;cursor:pointer">'+lbl+'</button>';}).join('') +
+    ['All','West Coast','Midwest','South','East Coast','Other'].map(function(rg){var lbl=es?({'All':'Todos','West Coast':'Costa Oeste','Midwest':'Medio Oeste','South':'Sur','East Coast':'Costa Este','Other':'Otro'})[rg]:rg;return '<button type="button" data-rg="'+rg+'" onclick="pdFilter(this)" style="padding:7px 14px;border-radius:999px;border:1px solid '+(rg==='All'?'var(--navy)':'var(--orange)')+';background:'+(rg==='All'?'var(--navy)':'var(--orange)')+';color:#fff;font-weight:700;font-size:13px;cursor:pointer">'+lbl+'</button>';}).join('') +
     '</div>' +
     '<div style="overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)">' +
     '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
@@ -501,7 +501,7 @@ function perDiemPage(rows, lang) {
     '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
     '<div style="margin-top:24px"><a href="' + homeHref + '" style="color:var(--orange);font-weight:700;text-decoration:none">' + T.back + '</a></div>' +
     '</div>' +
-    '<script>function pdFilter(btn){var rg=btn.getAttribute("data-rg");document.querySelectorAll("#pd-filters button").forEach(function(b){var on=b===btn;b.style.background=on?"var(--navy)":"#fff";b.style.color=on?"#fff":"var(--slate)";});document.querySelectorAll("tbody tr").forEach(function(tr){tr.style.display=(rg==="All"||tr.getAttribute("data-region")===rg)?"":"none";});}<\/script>' +
+    '<script>function pdFilter(btn){var rg=btn.getAttribute("data-rg");document.querySelectorAll("#pd-filters button").forEach(function(b){var on=b===btn;b.style.background=on?"var(--navy)":"var(--orange)";b.style.borderColor=on?"var(--navy)":"var(--orange)";b.style.color="#fff";});document.querySelectorAll("tbody tr").forEach(function(tr){tr.style.display=(rg==="All"||tr.getAttribute("data-region")===rg)?"":"none";});}<\/script>' +
     '</body></html>';
 }
 function topbar(active, lang, togglePath) {
