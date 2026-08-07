@@ -1789,16 +1789,17 @@
     "updated": "6/26/26"
   },
   "430": {
-    "scale": "50.50",
-    "total": "76.88",
-    "pension_def": null,
-    "pension_dc": "12.62",
+    "scale": "52.60",
+    "total": "79.88",
+    "pension_def": "13.15",
+    "pension_dc": null,
     "k401": null,
-    "vacation": "",
-    "hw": "12.24",
-    "nebf": "1.52",
-    "dues": "5.00%",
-    "updated": "11/13/25"
+    "vacation": null,
+    "hw": "12.55",
+    "nebf": "1.58",
+    "dues": null,
+    "note": "Microsoft data center work paying $9.91/hr over the hourly rate.",
+    "updated": "8/6/26"
   },
   "436": {
     "scale": "27.28",
