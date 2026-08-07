@@ -1159,6 +1159,8 @@ function makeSpanishHome() {
 
   // --- footer ---
   h = h.replace('<a href="/per-diem">Per Diem</a>', '<a href="/es/per-diem">Viáticos</a>');
+  h = h.replace('class="hero-cta" href="/per-diem"', 'class="hero-cta" href="/es/per-diem"');
+  h = h.replace('>Per Diem <svg', '>Viáticos <svg');
   h = h.replace('The Union Job Board', 'El Tablero de Trabajo Sindical');
   h = h.replace(
     'TrampHereBro is an independent information platform. We have no affiliation with any union, labor organization, government entity, or industry group. All information is provided for educational purposes only.',
