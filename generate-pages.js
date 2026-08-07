@@ -27,7 +27,7 @@ const SITE_DIR = '/Users/Owner/Desktop/trampherebro';   // your site repo folder
 const CANON    = 'https://www.trampherebro.com';        // canonical origin — matches your live redirect (apex → www)
 const SUPA_URL = 'https://cpyhqsfkvtkangjfddis.supabase.co';
 const SUPA_KEY = 'sb_publishable_lBCUtgCBIR7IkuwKt5I0Mg_-sb9vLMM';
-const CORE_PAGES = ['', 'snapshot', 'calculator', 'jnctn', 'resources', 'contact', 'privacy', 'terms', 'unionhistory', 'ibewhistory', 'uahistory', 'unionretirement']; // existing top-level pages, added to sitemap
+const CORE_PAGES = ['', 'snapshot', 'per-diem', 'calculator', 'jnctn', 'resources', 'contact', 'privacy', 'terms', 'unionhistory', 'ibewhistory', 'uahistory', 'unionretirement']; // existing top-level pages, added to sitemap
 /* =========================================================================== */
 
 const LOCALS_DIR = path.join(SITE_DIR, 'locals');
@@ -352,6 +352,138 @@ const NAV_JS = `<script id="nav-dd-js">(function(){function w(){return window.ma
 document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('.navdd>a'):null;if(!a||!w())return;
 e.preventDefault();var dd=a.parentNode;dd.classList.toggle('open');},false);})();<\/script>`;
 
+// ---- Per Diem / incentive detection + amount extraction ----
+function perDiemScan(notes) {
+  if (!notes) return { match: false };
+  const n = String(notes);
+  if (/no\s+per[\s-]?diem|per[\s-]?diem\s*[:\-]?\s*(none|n\/a)|no\s+incentive/i.test(n)) {
+    if (!/\$\d|over\s+(base|scale)|above\s+scale/i.test(n)) return { match: false };
+  }
+  const DETECT = /(per[\s-]?diem|\$\d[\d,.]*\s*(?:\/|\s)?(?:per\s)?day|\$\d[\d,.]*\s*(?:\/|\s)?(?:per\s)?wk|\$\d[\d,.]*\s*(?:\/|\s)?(?:per\s)?week|incentive|bonus|over\s+(?:base|scale)|above\s+scale|over\s+the\s+journeyman)/i;
+  if (!DETECT.test(n)) return { match: false };
+  let amount = null, kind = null, m;
+  m = n.match(/\$\d[\d,.]*\s*(?:\/|\s)?(?:per\s)?day/i);
+  if (m) { amount = m[0].replace(/\s+/g,'').replace('perday','/day'); kind = 'per diem'; }
+  if (!amount) { m = n.match(/\$\d[\d,.]*\s*(?:\/|\s)?(?:per\s)?w(?:k|eek)/i); if (m){ amount=m[0].replace(/\s+/g,''); kind='weekly'; } }
+  if (!amount) { m = n.match(/\$\d[\d,.]*\s*(?:\/hr\s*)?(?:over|above)\s+(?:base|scale|the\s+journeyman)/i); if (m){ amount=m[0].replace(/\s+/g,' ').trim(); kind='over scale'; } }
+  if (!amount) { m = n.match(/\$\d[\d,.]*\s*(?:\/hr)?\s*over/i); if (m){ amount=m[0].replace(/\s+/g,' ').trim(); kind='over scale'; } }
+  if (!amount) {
+    if (/\b(incentive|bonus)\b/i.test(n)) {
+      // grab the dollar amount + any unit right after it (/hr, per hour, /day, /week)
+      let dm = n.match(/\$\d[\d,.]*\s*(?:\/\s*hr|\/\s*hour|per\s+hour|\/\s*day|per\s+day|\/\s*wk|\/\s*week|per\s+week)?/i);
+      if (dm) {
+        amount = dm[0].replace(/\s+/g,'').replace('perhour','/hr').replace('perday','/day').replace('perweek','/week').replace('/hour','/hr');
+        // if we captured a bare dollar with no unit, mark it so display can flag "unit unclear"
+        if (!/\/(hr|day|week)/i.test(amount)) amount = amount + '\u00A0(unit?)';
+      }
+      kind = /bonus/i.test(n) ? 'bonus' : 'incentive';
+    }
+  }
+  if (!amount) {
+    if (/per[\s-]?diem/i.test(n)) kind = 'per diem';
+    else if (/incentive/i.test(n)) kind = 'incentive';
+    else if (/bonus/i.test(n)) kind = 'bonus';
+    else kind = 'over scale';
+  }
+  return { match: true, amount: amount, kind: kind || 'per diem' };
+}
+function perDiemRank(amount) {
+  if (!amount) return 0;
+  const m = String(amount).match(/\$?(\d[\d,.]*)/);
+  return m ? parseFloat(m[1].replace(/,/g,'')) : 0;
+}
+
+// ---- /per-diem page ----
+function perDiemPage(rows, lang) {
+  lang = lang || 'en';
+  const es = lang === 'es';
+  // human-readable label for each kind
+  const KINDLBL = es ? {
+    'per diem':'Viático diario', 'weekly':'Viático semanal', 'over scale':'Sobre escala',
+    'incentive':'Incentivo', 'bonus':'Bono'
+  } : {
+    'per diem':'Per diem (daily)', 'weekly':'Per diem (weekly)', 'over scale':'Over scale',
+    'incentive':'Incentive', 'bonus':'Bonus'
+  };
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const hits = [];
+  rows.forEach(r => {
+    const loc = r.local || {};
+    (r.calls || []).forEach(c => {
+      const sc = perDiemScan(c.notes);
+      if (!sc.match) return;
+      let seen = '';
+      if (c.last_seen) { const d = new Date(c.last_seen); if (!isNaN(d)) seen = MONTHS[d.getMonth()] + ' ' + d.getDate(); }
+      hits.push({
+        lid: loc.id,
+        localName: loc.name || ('Local ' + (loc.id ? (loc.id % 10000) : '')),
+        city: loc.city || '', state: loc.state || '',
+        contractor: c.contractor || '', call_type: c.call_type || 'JW',
+        job_name: c.job_name || '', location: c.location || '',
+        num_needed: Number(c.num_needed) || 0,
+        amount: sc.amount, kind: sc.kind, kindLbl: KINDLBL[sc.kind] || sc.kind,
+        rank: perDiemRank(sc.amount), seen: seen
+      });
+    });
+  });
+  hits.sort((a,b) => b.rank - a.rank || b.num_needed - a.num_needed);
+  const T = es ? {
+    title: 'Llamadas con Viáticos e Incentivos | TrampHereBro',
+    desc: 'Todas las llamadas abiertas que pagan viáticos, incentivos, bonos o sobre-escala.',
+    kick: 'El dinero de verdad', h1a: 'Viáticos ', h1b: 'e Incentivos',
+    sub: 'Todas las llamadas abiertas que pagan viáticos, incentivos, bonos o sobre-escala — la información más valiosa para el que viaja.',
+    amount: 'Pago extra', type: 'Tipo', local: 'Local', contractor: 'Contratista', site: 'Proyecto', hands: 'Manos', seen: 'Visto', view: 'Ver llamadas →', count: 'llamadas con pago extra', back: 'Volver al tablero →', unclear: 'Confirmar con el hall'
+  } : {
+    title: 'Per Diem & Incentive Job Calls | TrampHereBro',
+    desc: 'Every open union job call paying per diem, incentives, bonuses, or over-scale — sorted biggest first.',
+    kick: 'The real money', h1a: 'Per Diem ', h1b: '& Incentives',
+    sub: 'Every open call paying per diem, incentives, bonuses, or over-scale — the highest-value info for a traveling hand.',
+    amount: 'Extra pay', type: 'Type', local: 'Local', contractor: 'Contractor', site: 'Project', hands: 'Hands', seen: 'Seen', view: 'View calls →', count: 'calls with extra pay', back: 'Back to the board →', unclear: 'Confirm with hall'
+  };
+  const rowsHtml = hits.map(h => {
+    // amount cell — always show a number if we have one, else the kind
+    const amtTxt = h.amount ? esc(h.amount) : esc(h.kindLbl);
+    const amtBadge = '<span style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.5);color:var(--orange);font-weight:800;font-size:13px;white-space:nowrap">' + amtTxt + '</span>';
+    // type label — always shown, so a hand knows daily vs weekly vs over-scale
+    const typeCell = '<span style="color:var(--navy);font-weight:600;font-size:13px">' + esc(h.kindLbl) + '</span>';
+    const site = [h.job_name, h.location].filter(Boolean).join(' · ');
+    const href = (es ? '/es' : '') + '/locals/' + h.lid + '.html';
+    return '<tr style="border-top:1px solid var(--line)">' +
+      '<td style="padding:12px 10px;vertical-align:top">' + amtBadge + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top">' + typeCell + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top"><div style="color:var(--navy);font-weight:700">' + esc(h.localName) + '</div><div style="color:var(--slate);font-size:12px">' + esc([h.city,h.state].filter(Boolean).join(', ')) + '</div></td>' +
+      '<td style="padding:12px 10px;vertical-align:top;color:var(--navy);font-weight:600">' + esc(h.contractor) + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;color:var(--slate);font-size:13px">' + esc(site) + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;text-align:center;font-weight:800;color:var(--navy)">' + (h.num_needed || '') + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;color:var(--slate);font-size:12px;white-space:nowrap">' + esc(h.seen) + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;white-space:nowrap"><a href="' + href + '" style="color:var(--orange);font-weight:700;font-size:13px;text-decoration:none">' + T.view + '</a></td>' +
+      '</tr>';
+  }).join('');
+  const jsonld = '<script type="application/ld+json">' + JSON.stringify({
+    "@context":"https://schema.org","@type":"CollectionPage","name":T.title,"description":T.desc,
+    "url":"https://trampherebro.com/" + (es?'es/':'') + "per-diem.html"
+  }) + '<\/script>';
+  const homeHref = es ? '/es/' : '/';
+  return '<!DOCTYPE html><html lang="' + lang + '"><head>' +
+    '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + T.title + '</title><meta name="description" content="' + esc(T.desc) + '">' +
+    '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
+    '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">' +
+    jsonld + '<style>' + CSS + '</style></head><body>' +
+    topbar('', lang, 'per-diem') +
+    '<div style="max-width:1180px;margin:0 auto;padding:32px 20px 60px">' +
+    '<div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">' + T.kick + '</div>' +
+    '<h1 style="font-family:\'Space Grotesk\',sans-serif;font-size:34px;color:var(--navy);margin:0 0 8px">' + T.h1a + '<span style="color:var(--orange)">' + T.h1b + '</span></h1>' +
+    '<p style="color:var(--slate);font-size:16px;max-width:660px;margin:0 0 4px">' + T.sub + '</p>' +
+    '<p style="color:var(--slate);font-size:13px;margin:0 0 22px"><b style="color:var(--navy)">' + hits.length + '</b> ' + T.count + '</p>' +
+    '<div style="overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
+    '<thead><tr style="text-align:left;color:var(--slate);font-size:12px;text-transform:uppercase;letter-spacing:.04em">' +
+    '<th style="padding:12px 10px">' + T.amount + '</th><th style="padding:12px 10px">' + T.type + '</th><th style="padding:12px 10px">' + T.local + '</th><th style="padding:12px 10px">' + T.contractor + '</th><th style="padding:12px 10px">' + T.site + '</th><th style="padding:12px 10px;text-align:center">' + T.hands + '</th><th style="padding:12px 10px">' + T.seen + '</th><th style="padding:12px 10px"></th>' +
+    '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
+    '<div style="margin-top:24px"><a href="' + homeHref + '" style="color:var(--orange);font-weight:700;text-decoration:none">' + T.back + '</a></div>' +
+    '</div></body></html>';
+}
 function topbar(active, lang, togglePath) {
   lang = lang || 'en';
   const on = p => active === p ? ' class="on"' : '';
@@ -2325,6 +2457,7 @@ ${footer()}
   const ES_DIR = path.join(SITE_DIR, 'es');
   if (!fs.existsSync(ES_DIR)) fs.mkdirSync(ES_DIR, { recursive: true });
   const BILINGUAL = [
+    ['per-diem', l => perDiemPage(rows, l)],
     ['calculator', l => calculatorPage(rows, l)],
     ['unionhistory', historyPage],
     ['ibewhistory', ibewHistoryPage],
