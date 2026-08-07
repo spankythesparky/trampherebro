@@ -417,6 +417,7 @@ function perDiemPage(rows, lang) {
       hits.push({
         lid: loc.id,
         localName: loc.name || ('Local ' + (loc.id ? (loc.id % 10000) : '')),
+        trade: loc.trade,
         city: loc.city || '', state: loc.state || '',
         contractor: c.contractor || '', call_type: c.call_type || 'JW',
         job_name: c.job_name || '', location: c.location || '',
@@ -447,7 +448,7 @@ function perDiemPage(rows, lang) {
     // type label — always shown, so a hand knows daily vs weekly vs over-scale
     const typeCell = '<span style="color:var(--navy);font-weight:600;font-size:13px">' + esc(h.kindLbl) + '</span>';
     const site = [h.job_name, h.location].filter(Boolean).join(' · ');
-    const href = (es ? '/es' : '') + '/locals/' + h.lid + '.html';
+    const href = (es ? '/es' : '') + '/locals/' + slugFor(h.localName, h.lid, h.trade) + '.html';
     return '<tr style="border-top:1px solid var(--line)">' +
       '<td style="padding:12px 10px;vertical-align:top">' + amtBadge + '</td>' +
       '<td style="padding:12px 10px;vertical-align:top">' + typeCell + '</td>' +
