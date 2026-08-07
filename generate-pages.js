@@ -433,13 +433,13 @@ function perDiemPage(rows, lang) {
     desc: 'Todas las llamadas abiertas que pagan viáticos, incentivos, bonos o sobre-escala.',
     kick: 'El dinero de verdad', h1a: 'Viáticos ', h1b: 'e Incentivos',
     sub: 'Todas las llamadas abiertas que pagan viáticos, incentivos, bonos o sobre-escala — la información más valiosa para el que viaja.',
-    amount: 'Pago extra', type: 'Tipo', local: 'Local', contractor: 'Contratista', site: 'Proyecto', hands: 'Manos', seen: 'Visto', view: 'Ver llamadas →', count: 'llamadas con pago extra', back: 'Volver al tablero →', unclear: 'Confirmar con el hall'
+    amount: 'Pago extra', type: 'Tipo', local: 'Local', contractor: 'Contratista', site: 'Proyecto', hands: 'Manos', seen: 'Visto', view: 'Ver llamadas →', count: 'llamadas con pago extra', back: 'Volver al tablero →', unclear: 'Confirmar con el hall', disc: 'Estas cifras provienen de grabaciones y publicaciones de despacho del hall y pueden contener errores. Confirma siempre los viáticos, incentivos y detalles de pago directamente con el local antes de viajar.'
   } : {
     title: 'Per Diem & Incentive Job Calls | TrampHereBro',
     desc: 'Every open union job call paying per diem, incentives, bonuses, or over-scale — sorted biggest first.',
     kick: 'The real money', h1a: 'Per Diem ', h1b: '& Incentives',
     sub: 'Every open call paying per diem, incentives, bonuses, or over-scale — the highest-value info for a traveling hand.',
-    amount: 'Extra pay', type: 'Type', local: 'Local', contractor: 'Contractor', site: 'Project', hands: 'Hands', seen: 'Seen', view: 'View calls →', count: 'calls with extra pay', back: 'Back to the board →', unclear: 'Confirm with hall'
+    amount: 'Extra pay', type: 'Type', local: 'Local', contractor: 'Contractor', site: 'Project', hands: 'Hands', seen: 'Seen', view: 'View calls →', count: 'calls with extra pay', back: 'Back to the board →', unclear: 'Confirm with hall', disc: 'These amounts are pulled from hall dispatch recordings and postings and may contain errors. Always confirm per diem, incentives, and pay details directly with the local before you roll.'
   };
   const rowsHtml = hits.map(h => {
     // amount cell — always show a number if we have one, else the kind
@@ -477,6 +477,7 @@ function perDiemPage(rows, lang) {
     '<h1 style="font-family:\'Space Grotesk\',sans-serif;font-size:34px;color:var(--navy);margin:0 0 8px">' + T.h1a + '<span style="color:var(--orange)">' + T.h1b + '</span></h1>' +
     '<p style="color:var(--slate);font-size:16px;max-width:660px;margin:0 0 4px">' + T.sub + '</p>' +
     '<p style="color:var(--slate);font-size:13px;margin:0 0 22px"><b style="color:var(--navy)">' + hits.length + '</b> ' + T.count + '</p>' +
+    '<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.35);border-radius:10px;padding:12px 16px;margin:0 0 22px;color:var(--charcoal);font-size:13px;line-height:1.5">\u26A0\uFE0F ' + T.disc + '</div>' +
     '<div style="overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)">' +
     '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
     '<thead><tr style="text-align:left;color:var(--slate);font-size:12px;text-transform:uppercase;letter-spacing:.04em">' +
@@ -569,7 +570,7 @@ function callRow(c, lang) {
   if (/data ?cent(er|re)|hyperscale/.test(hay)) tags.push(`<span class="cr-tag cr-tag-dc">${es ? 'Centro de datos' : 'Data center'}</span>`);
   if (c.per_diem && pay) tags.push(`<span class="cr-tag">${(es ? 'viáticos ' : 'per diem ') + esc(c.per_diem)}</span>`);
   if (c.notes) {
-    const note = esc(String(c.notes).replace(/\s+/g, ' ').slice(0, 80));
+    const note = esc(String(c.notes).replace(/\s+/g, ' '));
     tags.push(`<span class="cr-tag cr-tag-note">${note}</span>`);
   }
   const tagRow = tags.length ? `<div class="cr-tags">${tags.join('')}</div>` : '';
