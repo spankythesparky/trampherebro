@@ -470,6 +470,16 @@ function perDiemPage(rows, lang) {
     '<title>' + T.title + '</title><meta name="description" content="' + esc(T.desc) + '">' +
     '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
     '<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">' +
+    '<meta property="og:type" content="website">' +
+    '<meta property="og:site_name" content="TrampHereBro">' +
+    '<meta property="og:title" content="' + esc(T.title) + '">' +
+    '<meta property="og:description" content="' + esc(T.desc) + '">' +
+    '<meta property="og:url" content="https://www.trampherebro.com/' + (es?'es/':'') + 'per-diem.html">' +
+    '<meta property="og:image" content="https://www.trampherebro.com/share-banner.png">' +
+    '<meta name="twitter:card" content="summary_large_image">' +
+    '<meta name="twitter:title" content="' + esc(T.title) + '">' +
+    '<meta name="twitter:description" content="' + esc(T.desc) + '">' +
+    '<meta name="twitter:image" content="https://www.trampherebro.com/share-banner.png">' +
     jsonld + '<style>' + CSS + '</style></head><body>' +
     topbar('', lang, 'per-diem') +
     '<div style="max-width:1180px;margin:0 auto;padding:32px 20px 60px">' +
