@@ -515,7 +515,7 @@ function topbar(active, lang, togglePath) {
       + `</div>`;
   }
   return `<div class="topbar"><div class="inner">
-<a class="brand" href="${lhref('', lang)}">Tramp<span class="b">Here</span>Bro</a>
+<a class="brand" href="${lhref('', lang)}" style="display:inline-flex;align-items:center;gap:10px"><img class="logo" src="/logo.png" alt="TrampHereBro" style="height:38px;width:auto">Tramp<span class="b">Here</span>Bro</a>
 ${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
 <nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('per-diem', lang)}"${on('per-diem')}>${T.perdiem}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
 </div></div>${NAV_JS}`;
