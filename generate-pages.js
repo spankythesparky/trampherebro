@@ -488,8 +488,8 @@ function topbar(active, lang, togglePath) {
   lang = lang || 'en';
   const on = p => active === p ? ' class="on"' : '';
   const T = lang === 'es'
-    ? { board:'Tablero', daily:'Reporte Diario', calc:'Calculadora de Pago', res:'Recursos', ret:'Jubilación Sindical', hist:'Historia', uh:'Historia Sindical', ibew:'Historia del IBEW', ua:'Historia del UA', contact:'Contacto', join:'Únete a JNCTN' }
-    : { board:'Board', daily:'Daily Update', calc:'Pay Calculator', res:'Resources', ret:'Union Retirement', hist:'History', uh:'Union History', ibew:'IBEW History', ua:'UA History', contact:'Contact', join:'Join JNCTN' };
+    ? { board:'Tablero', daily:'Reporte Diario', perdiem:'Viáticos', calc:'Calculadora de Pago', res:'Recursos', ret:'Jubilación Sindical', hist:'Historia', uh:'Historia Sindical', ibew:'Historia del IBEW', ua:'Historia del UA', contact:'Contacto', join:'Únete a JNCTN' }
+    : { board:'Board', daily:'Daily Update', perdiem:'Per Diem', calc:'Pay Calculator', res:'Resources', ret:'Union Retirement', hist:'History', uh:'Union History', ibew:'IBEW History', ua:'UA History', contact:'Contact', join:'Join JNCTN' };
   // Segmented EN|ES control. Lives OUTSIDE <nav> so it stays visible on mobile
   // rather than collapsing into the hamburger menu.
   const tp = togglePath || (TRANSLATED.has(active) ? active : null);
@@ -505,7 +505,7 @@ function topbar(active, lang, togglePath) {
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="${lhref('', lang)}">Tramp<span class="b">Here</span>Bro</a>
 ${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
+<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('per-diem', lang)}"${on('per-diem')}>${T.perdiem}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
 </div></div>${NAV_JS}`;
 }
 function footer(lang) {
@@ -1138,6 +1138,7 @@ function makeSpanishHome() {
   h = h.replace('>See the full daily update →<', '>Ver el reporte diario completo →<');
 
   // --- footer ---
+  h = h.replace('<a href="/per-diem">Per Diem</a>', '<a href="/es/per-diem">Viáticos</a>');
   h = h.replace('The Union Job Board', 'El Tablero de Trabajo Sindical');
   h = h.replace(
     'TrampHereBro is an independent information platform. We have no affiliation with any union, labor organization, government entity, or industry group. All information is provided for educational purposes only.',
