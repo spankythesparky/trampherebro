@@ -397,6 +397,8 @@ function perDiemRank(amount) {
 function perDiemPage(rows, lang) {
   lang = lang || 'en';
   const es = lang === 'es';
+  const PD_REGIONS = {'West Coast':['AK','AZ','CA','CO','HI','ID','MT','NM','NV','OR','UT','WA','WY'],'Midwest':['IA','IL','IN','KS','MI','MN','MO','ND','NE','OH','SD','WI'],'South':['AL','AR','DE','FL','GA','KY','LA','MD','MS','NC','OK','SC','TN','TX','VA','WV'],'East Coast':['CT','MA','ME','NH','NJ','NY','PA','RI','VT']};
+  const regionOf = st => { for (const r in PD_REGIONS) if (PD_REGIONS[r].includes(st)) return r; return 'Other'; };
   // human-readable label for each kind
   const KINDLBL = es ? {
     'per diem':'Viático diario', 'weekly':'Viático semanal', 'over scale':'Sobre escala',
@@ -422,6 +424,7 @@ function perDiemPage(rows, lang) {
         contractor: c.contractor || '', call_type: c.call_type || 'JW',
         job_name: c.job_name || '', location: c.location || '',
         num_needed: Number(c.num_needed) || 0,
+        region: regionOf(loc.state || ''),
         amount: sc.amount, kind: sc.kind, kindLbl: KINDLBL[sc.kind] || sc.kind,
         rank: perDiemRank(sc.amount), seen: seen
       });
@@ -449,7 +452,7 @@ function perDiemPage(rows, lang) {
     const typeCell = '<span style="color:var(--navy);font-weight:600;font-size:13px">' + esc(h.kindLbl) + '</span>';
     const site = [h.job_name, h.location].filter(Boolean).join(' · ');
     const href = (es ? '/es' : '') + '/locals/' + slugFor(h.localName, h.lid, h.trade) + '.html';
-    return '<tr style="border-top:1px solid var(--line)">' +
+    return '<tr data-region="' + esc(h.region) + '" style="border-top:1px solid var(--line)">' +
       '<td style="padding:12px 10px;vertical-align:top">' + amtBadge + '</td>' +
       '<td style="padding:12px 10px;vertical-align:top">' + typeCell + '</td>' +
       '<td style="padding:12px 10px;vertical-align:top"><div style="color:var(--navy);font-weight:700">' + esc(h.localName) + '</div><div style="color:var(--slate);font-size:12px">' + esc([h.city,h.state].filter(Boolean).join(', ')) + '</div></td>' +
@@ -488,13 +491,18 @@ function perDiemPage(rows, lang) {
     '<p style="color:var(--slate);font-size:16px;max-width:660px;margin:0 0 4px">' + T.sub + '</p>' +
     '<p style="color:var(--slate);font-size:13px;margin:0 0 22px"><b style="color:var(--navy)">' + hits.length + '</b> ' + T.count + '</p>' +
     '<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.35);border-radius:10px;padding:12px 16px;margin:0 0 22px;color:var(--charcoal);font-size:13px;line-height:1.5">\u26A0\uFE0F ' + T.disc + '</div>' +
+    '<div id="pd-filters" style="display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px">' +
+    ['All','West Coast','Midwest','South','East Coast','Other'].map(function(rg){var lbl=es?({'All':'Todos','West Coast':'Costa Oeste','Midwest':'Medio Oeste','South':'Sur','East Coast':'Costa Este','Other':'Otro'})[rg]:rg;return '<button type="button" data-rg="'+rg+'" onclick="pdFilter(this)" style="padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:'+(rg==='All'?'var(--navy)':'#fff')+';color:'+(rg==='All'?'#fff':'var(--slate)')+';font-weight:700;font-size:13px;cursor:pointer">'+lbl+'</button>';}).join('') +
+    '</div>' +
     '<div style="overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)">' +
     '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
     '<thead><tr style="text-align:left;color:var(--slate);font-size:12px;text-transform:uppercase;letter-spacing:.04em">' +
     '<th style="padding:12px 10px">' + T.amount + '</th><th style="padding:12px 10px">' + T.type + '</th><th style="padding:12px 10px">' + T.local + '</th><th style="padding:12px 10px">' + T.contractor + '</th><th style="padding:12px 10px">' + T.site + '</th><th style="padding:12px 10px;text-align:center">' + T.hands + '</th><th style="padding:12px 10px">' + T.seen + '</th><th style="padding:12px 10px"></th>' +
     '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
     '<div style="margin-top:24px"><a href="' + homeHref + '" style="color:var(--orange);font-weight:700;text-decoration:none">' + T.back + '</a></div>' +
-    '</div></body></html>';
+    '</div>' +
+    '<script>function pdFilter(btn){var rg=btn.getAttribute("data-rg");document.querySelectorAll("#pd-filters button").forEach(function(b){var on=b===btn;b.style.background=on?"var(--navy)":"#fff";b.style.color=on?"#fff":"var(--slate)";});document.querySelectorAll("tbody tr").forEach(function(tr){tr.style.display=(rg==="All"||tr.getAttribute("data-region")===rg)?"":"none";});}<\/script>' +
+    '</body></html>';
 }
 function topbar(active, lang, togglePath) {
   lang = lang || 'en';
