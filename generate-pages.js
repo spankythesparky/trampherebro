@@ -884,6 +884,12 @@ ${vitals ? (telecomCard
   : `<div class="sec-h">${H.vitalsH}</div><div class="vitcard"><div class="vitals">${vitals}</div>${wageUpdated}</div>`) : ''}
 ${contactCard}
 ${shareBlock}
+${(() => {
+  const D = es
+    ? { head: 'Este tablero es gratis y siempre lo será.', sub: 'Si te ahorró una noche llamando a los salones, echa unos dólares para mantenerlo funcionando.', btn: 'Apoya el tablero' }
+    : { head: "This board is free — and always will be.", sub: 'If it saved you a night of calling halls, chip in to keep it running.', btn: 'Support the board' };
+  return `<div class="donate"><div class="donate-txt"><div class="donate-h">${D.head}</div><div class="donate-s">${D.sub}</div></div><a class="donate-btn" href="https://www.buymeacoffee.com/trampherebro" target="_blank" rel="noopener">${D.btn}</a></div>`;
+})()}
 
 
 ${callsBlock}
