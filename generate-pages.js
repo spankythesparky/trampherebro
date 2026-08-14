@@ -1481,62 +1481,7 @@ function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix, sna
     if (snapTextUA) { snaps.UA = snapshotMd(snapTextUA); kicks.UA = "Today's Trampin Snapshot"; }
     const safeJson = o => JSON.stringify(o).replace(/<\/script/gi, '<\\/script');
     const snapHtml = `<section class="homesnap" id="homesnap"><div class="homesnap-inner"><div class="hs-kick"><span class="hs-dot"></span><span id="hs-kick-label">Today's Trampin Snapshot</span> · ${esc(PRETTY_DATE)}</div><div class="hs-body" id="hs-body">${snapshotMd(snapText)}</div><button class="hs-toggle" onclick="document.getElementById('homesnap').classList.toggle('collapsed')"></button><a class="hs-more" href="/snapshot">See the full daily update →</a></div></section><script>window.SNAPS=${safeJson(snaps)};window.SNAP_KICK=${safeJson(kicks)};</script>`;
-    // --- Top Per Diem column, sits beside the snapshot ---
-    const pdHits = [];
-    for (const r of rows) {
-      for (const c of (r.calls || [])) {
-        const pd = perDiemScan(c.notes);
-        if (!pd || !pd.match || !pd.amount) continue;
-        pdHits.push({
-          amount: pd.amount, kind: pd.kind, rank: perDiemRank(pd.amount),
-          contractor: c.contractor || '', site: c.job_name || '',
-          hands: Number(c.num_needed) || 0,
-          localName: r.local.name, lid: r.local.id,
-          city: r.local.city, state: r.local.state, trade: r.local.trade
-        });
-      }
-    }
-    pdHits.sort((a, b) => (b.rank - a.rank) || (b.hands - a.hands));
-    const pdSeen = new Set();
-    const pdTop = pdHits.filter(h => {
-      if (/unit\?/i.test(h.amount)) return false;      // skip ambiguous units on the homepage
-      if (pdSeen.has(h.lid)) return false;             // one row per local
-      pdSeen.add(h.lid); return true;
-    }).slice(0, 6);
-    const pdRows = pdTop.map(h => {
-      const href = '/locals/' + slugFor(h.localName, h.lid, h.trade) + '.html';
-      const where = [h.city, h.state].filter(Boolean).join(', ');
-      const what = [h.contractor, h.site].filter(Boolean).join(' \u00B7 ');
-      return '<a class="pdh-row" href="' + href + '">' +
-        '<span class="pdh-amt">' + esc(h.amount) + '</span>' +
-        '<span class="pdh-meta"><b>' + esc(h.localName) + '</b>' +
-        (where ? '<span class="pdh-where"> ' + esc(where) + '</span>' : '') +
-        (what ? '<span class="pdh-what">' + esc(what) + '</span>' : '') +
-        '</span></a>';
-    }).join('');
-    const pdHtml = pdTop.length ? '<aside class="pdhero"><div class="pdh-kick">Top Per Diem &amp; Premiums</div>' +
-      '<div class="pdh-list">' + pdRows + '</div>' +
-      '<a class="pdh-more" href="/per-diem">See every per diem call \u2192</a></aside>' : '';
-
-    const pdCss = '<style>' +
-      '.hs-wrap{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}' +
-      '.hs-wrap>.homesnap{margin:0!important;padding-top:0!important}' +
-      '.hs-wrap>.homesnap>.homesnap-inner{margin-top:0!important}' +
-      '.hs-wrap>.pdhero{margin:0!important}' +
-      '@media(min-width:960px){.hs-wrap{grid-template-columns:1.65fr 1fr}}' +
-      '.pdhero{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:16px 16px 12px}' +
-      '.pdh-kick{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#0b2545;margin-bottom:10px}' +
-      '.pdh-row{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-top:1px solid #eef1f6;text-decoration:none;color:inherit}' +
-      '.pdh-row:first-child{border-top:0}.pdh-row:hover .pdh-meta b{text-decoration:underline}' +
-      '.pdh-amt{flex:0 0 auto;background:#f97316;color:#fff;font-weight:800;font-size:13px;padding:3px 9px;border-radius:999px;white-space:nowrap}' +
-      '.pdh-meta{display:flex;flex-direction:column;font-size:13px;line-height:1.35;min-width:0}' +
-      '.pdh-meta b{color:#0b2545}.pdh-where{color:#5b6b82}' +
-      '.pdh-what{color:#6b7a90;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-      '.pdh-more{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:#f97316;text-decoration:none}' +
-      '.pdh-more:hover{text-decoration:underline}</style>';
-
-    const wrapped = pdHtml ? pdCss + '<div class="hs-wrap">' + snapHtml + pdHtml + '</div>' : snapHtml;
-    out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + wrapped + '<!--HS_END-->');
+    out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + snapHtml + '<!--HS_END-->');
   }
 
   if (typeof postFix === 'function') out = postFix(out);
