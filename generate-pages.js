@@ -1520,6 +1520,9 @@ function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix, sna
 
     const pdCss = '<style>' +
       '.hs-wrap{display:grid;grid-template-columns:1fr;gap:18px;align-items:start}' +
+      '.hs-wrap>.homesnap{margin:0!important;padding-top:0!important}' +
+      '.hs-wrap>.homesnap>.homesnap-inner{margin-top:0!important}' +
+      '.hs-wrap>.pdhero{margin:0!important}' +
       '@media(min-width:960px){.hs-wrap{grid-template-columns:1.65fr 1fr}}' +
       '.pdhero{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:16px 16px 12px}' +
       '.pdh-kick{font-size:13px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:#0b2545;margin-bottom:10px}' +
