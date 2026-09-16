@@ -1,7 +1,58 @@
 {
-  "fetched_at": "2026-09-16T00:24:48.503Z",
+  "fetched_at": "2026-09-16T23:22:39.039Z",
   "source_url": "https://ua.org/manpower-postings/",
   "postings": [
+    {
+      "key": "plant scherer|georgia|juliette|pipefitter",
+      "project": "Plant Scherer",
+      "state": "GEORGIA",
+      "city": "Juliette",
+      "trade": "Pipefitter",
+      "needed": 18,
+      "wage": "$43.98 USD",
+      "total_package": "$59.08 USD",
+      "duration": "2 months",
+      "schedule": "5-10",
+      "source_name": "United Association — UA Manpower Postings",
+      "source_url": "https://ua.org/manpower-postings/",
+      "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
+      "first_seen": "2026-09-16T23:22:39.039Z",
+      "last_seen": "2026-09-16T23:22:39.039Z"
+    },
+    {
+      "key": "plant jack mcdonough|georgia|smyrna|welder",
+      "project": "Plant Jack Mcdonough",
+      "state": "GEORGIA",
+      "city": "Smyrna",
+      "trade": "Welder",
+      "needed": 19,
+      "wage": "$43.98 USD",
+      "total_package": "$59.08 USD",
+      "duration": "7 weeks",
+      "schedule": "7-12",
+      "source_name": "United Association — UA Manpower Postings",
+      "source_url": "https://ua.org/manpower-postings/",
+      "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
+      "first_seen": "2026-09-16T23:22:39.039Z",
+      "last_seen": "2026-09-16T23:22:39.039Z"
+    },
+    {
+      "key": "plant jack mcdonough|georgia|smyrna|pipefitter",
+      "project": "Plant Jack Mcdonough",
+      "state": "GEORGIA",
+      "city": "Smyrna",
+      "trade": "Pipefitter",
+      "needed": 12,
+      "wage": "$43.98 USD",
+      "total_package": "$59.08 USD",
+      "duration": "7 weeks",
+      "schedule": "5-10",
+      "source_name": "United Association — UA Manpower Postings",
+      "source_url": "https://ua.org/manpower-postings/",
+      "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
+      "first_seen": "2026-09-16T23:22:39.039Z",
+      "last_seen": "2026-09-16T23:22:39.039Z"
+    },
     {
       "key": "phillips 66 refinery turnaround|illinois|wood river|pipefitter",
       "project": "Phillips 66 Refinery Turnaround",
@@ -17,7 +68,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "mesabi metallics|minnesota|nashwauk|pipefitter",
@@ -34,7 +85,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "mesabi metallics|minnesota|nashwauk|welder",
@@ -51,7 +102,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "peach bottom|pennsylvania|delta|pipefitter",
@@ -68,7 +119,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "peach bottom|pennsylvania|delta|welder",
@@ -85,7 +136,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "intel|ohio|columbus|pipefitter",
@@ -102,7 +153,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "syensco|michigan|kalamazoo|pipefitter",
@@ -119,7 +170,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "prospect utility plant|minnesota|rochester|welder",
@@ -136,7 +187,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "bp whiting refinery|indiana|whiting|steamfitter",
@@ -153,7 +204,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "vantage light house, data center|wisconsin|port washington|steamfitter",
@@ -170,7 +221,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "vantage light house, data center|wisconsin|port washington|welder",
@@ -187,7 +238,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "local new orleans work|louisiana|new orleans|plumber",
@@ -204,7 +255,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "sappi paper|minnesota|cloquet|pipefitter",
@@ -221,7 +272,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "sappi paper|minnesota|cloquet|welder",
@@ -238,7 +289,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "seward power plant outage|pennsylvania|new florence|pipefitter",
@@ -255,7 +306,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "turney energy center|missouri|lathrop|pipefitter",
@@ -272,7 +323,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "byron station nuclear outage|illinois|byron|pipefitter",
@@ -289,7 +340,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "byron station nuclear outage|illinois|byron|welder",
@@ -306,7 +357,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "millstone nuclear power station|connecticut|waterford|welder",
@@ -323,7 +374,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "pipefitter|florida|tampa|pipefitter",
@@ -340,7 +391,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "sml2 data center|south carolina|ridgeville|pipefitter",
@@ -357,7 +408,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "seagate|minnesota|bloomington|pipefitter",
@@ -374,7 +425,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "dc4|georgia|fayetteville|pipefitter",
@@ -391,7 +442,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "pbf refinery paulsboro|new jersey|paulsboro|welder",
@@ -408,7 +459,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "pbf refinery paulsboro|new jersey|paulsboro|pipefitter",
@@ -416,7 +467,7 @@
       "state": "NEW JERSEY",
       "city": "Paulsboro",
       "trade": "Pipefitter",
-      "needed": 100,
+      "needed": 75,
       "wage": "$59.50 USD",
       "total_package": "$106.79 USD",
       "duration": "6 weeks",
@@ -425,7 +476,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "plant yates|georgia|newnan|pipefitter",
@@ -442,7 +493,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "plant yates|georgia|newnan|welder",
@@ -459,7 +510,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "kelvar|georgia|ellenwood|pipefitter",
@@ -476,7 +527,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "equinix|georgia|hampton|pipefitter",
@@ -493,7 +544,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "salem #1 nuclear plant|new jersey|hancocks bridge|welder",
@@ -510,7 +561,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "salem #1 nuclear plant|new jersey|hancocks bridge|pipefitter",
@@ -527,7 +578,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "fairland fabrication shop|indiana|fairland|welder",
@@ -544,7 +595,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "fairland fabrication shop|indiana|fairland|welder",
@@ -561,7 +612,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "aedc sir force base tullahoma cls agreement|tennessee|nashville|welder",
@@ -578,7 +629,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "repauno port terminal|new jersey|repauno|welder",
@@ -595,7 +646,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "fab shop|kansas|lawrence|welder",
@@ -612,7 +663,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "apollo fab shop|tennessee|oak ridge|welder",
@@ -629,7 +680,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "llano/ claude p&e|texas|claude|pipefitter",
@@ -646,7 +697,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "stainless header fabrication - mckinstry|washington|spokane|pipefitter",
@@ -663,7 +714,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "various locations around st louis.|missouri|st louis|plumber",
@@ -680,7 +731,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     },
     {
       "key": "piping systems fabrication shop-data center fabrication|wisconsin|hortonville|welder",
@@ -697,7 +748,7 @@
       "source_url": "https://ua.org/manpower-postings/",
       "verify_note": "Posted by the UA International, not an individual local. Always verify with the UA or the referring local before you travel.",
       "first_seen": "2026-09-16T00:17:57.570Z",
-      "last_seen": "2026-09-16T00:24:48.503Z"
+      "last_seen": "2026-09-16T23:22:39.039Z"
     }
   ]
 }

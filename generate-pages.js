@@ -1484,6 +1484,16 @@ function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix, sna
     out = out.replace(/<!--HS_START-->[\s\S]*?<!--HS_END-->/, '<!--HS_START-->' + snapHtml + '<!--HS_END-->');
   }
 
+  // refresh the UA national bar counts from the live scrape
+  try {
+    const uaFeed = JSON.parse(fs.readFileSync(SITE_DIR + '/ua-postings.json', 'utf8'));
+    const uaPosts = uaFeed.postings || [];
+    const uaN = uaPosts.length;
+    const uaH = uaPosts.reduce((t, x) => t + (Number(x.needed) || 0), 0);
+    out = out.replace(/(<b id="ua-nat-n">)[^<]*(<\/b>)/, '$1' + uaN + '$2');
+    out = out.replace(/(<b id="ua-nat-h">)[^<]*(<\/b>)/, '$1' + uaH + '$2');
+  } catch (e) { }
+
   if (typeof postFix === 'function') out = postFix(out);
   fs.writeFileSync(INDEX_HTML, out);
   return arr.length;
