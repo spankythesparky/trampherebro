@@ -508,8 +508,8 @@ function topbar(active, lang, togglePath) {
   lang = lang || 'en';
   const on = p => active === p ? ' class="on"' : '';
   const T = lang === 'es'
-    ? { board:'Tablero', daily:'Reporte Diario', perdiem:'Viáticos', calc:'Calculadora de Pago', res:'Recursos', ret:'Jubilación Sindical', hist:'Historia', uh:'Historia Sindical', ibew:'Historia del IBEW', ua:'Historia del UA', contact:'Contacto', join:'Únete a JNCTN' }
-    : { board:'Board', daily:'Daily Update', perdiem:'Per Diem', calc:'Pay Calculator', res:'Resources', ret:'Union Retirement', hist:'History', uh:'Union History', ibew:'IBEW History', ua:'UA History', contact:'Contact', join:'Join JNCTN' };
+    ? { board:'Tablero', daily:'Reporte Diario', perdiem:'Viáticos', uamp:'Trabajos UA', uagrp:'UA', calc:'Calculadora de Pago', res:'Recursos', ret:'Jubilación Sindical', hist:'Historia', uh:'Historia Sindical', ibew:'Historia del IBEW', ua:'Historia del UA', contact:'Contacto', join:'Únete a JNCTN' }
+    : { board:'Board', daily:'Daily Update', perdiem:'Per Diem', uamp:'Job Calls', uagrp:'UA', calc:'Pay Calculator', res:'Resources', ret:'Union Retirement', hist:'History', uh:'Union History', ibew:'IBEW History', ua:'UA History', contact:'Contact', join:'Join JNCTN' };
   // Segmented EN|ES control. Lives OUTSIDE <nav> so it stays visible on mobile
   // rather than collapsing into the hamburger menu.
   const tp = togglePath || (TRANSLATED.has(active) ? active : null);
@@ -525,7 +525,7 @@ function topbar(active, lang, togglePath) {
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="${lhref('', lang)}" style="display:inline-flex;align-items:center;gap:10px"><img class="logo" src="/logo.png" alt="TrampHereBro" style="height:38px;width:auto">Tramp<span class="b">Here</span>Bro</a>
 ${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('per-diem', lang)}"${on('per-diem')}>${T.perdiem}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
+<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('per-diem', lang)}"${on('per-diem')}>${T.perdiem}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('ua-manpower', lang)}"${on('ua-manpower')}${on('uahistory')}>${T.uagrp}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('ua-manpower', lang)}">${T.uamp}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
 </div></div>${NAV_JS}`;
 }
 function footer(lang) {
@@ -1517,6 +1517,77 @@ async function generateOutlook(local, calls) {
 
 
 /* -------------------- Paycheck Calculator page -------------------------- */
+function uaManpowerPage(lang) {
+  lang = lang || 'en';
+  const es = lang === 'es';
+  let feed = { postings: [], fetched_at: null, source_url: 'https://ua.org/manpower-postings/' };
+  try { feed = JSON.parse(fs.readFileSync(SITE_DIR + '/ua-postings.json', 'utf8')); } catch (e) { }
+  const posts = (feed.postings || []).slice().sort((a, b) => b.needed - a.needed);
+  const hands = posts.reduce((s, p) => s + (p.needed || 0), 0);
+
+  const T = es ? {
+    title: 'Trabajos Nacionales UA | TrampHereBro',
+    desc: 'Convocatorias nacionales de la United Association — proyectos grandes con salario y paquete total publicados.',
+    kick: 'Trabajo nacional de proyecto', h1a: 'Convocatorias ', h1b: 'UA Nacionales',
+    sub: 'Proyectos publicados por la United Association International — no por un local individual. Salario y paquete total incluidos.',
+    project: 'Proyecto', where: 'Ubicaci\u00F3n', trade: 'Oficio', hands: 'Manos', wage: 'Salario', pkg: 'Paquete total', dur: 'Duraci\u00F3n', sched: 'Horario',
+    count: 'convocatorias abiertas', handsLbl: 'manos',
+    disc: 'Estas convocatorias las publica la United Association International, no un local individual. TrampHereBro las muestra tal como aparecen publicadas. Confirma siempre los detalles con la UA o el local correspondiente antes de viajar.',
+    src: 'Fuente:', apply: 'Aplicar en ua.org \u2192', updated: 'Actualizado'
+  } : {
+    title: 'UA National Job Calls | TrampHereBro',
+    desc: 'National manpower postings from the United Association — big projects with wages and total package listed.',
+    kick: 'National project work', h1a: 'UA Manpower ', h1b: 'Postings',
+    sub: 'Projects posted by the United Association International \u2014 not by an individual local. Wage and total package included.',
+    project: 'Project', where: 'Location', trade: 'Trade', hands: 'Hands', wage: 'Wage', pkg: 'Total package', dur: 'Duration', sched: 'Schedule',
+    count: 'open postings', handsLbl: 'hands',
+    disc: 'These postings are published by the United Association International, not by an individual local. TrampHereBro lists them as posted. Always verify details with the UA or the referring local before you travel.',
+    src: 'Source:', apply: 'Apply at ua.org \u2192', updated: 'Updated'
+  };
+
+  const rowsHtml = posts.map(p => {
+    const wageBadge = p.wage ? '<span style="display:inline-block;padding:3px 10px;border-radius:999px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.5);color:var(--orange);font-weight:800;font-size:13px;white-space:nowrap">' + esc(p.wage) + '</span>' : '';
+    return '<tr style="border-top:1px solid var(--line)">' +
+      '<td style="padding:12px 10px;vertical-align:top"><div style="color:var(--navy);font-weight:700">' + esc(p.project) + '</div></td>' +
+      '<td style="padding:12px 10px;vertical-align:top"><div style="color:var(--navy);font-weight:600;font-size:13px">' + esc(p.city) + '</div><div style="color:var(--slate);font-size:12px">' + esc(p.state) + '</div></td>' +
+      '<td style="padding:12px 10px;vertical-align:top;color:var(--navy);font-weight:600;font-size:13px">' + esc(p.trade) + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;text-align:center;color:var(--navy);font-weight:800">' + (p.needed || '') + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top">' + wageBadge + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;color:var(--navy);font-weight:700;font-size:13px">' + esc(p.total_package || '') + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;color:var(--slate);font-size:13px">' + esc(p.duration || '') + '</td>' +
+      '<td style="padding:12px 10px;vertical-align:top;color:var(--slate);font-size:12px">' + esc(p.schedule || '') + '</td>' +
+      '</tr>';
+  }).join('');
+
+  const when = feed.fetched_at ? new Date(feed.fetched_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' }) + ' ET' : '';
+
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + esc(T.title) + '</title>' +
+    '<meta name="description" content="' + esc(T.desc) + '">' +
+    '<link rel="canonical" href="' + CANON + '/' + (es ? 'es/' : '') + 'ua-manpower">' +
+    '<meta property="og:title" content="' + esc(T.title) + '">' +
+    '<meta property="og:description" content="' + esc(T.desc) + '">' +
+    '<meta property="og:url" content="' + CANON + '/' + (es ? 'es/' : '') + 'ua-manpower.html">' +
+    '<meta property="og:image" content="' + CANON + '/share-banner.png">' +
+    '<meta name="twitter:card" content="summary_large_image">' +
+    '<style>' + CSS + '</style></head><body>' +
+    topbar('', lang, 'ua-manpower') +
+    '<div style="max-width:1180px;margin:0 auto;padding:32px 20px 60px">' +
+    '<div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">' + T.kick + '</div>' +
+    '<h1 style="font-family:\'Space Grotesk\',sans-serif;font-size:34px;color:var(--navy);margin:0 0 8px">' + T.h1a + '<span style="color:var(--orange)">' + T.h1b + '</span></h1>' +
+    '<p style="color:var(--slate);font-size:16px;max-width:660px;margin:0 0 4px">' + T.sub + '</p>' +
+    '<p style="color:var(--slate);font-size:13px;margin:0 0 6px"><b style="color:var(--navy)">' + posts.length + '</b> ' + T.count + ' \u00B7 <b style="color:var(--navy)">' + hands + '</b> ' + T.handsLbl + (when ? ' \u00B7 ' + T.updated + ' ' + esc(when) : '') + '</p>' +
+    '<p style="color:var(--slate);font-size:13px;margin:0 0 22px">' + T.src + ' <a href="' + esc(feed.source_url) + '" target="_blank" rel="noopener" style="color:var(--orange);font-weight:700">ua.org/manpower-postings</a> \u00B7 <a href="' + esc(feed.source_url) + '" target="_blank" rel="noopener" style="color:var(--orange);font-weight:700">' + T.apply + '</a></p>' +
+    '<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.35);border-radius:10px;padding:12px 16px;margin:0 0 22px;color:var(--charcoal);font-size:13px;line-height:1.5">\u26A0\uFE0F ' + T.disc + '</div>' +
+    '<div style="overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)">' +
+    '<table style="width:100%;border-collapse:collapse;font-size:14px">' +
+    '<thead><tr style="text-align:left;color:var(--slate);font-size:12px;text-transform:uppercase;letter-spacing:.04em">' +
+    '<th style="padding:12px 10px">' + T.project + '</th><th style="padding:12px 10px">' + T.where + '</th><th style="padding:12px 10px">' + T.trade + '</th><th style="padding:12px 10px;text-align:center">' + T.hands + '</th><th style="padding:12px 10px">' + T.wage + '</th><th style="padding:12px 10px">' + T.pkg + '</th><th style="padding:12px 10px">' + T.dur + '</th><th style="padding:12px 10px">' + T.sched + '</th>' +
+    '</tr></thead><tbody>' + rowsHtml + '</tbody></table></div>' +
+    '</div></body></html>';
+}
+
 function calculatorPage(rows, lang) {
   lang = lang || 'en';
   const es = lang === 'es';
@@ -2482,6 +2553,7 @@ ${footer()}
   if (!fs.existsSync(ES_DIR)) fs.mkdirSync(ES_DIR, { recursive: true });
   const BILINGUAL = [
     ['per-diem', l => perDiemPage(rows, l)],
+    ['ua-manpower', l => uaManpowerPage(l)],
     ['calculator', l => calculatorPage(rows, l)],
     ['unionhistory', historyPage],
     ['ibewhistory', ibewHistoryPage],
