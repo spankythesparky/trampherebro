@@ -1469,8 +1469,18 @@ function syncHomepageMapInner(rows, coords, snapText, snapTextLine, postFix, sna
   const hands = rows.reduce((s, r) => s + r.calls.reduce((x, c) => x + (Number(c.num_needed) || 0), 0), 0);
   const activeLocals = rows.filter(r => r.calls.length > 0).length;
   const setStat = (id, val) => { out = out.replace(new RegExp('(id="' + id + '">)[^<]*'), '$1' + val); };
-  setStat('s-calls', openCalls);
-  setStat('s-pos', hands);
+  // fold national postings (UA manpower + UBC millwrights) into the headline totals
+  let natCalls = 0, natHands = 0;
+  for (const f of ['/ua-postings.json', '/millwright-postings.json']) {
+    try {
+      const j = JSON.parse(fs.readFileSync(SITE_DIR + f, 'utf8'));
+      const ps = j.postings || [];
+      natCalls += ps.length;
+      natHands += ps.reduce((t, x) => t + (Number(x.needed) || 0), 0);
+    } catch (e) { }
+  }
+  setStat('s-calls', openCalls + natCalls);
+  setStat('s-pos', hands + natHands);
   setStat('s-active', activeLocals);
   setStat('s-tracked', arr.length);
 
