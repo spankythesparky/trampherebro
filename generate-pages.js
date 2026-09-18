@@ -1599,6 +1599,71 @@ function uaManpowerPage(lang) {
     '</div></body></html>';
 }
 
+function millwrightsPage(lang) {
+  lang = lang || 'en';
+  const es = lang === 'es';
+  let feed = { postings: [], fetched_at: null, source_url: 'https://ubcmillwrights.org/bulletin-type/needed/' };
+  try { feed = JSON.parse(fs.readFileSync(SITE_DIR + '/millwright-postings.json', 'utf8')); } catch (e) { }
+  const posts = (feed.postings || []).slice().sort((a, b) => String(b.posted).localeCompare(String(a.posted)));
+
+  const T = es ? {
+    title: 'Trabajos de Millwright UBC | TrampHereBro',
+    desc: 'Convocatorias activas del tabl\u00F3n de la UBC Millwrights \u2014 contratista, sitio, salario, prestaciones y vi\u00E1ticos.',
+    kick: 'Millwrights y carpinteros', h1a: 'Convocatorias ', h1b: 'UBC',
+    sub: 'Convocatorias de personal publicadas por la United Brotherhood of Carpenters/Millwrights.',
+    count: 'convocatorias activas', updated: 'Actualizado', posted: 'Publicado', src: 'Fuente:', view: 'Ver la publicaci\u00F3n original \u2192',
+    none: 'No hay convocatorias activas en este momento. Consulta el tabl\u00F3n de la UBC directamente.',
+    disc: 'Estas convocatorias las publica la United Brotherhood of Carpenters/Millwrights, no un local individual. TrampHereBro las muestra tal como aparecen y solo lista las de los \u00FAltimos 45 d\u00EDas. Confirma siempre con el contacto indicado antes de viajar.'
+  } : {
+    title: 'UBC Millwright Job Calls | TrampHereBro',
+    desc: 'Live manpower calls from the UBC Millwrights bulletin board \u2014 contractor, job site, wage, fringes and per diem.',
+    kick: 'Millwrights & carpenters', h1a: 'UBC ', h1b: 'Job Calls',
+    sub: 'Manpower calls posted by the United Brotherhood of Carpenters/Millwrights.',
+    count: 'live calls', updated: 'Updated', posted: 'Posted', src: 'Source:', view: 'View the original posting \u2192',
+    none: 'No live calls right now. Check the UBC bulletin board directly.',
+    disc: 'These calls are posted by the United Brotherhood of Carpenters/Millwrights, not by an individual local hall. TrampHereBro lists them as posted and shows only those from the last 45 days. Always verify with the listed contact before you travel.'
+  };
+
+  const cards = posts.map(p => {
+    const when = p.posted ? new Date(p.posted).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    const lines = String(p.body || '').split('\n').filter(x => x.trim());
+    return '<div style="background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px 22px;margin:0 0 16px">' +
+      '<div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:10px">' +
+      '<h2 style="font-family:\'Space Grotesk\',sans-serif;font-size:19px;color:var(--navy);margin:0">' + esc(p.title) + '</h2>' +
+      (when ? '<span style="color:var(--slate);font-size:12.5px">' + T.posted + ' ' + esc(when) + '</span>' : '') +
+      '</div>' +
+      '<div style="color:var(--charcoal);font-size:14.5px;line-height:1.65">' +
+      lines.map(l => '<div>' + esc(l) + '</div>').join('') +
+      '</div>' +
+      '<div style="margin-top:12px"><a href="' + esc(p.url) + '" target="_blank" rel="noopener" style="color:var(--orange);font-weight:700;font-size:13px;text-decoration:none">' + T.view + '</a></div>' +
+      '</div>';
+  }).join('');
+
+  const when = feed.fetched_at ? new Date(feed.fetched_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' }) + ' ET' : '';
+
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width,initial-scale=1">' +
+    '<title>' + esc(T.title) + '</title>' +
+    '<meta name="description" content="' + esc(T.desc) + '">' +
+    '<link rel="canonical" href="' + CANON + '/' + (es ? 'es/' : '') + 'millwrights">' +
+    '<meta property="og:title" content="' + esc(T.title) + '">' +
+    '<meta property="og:description" content="' + esc(T.desc) + '">' +
+    '<meta property="og:url" content="' + CANON + '/' + (es ? 'es/' : '') + 'millwrights.html">' +
+    '<meta property="og:image" content="' + CANON + '/share-banner.png">' +
+    '<meta name="twitter:card" content="summary_large_image">' +
+    '<style>' + CSS + '</style></head><body>' +
+    topbar('', lang, 'millwrights') +
+    '<div style="max-width:900px;margin:0 auto;padding:32px 20px 60px">' +
+    '<div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--orange);margin-bottom:6px">' + T.kick + '</div>' +
+    '<h1 style="font-family:\'Space Grotesk\',sans-serif;font-size:34px;color:var(--navy);margin:0 0 8px">' + T.h1a + '<span style="color:var(--orange)">' + T.h1b + '</span></h1>' +
+    '<p style="color:var(--slate);font-size:16px;max-width:660px;margin:0 0 4px">' + T.sub + '</p>' +
+    '<p style="color:var(--slate);font-size:13px;margin:0 0 6px"><b style="color:var(--navy)">' + posts.length + '</b> ' + T.count + (when ? ' \u00B7 ' + T.updated + ' ' + esc(when) : '') + '</p>' +
+    '<p style="color:var(--slate);font-size:13px;margin:0 0 22px">' + T.src + ' <a href="' + esc(feed.source_url) + '" target="_blank" rel="noopener" style="color:var(--orange);font-weight:700">ubcmillwrights.org</a></p>' +
+    '<div style="background:rgba(255,107,0,.08);border:1px solid rgba(255,107,0,.35);border-radius:10px;padding:12px 16px;margin:0 0 22px;color:var(--charcoal);font-size:13px;line-height:1.5">\u26A0\uFE0F ' + T.disc + '</div>' +
+    (posts.length ? cards : '<p style="color:var(--slate)">' + T.none + '</p>') +
+    '</div></body></html>';
+}
+
 function calculatorPage(rows, lang) {
   lang = lang || 'en';
   const es = lang === 'es';
@@ -2715,6 +2780,7 @@ ${footer()}
   const BILINGUAL = [
     ['per-diem', l => perDiemPage(rows, l)],
     ['ua-manpower', l => uaManpowerPage(l)],
+    ['millwrights', l => millwrightsPage(l)],
     ['calculator', l => calculatorPage(rows, l)],
     ['unionhistory', historyPage],
     ['ibewhistory', ibewHistoryPage],
