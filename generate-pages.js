@@ -1415,6 +1415,7 @@ const ES_CONTACT = [
   ['>Issues With Site<', '>Problemas con el Sitio<'],
   ['>Partnership<', '>Alianza<'],
   ['>General Inquiry<', '>Consulta General<'],
+  ['>Phone <span style="font-weight:400;opacity:.6">(optional)</span><', '>Tel\u00e9fono <span style="font-weight:400;opacity:.6">(opcional)</span><'],
   ['>Message<', '>Mensaje<'],
   ['<button type="submit" class="cd-submit">Send message <svg', '<button type="submit" class="cd-submit">Enviar mensaje <svg'],
   // form JS feedback — a Spanish visitor must not get English confirmations
