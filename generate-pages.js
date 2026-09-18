@@ -508,8 +508,8 @@ function topbar(active, lang, togglePath) {
   lang = lang || 'en';
   const on = p => active === p ? ' class="on"' : '';
   const T = lang === 'es'
-    ? { board:'Tablero', daily:'Reporte Diario', perdiem:'Viáticos', uamp:'Trabajos UA', calc:'Calculadora de Pago', res:'Recursos', ret:'Jubilación Sindical', hist:'Historia', uh:'Historia Sindical', ibew:'Historia del IBEW', ua:'Historia del UA', contact:'Contacto', join:'Únete a JNCTN' }
-    : { board:'Board', daily:'Daily Update', perdiem:'Per Diem', uamp:'UA Calls', calc:'Pay Calculator', res:'Resources', ret:'Union Retirement', hist:'History', uh:'Union History', ibew:'IBEW History', ua:'UA History', contact:'Contact', join:'Join JNCTN' };
+    ? { board:'Tablero', daily:'Reporte Diario', perdiem:'Viáticos', uamp:'Trabajos UA', calc:'Calculadora de Pago', res:'Recursos', ret:'Jubilación Sindical', hist:'Historia', uh:'Historia Sindical', ibew:'Historia del IBEW', ua:'Historia del UA', iron:'Historia de los Iron Workers', contact:'Contacto', join:'Únete a JNCTN' }
+    : { board:'Board', daily:'Daily Update', perdiem:'Per Diem', uamp:'UA Calls', calc:'Pay Calculator', res:'Resources', ret:'Union Retirement', hist:'History', uh:'Union History', ibew:'IBEW History', ua:'UA History', iron:'Iron Workers History', contact:'Contact', join:'Join JNCTN' };
   // Segmented EN|ES control. Lives OUTSIDE <nav> so it stays visible on mobile
   // rather than collapsing into the hamburger menu.
   const tp = togglePath || (TRANSLATED.has(active) ? active : null);
@@ -525,7 +525,7 @@ function topbar(active, lang, togglePath) {
   return `<div class="topbar"><div class="inner">
 <a class="brand" href="${lhref('', lang)}" style="display:inline-flex;align-items:center;gap:10px"><img class="logo" src="/logo.png" alt="TrampHereBro" style="height:38px;width:auto">Tramp<span class="b">Here</span>Bro</a>
 ${toggle}<button class="navtoggle" aria-label="Menu" onclick="document.querySelector('.topbar .nav').classList.toggle('open')"><span></span><span></span><span></span></button>
-<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('per-diem', lang)}"${on('per-diem')}>${T.perdiem}</a><a href="${lhref('ua-manpower', lang)}"${on('ua-manpower')}>${T.uamp}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
+<nav class="nav"><a href="${lhref('', lang)}"${on('home')}>${T.board}</a><a href="${lhref('snapshot', lang)}"${on('snapshot')}>${T.daily}</a><a href="${lhref('per-diem', lang)}"${on('per-diem')}>${T.perdiem}</a><a href="${lhref('ua-manpower', lang)}"${on('ua-manpower')}>${T.uamp}</a><a href="${lhref('calculator', lang)}"${on('calculator')}>${T.calc}</a><a href="${lhref('resources', lang)}"${on('resources')}>${T.res}</a><a href="${lhref('unionretirement', lang)}"${on('unionretirement')}>${T.ret}</a><span class="navdd"><a href="${lhref('unionhistory', lang)}"${on('unionhistory')}${on('ibewhistory')}>${T.hist}<svg class="caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg></a><span class="ddmenu"><a href="${lhref('unionhistory', lang)}">${T.uh}</a><a href="${lhref('ibewhistory', lang)}">${T.ibew}</a><a href="${lhref('uahistory', lang)}">${T.ua}</a><a href="${lhref('ironhistory', lang)}">${T.iron}</a></span></span><a href="${lhref('contact', lang)}"${on('contact')}>${T.contact}</a><a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener" class="nav-spanky">Spanky the Sparky</a></nav>
 </div></div>${NAV_JS}`;
 }
 function footer(lang) {
@@ -2441,6 +2441,156 @@ ${footer(lang)}
 </body></html>`;
 }
 
+function ironHistoryPage(lang) {
+  lang = lang || 'en';
+  const EN = {
+    kick: 'The Trade That Works Above Everything Else',
+    h1b: 'The Sky',
+    tlSecAccent: 'Iron Workers',
+    tlSecB: '',
+    closeHb: 'Iron Workers',
+    closeHc: ' Have Not.',
+    title: 'Iron Workers History — Cowboys in the Sky | TrampHereBro',
+    desc: 'The history of the International Association of Bridge, Structural, Ornamental and Reinforcing Iron Workers — from the 1896 Pittsburgh founding and the McNamara bombings to the Golden Gate safety net and the modern era of bridges, data centers and megaprojects.',
+    keywords: 'ironworkers history, iron workers union history, International Association of Bridge Structural Ornamental Reinforcing Iron Workers, McNamara bombings, Los Angeles Times bombing, Golden Gate Bridge safety net, Halfway to Hell Club, structural steel, union apprenticeship, traveling ironworker',
+    crumb: 'Iron Workers History',
+    h1a: 'Cowboys in ',
+    hsub: 'Founded above an alley in Pittsburgh, 1896. The story of the men and women who erect the steel that holds up everything else.',
+    lead: 'The work has always been dangerous. By the time delegates met at Moorhead\u2019s Hall in February 1896, the men who erected structural steel for a living were already known for two things: their skill at moving across high steel without falling, and the regularity with which they nevertheless fell. Statistically, roughly <b>one ironworker in a hundred</b> stood to die each year. The first major activity of the new union was distributing <b>$50 burial money to widows</b>.',
+    stats: [['1896','Year of founding'],['130K','Active members'],['130 yrs','Years organizing'],['4-yr','Apprenticeship']],
+    pull: '\u201CCowboys in the sky.\u201D \u2014 what the trade has always called itself, and earned.',
+    tlSecA: 'A Timeline of the ',
+    tlSub: 'From burial funds and dynamite to the bridges, stadiums, chip plants and data centers of the modern economy.',
+    closeHa: 'The work has changed. The ',
+    closeP: 'When delegates met at Moorhead\u2019s Hall in 1896, the skyscraper had only recently been invented and the bridges that would carry the industrial economy were still being drawn. The men who did the work were dying with such regularity that the union\u2019s first real function was burying them. One hundred and thirty years later the Iron Workers do the same essential thing: organize the people who erect, weld, reinforce and finish the steel that holds up the buildings, the bridges, the stadiums, the chip plants and the data centers of North America.',
+    closeA: 'Find open ironworker calls \u2192',
+    ldHeadline: 'Iron Workers History — Cowboys in the Sky',
+    TL: [
+      ['1870s\u20131895','The Pre-Union World','Steel erection drew the most daring and most independent men in the trades, and offered them almost nothing in return. No standard wage, no safety rule, no provision for a widow. Men admired from the street for feats of nerve had no protection when the nerve ran out.'],
+      ['Feb 4, 1896','Moorhead\u2019s Hall, Pittsburgh','Delegates from independent locals in New York, Buffalo, Boston, Pittsburgh and Chicago met and founded the International Association of Bridge and Structural Iron Workers of America. In New York, walking delegate Sam Parks is credited with driving the ironworker\u2019s daily wage from $2 to $4 in a single year.'],
+      ['1900\u20131901','Nearly Broke, Then Doubled','By 1900 the International had 1,731 members and was in debt. The next year was the best in its early history — membership swelled to roughly 6,000, the number of chartered locals more than doubled, and the union affiliated with the AFL.'],
+      ['1903','American Bridge \u2014 and the Opposition','The union\u2019s first major success was organizing American Bridge, a U.S. Steel subsidiary. That same year U.S. Steel and American Bridge founded the National Erectors\u2019 Association to promote the open shop and break the union.'],
+      ['1906\u20131911','The Dynamite Campaign','Facing an employer offensive it could not beat at the bargaining table, the union turned to explosives. Estimates run from 87 to 150 bombings of iron works and job sites across the United States and Canada, most causing property damage and no injuries. It has since been described as perhaps the largest domestic bombing campaign in American history. An NEA spy sat on the union\u2019s own executive board throughout.'],
+      ['Oct 1, 1910','The Los Angeles Times Bombing','At 1:07 a.m., J.B. McNamara set sixteen sticks of dynamite in an alley beside the Los Angeles Times building. The blast ignited gas lines and the fire killed 21 people, most of them non-union printers, and injured more than 100. Publisher Harrison Gray Otis, who had spent twenty years fighting the city\u2019s unions, called it the crime of the century.'],
+      ['1911','The Confessions','Secretary-Treasurer J.J. McNamara had been paying his brother $1,000 a month out of the union treasury. Clarence Darrow took the defense, concluded the brothers would hang, and was arrested attempting to bribe a juror. J.B. got life; J.J. got fifteen years and later returned to the union as an organizer. The labor movement in Los Angeles collapsed and the city stayed largely union-free until the 1930s.'],
+      ['1914\u20131934','Rebuilding','The union spent two decades climbing out from under the bombings — rebuilding credibility, rebuilding membership, and surviving the open-shop 1920s. The New Deal and the Wagner Act finally put federal law behind the right to organize.'],
+      ['1936\u20131937','The Golden Gate and the Net','Chief engineer Joseph Strauss rejected the industry\u2019s grim arithmetic of one death per million dollars spent and paid $130,000 for a manila safety net slung fifteen feet beneath the deck. Nineteen men fell into it and lived, calling themselves the Halfway to Hell Club. Al Zampa broke four vertebrae, spent twelve weeks at St. Luke\u2019s, then walked a girder on the unpainted bridge to prove the fall hadn\u2019t taken his nerve. On February 17, 1937, a five-ton platform tore through the net and killed ten men.'],
+      ['1940s\u20131970s','The Golden Age','War production, the interstate system, and the postwar skyline boom put ironworkers on nearly every major structure in North America — the Gateway Arch, the Sears Tower, the bridges and stadiums. Density was high, apprenticeships were full, and the trade set the standard.'],
+      ['1970s\u20132000s','The Long Pressure','Organized employers pushed hard for the open shop through the last quarter of the century. Density fell across the building trades, non-union erectors took market share, and the union spent decades on defense.'],
+      ['2015\u20132025','The Eric Dean Era','A fourth-generation Local 63 ironworker out of Chicago who apprenticed in 1980, Dean served as general president for ten years. Membership grew, pension and health funds strengthened, and the union developed and implemented a maternity leave program for women ironworkers — a first for the trade.'],
+      ['2024\u20132025','Bridges, Data Centers, Megaprojects','Bridge replacement work, semiconductor fabs, stadium builds and hyperscale data centers pulled hard on the trade. Steel erection and reinforcing became bottleneck crafts on projects measured in billions.'],
+      ['Jan 1, 2026','Bryenton Takes Over','Kevin Bryenton was unanimously elected general president effective January 1, 2026. A Toronto ironworker since 1987 who graduated outstanding apprentice of his year, he came up through Local 721 as an instructor and apprenticeship coordinator before serving as general vice president, executive director of Canadian affairs, and general secretary.'],
+    ]
+  };
+  const ES = {
+    kick: 'El Oficio Que Trabaja Por Encima de Todo',
+    h1b: 'Cielo',
+    tlSecAccent: 'Iron Workers',
+    tlSecB: '',
+    closeHb: 'Iron Workers',
+    closeHc: ' No.',
+    title: 'Historia de los Iron Workers — Vaqueros del Cielo | TrampHereBro',
+    desc: 'La historia de la Asociaci\u00F3n Internacional de Iron Workers — desde la fundaci\u00F3n en Pittsburgh en 1896 y los atentados de los McNamara hasta la red de seguridad del Golden Gate y la era moderna de puentes, centros de datos y megaproyectos.',
+    keywords: 'historia de los ironworkers, historia sindicato iron workers, atentados McNamara, bomba Los Angeles Times, red de seguridad Golden Gate, acero estructural, aprendizaje sindical, ironworker viajero',
+    crumb: 'Historia de los Iron Workers',
+    h1a: 'Vaqueros del ',
+    hsub: 'Fundado sobre un callej\u00F3n en Pittsburgh, 1896. La historia de quienes levantan el acero que sostiene todo lo dem\u00E1s.',
+    lead: 'El trabajo siempre ha sido peligroso. Cuando los delegados se reunieron en Moorhead\u2019s Hall en febrero de 1896, los hombres que levantaban acero estructural ya eran conocidos por dos cosas: su destreza para moverse sobre el acero sin caer, y la regularidad con que a\u00FAn as\u00ED ca\u00EDan. Estad\u00EDsticamente, alrededor de <b>uno de cada cien ironworkers</b> mor\u00EDa cada a\u00F1o. La primera actividad importante del nuevo sindicato fue repartir <b>$50 de dinero funerario a las viudas</b>.',
+    stats: [['1896','A\u00F1o de fundaci\u00F3n'],['130K','Miembros activos'],['130 a\u00F1os','Organizando'],['4 a\u00F1os','Aprendizaje']],
+    pull: '\u201CVaqueros del cielo.\u201D \u2014 como el oficio siempre se ha llamado a s\u00ED mismo, y se lo ha ganado.',
+    tlSecA: 'Una Cronolog\u00EDa del ',
+    tlSub: 'De fondos funerarios y dinamita a los puentes, estadios, plantas de chips y centros de datos de la econom\u00EDa moderna.',
+    closeHa: 'El trabajo ha cambiado. Los ',
+    closeP: 'Cuando los delegados se reunieron en Moorhead\u2019s Hall en 1896, el rascacielos apenas se hab\u00EDa inventado y los puentes que sostendr\u00EDan la econom\u00EDa industrial a\u00FAn se dibujaban. Los hombres que hac\u00EDan el trabajo mor\u00EDan con tal regularidad que la primera funci\u00F3n real del sindicato fue enterrarlos. Ciento treinta a\u00F1os despu\u00E9s, los Iron Workers hacen lo mismo: organizar a quienes levantan, sueldan, refuerzan y terminan el acero que sostiene los edificios, los puentes, los estadios, las plantas de chips y los centros de datos de Norteam\u00E9rica.',
+    closeA: 'Ver llamadas abiertas de ironworkers \u2192',
+    ldHeadline: 'Historia de los Iron Workers — Vaqueros del Cielo',
+    TL: [
+      ['1870\u20131895','El Mundo Antes del Sindicato','El montaje de acero atra\u00EDa a los hombres m\u00E1s audaces e independientes de los oficios, y no les ofrec\u00EDa casi nada a cambio. Sin salario est\u00E1ndar, sin regla de seguridad, sin provisi\u00F3n para una viuda.'],
+      ['4 feb 1896','Moorhead\u2019s Hall, Pittsburgh','Delegados de locales independientes de Nueva York, Buffalo, Boston, Pittsburgh y Chicago fundaron la Asociaci\u00F3n Internacional de Iron Workers de Puentes y Estructuras de Am\u00E9rica. En Nueva York, el delegado Sam Parks logr\u00F3 duplicar el jornal del ironworker de $2 a $4 en un solo a\u00F1o.'],
+      ['1900\u20131901','Casi en Quiebra, Luego el Doble','En 1900 el Internacional ten\u00EDa 1,731 miembros y estaba endeudado. El a\u00F1o siguiente fue el mejor de su historia temprana — la membres\u00EDa creci\u00F3 a unos 6,000 y el sindicato se afili\u00F3 a la AFL.'],
+      ['1903','American Bridge y la Oposici\u00F3n','El primer gran \u00E9xito del sindicato fue organizar American Bridge, filial de U.S. Steel. Ese mismo a\u00F1o, U.S. Steel y American Bridge fundaron la National Erectors\u2019 Association para imponer el taller abierto.'],
+      ['1906\u20131911','La Campa\u00F1a de Dinamita','Sin poder ganar en la mesa de negociaci\u00F3n, el sindicato recurri\u00F3 a explosivos. Las estimaciones van de 87 a 150 atentados contra obras y talleres de hierro en Estados Unidos y Canad\u00E1, casi todos con da\u00F1o material y sin heridos.'],
+      ['1 oct 1910','La Bomba del Los Angeles Times','A la 1:07 de la madrugada, J.B. McNamara coloc\u00F3 diecis\u00E9is cartuchos de dinamita en un callej\u00F3n junto al edificio del Los Angeles Times. La explosi\u00F3n encendi\u00F3 l\u00EDneas de gas y el incendio mat\u00F3 a 21 personas, en su mayor\u00EDa impresores no sindicalizados, e hiri\u00F3 a m\u00E1s de 100.'],
+      ['1911','Las Confesiones','El secretario-tesorero J.J. McNamara pagaba a su hermano $1,000 al mes del tesoro sindical. Clarence Darrow asumi\u00F3 la defensa y fue arrestado intentando sobornar a un jurado. J.B. recibi\u00F3 cadena perpetua; J.J., quince a\u00F1os. El movimiento obrero de Los \u00C1ngeles colaps\u00F3 hasta los a\u00F1os treinta.'],
+      ['1914\u20131934','Reconstrucci\u00F3n','El sindicato pas\u00F3 dos d\u00E9cadas recuperando credibilidad y membres\u00EDa, y sobreviviendo a los a\u00F1os veinte del taller abierto. El New Deal y la Ley Wagner finalmente respaldaron el derecho a organizarse.'],
+      ['1936\u20131937','El Golden Gate y la Red','El ingeniero jefe Joseph Strauss rechaz\u00F3 la aritm\u00E9tica de una muerte por cada mill\u00F3n de d\u00F3lares gastado y pag\u00F3 $130,000 por una red de seguridad bajo el tablero. Diecinueve hombres cayeron en ella y sobrevivieron — el Halfway to Hell Club. El 17 de febrero de 1937 una plataforma de cinco toneladas rompi\u00F3 la red y mat\u00F3 a diez hombres.'],
+      ['1940\u20131970','La \u00C9poca Dorada','La producci\u00F3n de guerra, el sistema interestatal y el auge de rascacielos de posguerra pusieron a los ironworkers en casi toda gran estructura de Norteam\u00E9rica.'],
+      ['1970\u20132000','La Presi\u00F3n Larga','Los empleadores organizados empujaron el taller abierto durante el \u00FAltimo cuarto de siglo. La densidad sindical cay\u00F3 y los montadores no sindicalizados ganaron mercado.'],
+      ['2015\u20132025','La Era de Eric Dean','Ironworker de cuarta generaci\u00F3n del Local 63 de Chicago, Dean fue presidente general durante diez a\u00F1os. Creci\u00F3 la membres\u00EDa, se fortalecieron los fondos de pensi\u00F3n y salud, y se implement\u00F3 un programa de licencia de maternidad para mujeres ironworkers.'],
+      ['2024\u20132025','Puentes, Centros de Datos, Megaproyectos','El reemplazo de puentes, las f\u00E1bricas de semiconductores y los centros de datos a hiperescala tensionaron el oficio. El montaje de acero se volvi\u00F3 un cuello de botella en proyectos de miles de millones.'],
+      ['1 ene 2026','Bryenton Toma el Mando','Kevin Bryenton fue electo por unanimidad presidente general a partir del 1 de enero de 2026. Ironworker de Toronto desde 1987, subi\u00F3 por el Local 721 como instructor y coordinador de aprendizaje antes de ser secretario general.'],
+    ]
+  };
+  const D = lang === 'es' ? ES : EN;
+  const title = D.title;
+  const desc = D.desc;
+  const urlPath = (lang === 'es' ? '/es/' : '/') + 'ironhistory';
+  const HS = `
+  .h-lead{font-size:18px;line-height:1.7;margin:0 0 8px}.h-lead b{color:var(--navy)}
+  .h-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 30px}
+  .h-stat{background:var(--card);border:1px solid var(--line);border-top:3px solid var(--orange);border-radius:12px;padding:18px 12px;text-align:center}
+  .h-stat .n{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:var(--navy);line-height:1}
+  .h-stat .l{font-size:11.5px;color:var(--slate);margin-top:7px;font-weight:500}
+  .h-pull{border-left:3px solid var(--orange);background:var(--card);padding:14px 18px;margin:22px 0 34px;border-radius:0 10px 10px 0;font-size:15px;font-style:italic;color:var(--navy)}
+  .h-sect{font-family:'Space Grotesk',sans-serif;font-size:25px;color:var(--navy);font-weight:700;margin:8px 0 4px;letter-spacing:-.01em}
+  .h-sect .accent{color:var(--orange)}
+  .h-sub{color:var(--slate);font-size:14px;margin-bottom:24px}
+  .h-tl{border-left:2px solid var(--line);margin-left:8px}
+  .h-i{position:relative;padding:0 0 26px 28px}
+  .h-i:before{content:'';position:absolute;left:-7px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--orange);border:2px solid var(--bg)}
+  .h-y{font-family:'Space Grotesk',sans-serif;font-weight:700;color:var(--orange);font-size:15px}
+  .h-e{font-weight:700;color:var(--navy);font-size:16px;margin:2px 0 4px}
+  .h-d{color:var(--charcoal);font-size:14.5px;line-height:1.6}
+  .h-close{background:var(--navy);color:#fff;border-radius:16px;padding:30px 32px;margin-top:44px;text-align:center}
+  .h-close h3{font-family:'Space Grotesk',sans-serif;font-size:22px;margin-bottom:10px}.h-close h3 b{color:var(--orange)}
+  .h-close p{color:#c6d6ef;font-size:15px;max-width:580px;margin:0 auto 18px;line-height:1.6}
+  .h-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
+  @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}}`;
+  const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
+  const ld = {
+    "@context":"https://schema.org","@type":"Article",
+    "headline":D.ldHeadline,
+    "inLanguage":lang,
+    "about":["United Association","UA union history","plumbers and pipefitters union","pipe trades history"],
+    "author":{"@type":"Person","name":"Noah \u2014 Spanky The Sparky"},
+    "publisher":{"@type":"Organization","name":"TrampHereBro"},
+    "mainEntityOfPage":CANON+urlPath,
+    "description":desc
+  };
+  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
+<meta name="keywords" content="${esc(D.keywords)}">
+<link rel="canonical" href="${CANON}${urlPath}">
+${hreflangTags('ironhistory')}
+<meta property="og:type" content="article"><meta property="og:site_name" content="TrampHereBro">
+<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
+<meta property="og:url" content="${CANON}${urlPath}"><meta property="og:image" content="${CANON}/share-banner.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">${JSON.stringify(ld)}</script>
+${FAVICON_LINK}
+${FONTS}${GA_TAG}
+<style>${CSS}${HS}</style>
+</head><body>
+${topbar('ironhistory', lang)}
+<header><div class="hero-inner">
+<div class="crumbs"><a href="${lhref('', lang)}">${lang === 'es' ? 'Tablero' : 'Board'}</a> \u203a ${D.crumb}</div>
+<div class="kick"><span class="dot"></span>${D.kick}</div>
+<h1 class="lede">${D.h1a}<b>${D.h1b}</b></h1>
+<div class="hsub">${D.hsub}</div>
+</div></header>
+<main class="wrap">
+<p class="h-lead">${D.lead}</p>
+<div class="h-stats">${D.stats.map(s => `<div class="h-stat"><div class="n">${s[0]}</div><div class="l">${esc(s[1])}</div></div>`).join('')}</div>
+<div class="h-pull">${D.pull}</div>
+<div class="h-sect">${D.tlSecA}<span class="accent">${D.tlSecAccent}</span>${D.tlSecB}</div>
+<div class="h-sub">${D.tlSub}</div>
+<div class="h-tl">${tl}</div>
+<div class="h-close"><h3>${D.closeHa}<b>${D.closeHb}</b>${D.closeHc}</h3><p>${D.closeP}</p><a href="${lhref('', lang)}">${D.closeA}</a></div>
+</main>
+${footer(lang)}
+</body></html>`;
+}
+
 function snapshotPage(text, textLine, textUA) {
   const title = 'IBEW Trampin Snapshot — Daily Job Call Update | TrampHereBro';
   const desc = `Today's IBEW traveler snapshot: top-paying locals, the biggest boards, and where the data-center work is right now. Updated ${PRETTY_DATE}.`;
@@ -2568,6 +2718,7 @@ ${footer()}
     ['unionhistory', historyPage],
     ['ibewhistory', ibewHistoryPage],
     ['uahistory', uaHistoryPage],
+    ['ironhistory', ironHistoryPage],
     ['unionretirement', retirementPage],
   ];
   for (const lang of LANGS) {
