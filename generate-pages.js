@@ -1186,6 +1186,7 @@ function makeSpanishHome() {
   h = h.replace('Tool and boot brands', 'Marcas de herramientas y botas');
   h = h.replace('Training programs', 'Programas de capacitacion');
   h = h.replace('Benefit funds', 'Fondos de beneficios');
+  h = h.replace('and more', 'y mas');
   h = h.replace('tradespeople reached', 'trabajadores alcanzados');
   h = h.replace('>sessions<', '>sesiones<');
   h = h.replace('arrive by Google search', 'llegan por busqueda de Google');
