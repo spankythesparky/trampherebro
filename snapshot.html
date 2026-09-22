@@ -97,6 +97,8 @@ main{padding:34px 0 10px}
 .donate-btn:hover{filter:brightness(1.05)}
 .donate-btns{display:flex;gap:10px;flex-wrap:wrap;flex:none}
 .donate-btn.alt{background:transparent;border:1.5px solid #ff9250;padding:10.5px 20px}
+.donate-btns .donate-btn{box-sizing:border-box;text-align:center}
+@media(max-width:560px){.donate-btns{width:100%;flex-wrap:nowrap}.donate-btns .donate-btn{flex:1 1 0;min-width:0;padding:9px 8px;font-size:13px}}
 /* ===== redesigned call row (cr-*) ===== */
 .cr{display:flex;align-items:flex-start;gap:13px;padding:13px 0;border-top:1px solid var(--line2)}
 .cr-hands{flex:none;width:46px;height:46px;border-radius:11px;background:rgba(255,107,0,.10);
