@@ -1174,6 +1174,17 @@ function makeSpanishHome() {
   h = h.replace('Proudly made by Noah "<b>Spanky The Sparky</b>" — IBEW Journeyman', 'Hecho con orgullo por Noah "<b>Spanky The Sparky</b>" — Oficial del IBEW');
   h = h.replace('All rights reserved.', 'Todos los derechos reservados.');
 
+
+  // sponsor band
+  h = h.replace('Sponsorship', 'Patrocinio');
+  h = h.replace('Put your brand in front of the people who build it.', 'Pon tu marca frente a quienes construyen.');
+  h = h.replace('Hiring manpower, or selling tools, boots, trucks, or training? This is where traveling hands plan their next job, and the board stays free to them because sponsors carry the cost.', 'Buscas personal, o vendes herramientas, botas, camionetas o capacitacion? Aqui los viajeros planean su proximo trabajo, y el tablero sigue gratis para ellos porque los patrocinadores cubren el costo.');
+  h = h.replace('tradespeople reached', 'trabajadores alcanzados');
+  h = h.replace('arrive by Google search', 'llegan por busqueda de Google');
+  h = h.replace('locals, 5 trades', 'locales, 5 oficios');
+  h = h.replace('See the sponsorship overview →', 'Ve la presentacion para patrocinadores →');
+  h = h.replace('Traffic from Google Analytics, July 6 to September 21, 2026.', 'Trafico de Google Analytics, 6 de julio al 21 de septiembre de 2026.');
+  h = h.replace('>sessions<', '>sesiones<');
   const ES_DIR = path.join(SITE_DIR, 'es');
   if (!fs.existsSync(ES_DIR)) fs.mkdirSync(ES_DIR, { recursive: true });
   fs.writeFileSync(path.join(ES_DIR, 'index.html'), h);
