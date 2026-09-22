@@ -1180,6 +1180,8 @@ function makeSpanishHome() {
   h = h.replace('Sponsorship', 'Patrocinio');
   h = h.replace('Need hands, or selling to the ones who have them?', 'Necesitas personal, o le vendes a quienes lo tienen?');
   h = h.replace('If your hall is short manpower and wants its calls seen nationwide, or your company makes the tools, boots, trucks, and training traveling hands buy, this is the room. The board stays free to members because sponsors carry the cost.', 'Si tu salon necesita personal y quiere que sus llamados se vean en todo el pais, o si tu empresa fabrica las herramientas, botas, camionetas y capacitacion que compran los viajeros, este es el lugar. El tablero sigue gratis para los miembros porque los patrocinadores cubren el costo.');
+  h = h.replace('Sponsors get their own tab on the board and a spot on the homepage.', 'Los patrocinadores reciben su propia pestana en el tablero y un lugar en la pagina principal.');
+  h = h.replace('Your hall, your open calls, or your brand, front and center for every traveler who opens the site.', 'Tu salon, tus llamados abiertos, o tu marca, al frente para cada viajero que abre el sitio.');
   h = h.replace('Locals and halls', 'Locales y salones');
   h = h.replace('Signatory contractors', 'Contratistas sindicalizados');
   h = h.replace('Tool and boot brands', 'Marcas de herramientas y botas');
