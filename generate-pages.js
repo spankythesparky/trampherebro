@@ -890,8 +890,8 @@ ${contactCard}
 ${shareBlock}
 ${(() => {
   const D = es
-    ? { head: 'Este tablero es gratis y siempre lo será.', sub: 'Si te ahorró una noche llamando a los salones, echa unos dólares para mantenerlo funcionando.', btn: 'Apoya el tablero' }
-    : { head: "This board is free — and always will be.", sub: 'If it saved you a night of calling halls, chip in to keep it running.', btn: 'Support the board' };
+    ? { head: 'Este tablero es gratis y siempre lo será.', sub: 'Si te ahorró una noche llamando a los salones, echa unos dólares para mantenerlo funcionando.', btn: 'Miembros: apoya el tablero' }
+    : { head: "This board is free — and always will be.", sub: 'If it saved you a night of calling halls, chip in to keep it running.', btn: 'Members: support the board' };
   return `<div class="donate"><div class="donate-txt"><div class="donate-h">${D.head}</div><div class="donate-s">${D.sub}</div></div><div class="donate-btns"><a class="donate-btn" href="https://www.buymeacoffee.com/trampherebro" target="_blank" rel="noopener">${D.btn}</a><a class="donate-btn alt" href="/partner/">${(typeof lang!=="undefined"&&lang==="es")?"Patrocina el tablero":"Sponsor the board"}</a></div></div>`;
 })()}
 
@@ -1176,6 +1176,7 @@ function makeSpanishHome() {
 
 
   // sponsor band
+  h = h.replace('Members: support the board →', 'Miembros: apoya el tablero →');
   h = h.replace('Sponsorship', 'Patrocinio');
   h = h.replace('Need hands, or selling to the ones who have them?', 'Necesitas personal, o le vendes a quienes lo tienen?');
   h = h.replace('If your hall is short manpower and wants its calls seen nationwide, or your company makes the tools, boots, trucks, and training traveling hands buy, this is the room. The board stays free to members because sponsors carry the cost.', 'Si tu salon necesita personal y quiere que sus llamados se vean en todo el pais, o si tu empresa fabrica las herramientas, botas, camionetas y capacitacion que compran los viajeros, este es el lugar. El tablero sigue gratis para los miembros porque los patrocinadores cubren el costo.');
