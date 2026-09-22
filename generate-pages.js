@@ -1183,7 +1183,6 @@ function makeSpanishHome() {
   h = h.replace('Sponsors get their own tab on the board and a spot on the homepage.', 'Los patrocinadores reciben su propia pestana en el tablero y un lugar en la pagina principal.');
   h = h.replace('Your hall, your open calls, or your brand, front and center for every traveler who opens the site.', 'Tu salon, tus llamados abiertos, o tu marca, al frente para cada viajero que abre el sitio.');
   h = h.replace('Locals and halls', 'Locales y salones');
-  h = h.replace('Signatory contractors', 'Contratistas sindicalizados');
   h = h.replace('Tool and boot brands', 'Marcas de herramientas y botas');
   h = h.replace('Training programs', 'Programas de capacitacion');
   h = h.replace('Benefit funds', 'Fondos de beneficios');
