@@ -1402,6 +1402,7 @@ const META_CONTACT = {
 };
 
 const ES_CONTACT = [
+  ['Funding or sponsoring the board? See the partnership overview →', '¿Quieres financiar o patrocinar el tablero? Ve la presentación para socios →'],
   ['Add a hall, report a correction, or reach out about partnerships.', 'Agrega un salón, reporta una corrección, o comunícate sobre alianzas.'],
   ['<div class="kick"><span class="dot"></span>Contact</div>', '<div class="kick"><span class="dot"></span>Contacto</div>'],
   ['>Let’s get<', '>Vamos a<'],
