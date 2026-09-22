@@ -848,6 +848,32 @@ loadLive();
 updateSnap();
 </script>
 <script>/*hs-collapse-init*/(function(){var k=document.querySelector('.hs-kick');var b=document.getElementById('hs-body');if(!k||!b)return;k.style.cursor='pointer';k.style.position='relative';k.style.paddingRight='24px';k.setAttribute('role','button');k.setAttribute('aria-label','Toggle snapshot');var c=document.createElement('span');c.textContent='\u25be';c.style.cssText='position:absolute;right:2px;top:50%;transform:translateY(-50%);transition:transform .2s ease;font-size:13px;opacity:.75';k.appendChild(c);k.addEventListener('click',function(){var hid=b.style.display==='none';b.style.display=hid?'':'none';c.style.transform=hid?'translateY(-50%)':'translateY(-50%) rotate(-90deg)';});})();</script>
-<script>(function(){function syncUABar(){var b=document.getElementById("ua-natbar");if(!b)return;var on=document.querySelector('.trade.on[data-trade="UA"]');b.style.display=on?"flex":"none";}document.addEventListener("click",function(e){if(e.target.closest(".trade"))setTimeout(syncUABar,0);});document.addEventListener("DOMContentLoaded",syncUABar);syncUABar();})();</script><script id="nav-dd-js">(function(){function w(){return window.matchMedia('(max-width:640px)').matches;}
+<script>(function(){function syncUABar(){var b=document.getElementById("ua-natbar");if(!b)return;var on=document.querySelector('.trade.on[data-trade="UA"]');b.style.display=on?"flex":"none";}document.addEventListener("click",function(e){if(e.target.closest(".trade"))setTimeout(syncUABar,0);});document.addEventListener("DOMContentLoaded",syncUABar);syncUABar();})();</script><script id="snap-tabs-js">(function(){
+var LBL={IBEW:'IBEW Indoor',LINEMAN:'IBEW Lineman',UA:'UA Plumbers',IRONWORKER:'Ironworkers',MILLWRIGHT:'UBC Millwrights'};
+function paint(k){Array.prototype.forEach.call(document.querySelectorAll('#snap-tabs button'),function(b){var on=b.getAttribute('data-k')===k;b.style.background=on?'#ff6b00':'#fff';b.style.color=on?'#fff':'#0f2a52';b.style.borderColor=on?'#ff6b00':'#e2e8f0';});}
+function show(k){var body=document.getElementById('hs-body'),kick=document.getElementById('hs-kick-label');
+ if(!body||!window.SNAPS||!window.SNAPS[k])return;
+ body.style.display='';body.innerHTML=window.SNAPS[k];
+ if(kick&&window.SNAP_KICK&&window.SNAP_KICK[k])kick.textContent=window.SNAP_KICK[k];
+ paint(k);}
+function sync(){var k=window.tradeFilter;if(k&&window.SNAPS&&window.SNAPS[k])paint(k);}
+function init(){
+ var body=document.getElementById('hs-body');
+ if(!body||!window.SNAPS||document.getElementById('snap-tabs'))return false;
+ var keys=Object.keys(window.SNAPS).filter(function(k){return window.SNAPS[k];});
+ if(keys.length<2)return false;
+ var bar=document.createElement('div');bar.id='snap-tabs';
+ bar.style.cssText='display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px;margin:0;-webkit-overflow-scrolling:touch;scrollbar-width:none';
+ keys.forEach(function(k){var b=document.createElement('button');b.type='button';b.setAttribute('data-k',k);
+  b.textContent=LBL[k]||k;
+  b.style.cssText='flex:none;cursor:pointer;font:600 13px Inter,sans-serif;padding:7px 14px;border-radius:999px;border:1px solid #e2e8f0;background:#fff;color:#0f2a52;white-space:nowrap';
+  b.onclick=function(){show(k);};bar.appendChild(b);});
+ body.parentNode.insertBefore(bar,body);
+ sync();
+ if(typeof window.updateSnap==='function'){var o=window.updateSnap;window.updateSnap=function(){o.apply(this,arguments);sync();};}
+ return true;}
+var tries=0,iv=setInterval(function(){if(init()||++tries>40)clearInterval(iv);},120);
+})();</script>
+<script id="nav-dd-js">(function(){function w(){return window.matchMedia('(max-width:640px)').matches;}
 document.addEventListener('click',function(e){var a=e.target.closest?e.target.closest('.navdd>a'):null;if(!a||!w())return;
 e.preventDefault();a.parentNode.classList.toggle('open');},false);})();</script></body></html>
