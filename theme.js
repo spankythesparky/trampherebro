@@ -26,6 +26,8 @@
       'html[data-theme="dark"] .topcalls,html[data-theme="dark"] .topcalls-h,html[data-theme="dark"] .topcalls-inner,html[data-theme="dark"] .toplist,html[data-theme="dark"] #topcalls-toggle{color:var(--ink)}' +
       'html[data-theme="dark"] .states,html[data-theme="dark"] .states a,html[data-theme="dark"] .hotstrip{color:var(--ink)}' +
       '.nav #thb-toggle{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}' +
+      'html[data-theme="dark"] .ddmenu a:hover,html[data-theme="dark"] .ddmenu a:focus{background:rgba(255,255,255,.12) !important;color:#fff !important}' +
+      'html[data-theme="dark"] .nav a:hover{background:rgba(255,255,255,.10) !important;color:#fff !important}' +
       '#thb-toggle{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--navy);border-radius:8px;width:34px;height:30px;font-size:15px;line-height:1;margin-left:8px;flex:none;vertical-align:middle}' +
       'html[data-theme="dark"] #thb-toggle{border-color:rgba(255,255,255,.35);background:transparent;color:#fff}' +
       '#thb-toggle:hover{border-color:#FF6B00}';
