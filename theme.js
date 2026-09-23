@@ -61,6 +61,14 @@
   window.thbSweep = sweep;
   setTimeout(sweep, 60); setTimeout(sweep, 700); setTimeout(sweep, 2000);
   document.addEventListener("click", function(){ setTimeout(sweep, 120); }, true);
+  document.addEventListener("mouseover", function(e){
+    if(document.documentElement.getAttribute("data-theme")!=="dark") return;
+    var el=e.target; if(!el || !el.tagName) return;
+    var t=el.tagName; if(t==="IMG"||t==="SVG"||t==="CANVAS") return;
+    var cs=window.getComputedStyle(el);
+    if(lum(cs.backgroundColor)>200){ el.style.background="rgba(255,255,255,.10)"; el.style.color="var(--ink)"; }
+  }, true);
+
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", function(){ css(); btn(); }); }
   else { css(); btn(); }
 })();
