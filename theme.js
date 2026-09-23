@@ -1,0 +1,56 @@
+(function(){
+  function get(){ try{ var t=localStorage.getItem("thb-theme"); if(t) return t; }catch(e){}
+    return (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light"; }
+  function set(t){ document.documentElement.setAttribute("data-theme",t);
+    try{ localStorage.setItem("thb-theme",t); }catch(e){}
+    if(window.thbSweep) setTimeout(window.thbSweep,20);
+    var b=document.getElementById("thb-toggle"); if(b) b.textContent = (t==="dark") ? "\u2600" : "\u263E"; }
+  document.documentElement.setAttribute("data-theme", get());
+  function css(){
+    if(document.getElementById("thb-theme-css")) return;
+    var s=document.createElement("style"); s.id="thb-theme-css";
+    s.textContent =
+      ':root{--ink:#1E293B}' +
+      'html[data-theme="dark"]{--bg:#0B1220;--card:#132034;--ink:#E7EEF9;--charcoal:#E7EEF9;--slate:#9CB0CC;--line:#27364E;--line2:#1D2B41;--shadow:0 1px 2px rgba(0,0,0,.45),0 6px 20px rgba(0,0,0,.5);--shadow-lg:0 2px 6px rgba(0,0,0,.5),0 14px 40px rgba(0,0,0,.6)}' +
+      'html[data-theme="dark"] body{background:var(--bg);color:var(--ink)}' +
+      'html[data-theme="dark"] h1,html[data-theme="dark"] h2,html[data-theme="dark"] h3,html[data-theme="dark"] h4{color:var(--ink)}' +
+      'html[data-theme="dark"] .hs-body,html[data-theme="dark"] .hs-body b{color:var(--ink)}' +
+      'html[data-theme="dark"] img[alt="TrampHereBro"]{background:#fff;padding:4px 7px;border-radius:9px}' +
+      'html[data-theme="dark"] .nav a{color:#DCE6F5}' +
+      'html[data-theme="dark"] .nav a.on{color:#FF6B00}' +
+      'html[data-theme="dark"] .ddmenu a{color:var(--ink)}' +
+      'html[data-theme="dark"] .sec-h{color:var(--ink)}' +
+      'html[data-theme="dark"] .tabs button{color:#B9C7DD}' +
+      'html[data-theme="dark"] .tabs button.on{color:#FF6B00}' +
+      'html[data-theme="dark"] .ctabs button{color:#B9C7DD}' +
+      'html[data-theme="dark"] .topcalls,html[data-theme="dark"] .topcalls-h,html[data-theme="dark"] .topcalls-inner,html[data-theme="dark"] .toplist,html[data-theme="dark"] #topcalls-toggle{color:var(--ink)}' +
+      'html[data-theme="dark"] .states,html[data-theme="dark"] .states a,html[data-theme="dark"] .hotstrip{color:var(--ink)}' +
+      '.nav #thb-toggle{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}' +
+      '#thb-toggle{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--navy);border-radius:8px;width:34px;height:30px;font-size:15px;line-height:1;margin-left:8px;flex:none;vertical-align:middle}' +
+      'html[data-theme="dark"] #thb-toggle{border-color:rgba(255,255,255,.35);background:transparent;color:#fff}' +
+      '#thb-toggle:hover{border-color:#FF6B00}';
+    document.head.appendChild(s);
+  }
+  function btn(){
+    if(document.getElementById("thb-toggle")) return;
+    var host=document.querySelector(".langtog")||document.querySelector("nav.nav")||document.querySelector(".nav"); if(!host) return;
+    var b=document.createElement("button"); b.id="thb-toggle"; b.type="button";
+    b.setAttribute("aria-label","Toggle night mode");
+    b.textContent = (document.documentElement.getAttribute("data-theme")==="dark") ? "\u2600" : "\u263E";
+    b.onclick=function(){ set(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark"); };
+    host.appendChild(b);
+  }
+  var NAVY = ["rgb(7, 37, 84)","rgb(12, 46, 99)","rgb(15, 42, 82)","rgb(10, 35, 80)","rgb(11, 42, 92)"];
+  function light(c){ var m=/rgb\((\d+), (\d+), (\d+)\)/.exec(c); if(!m) return false;
+    return (0.299*(+m[1]) + 0.587*(+m[2]) + 0.114*(+m[3])) > 150; }
+  function sweep(){
+    if(document.documentElement.getAttribute("data-theme")!=="dark") return;
+    var all=document.querySelectorAll("body *"), i, el, cs;
+    for(i=0;i<all.length;i++){ el=all[i]; cs=window.getComputedStyle(el);
+      if(NAVY.indexOf(cs.color)>-1 && !light(cs.backgroundColor)) el.style.color="var(--ink)"; }
+  }
+  window.thbSweep = sweep;
+  setTimeout(sweep, 60); setTimeout(sweep, 700); setTimeout(sweep, 2000);
+  if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", function(){ css(); btn(); }); }
+  else { css(); btn(); }
+})();

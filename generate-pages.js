@@ -146,26 +146,26 @@ html{scroll-behavior:smooth;overflow-x:hidden}
 body{color:var(--charcoal);font-family:'Inter',system-ui,sans-serif;font-weight:450;line-height:1.6;letter-spacing:-.006em;-webkit-font-smoothing:antialiased;background:#D9E4F1;background-image:radial-gradient(1250px 680px at 94% -12%,rgba(255,107,0,.38),transparent 56%),radial-gradient(1100px 620px at -6% 0%,rgba(7,37,84,.30),transparent 54%),linear-gradient(165deg,#E7EFF8 0%,#D3E0EF 55%,#DBE7F3 100%);background-attachment:fixed;min-height:100vh}
 .wrap{max-width:1040px;margin:0 auto;padding:0 28px}
 a{color:inherit;text-decoration:none}
-.topbar{background:#fff;border-bottom:1px solid var(--line);box-shadow:0 1px 10px rgba(7,37,84,.05);position:sticky;top:0;z-index:20}
+.topbar{background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 10px rgba(7,37,84,.05);position:sticky;top:0;z-index:20}
 .topbar .inner{max-width:1040px;margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative}
 .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--navy);letter-spacing:-.02em}
 .brand .b{color:var(--orange)}
 .nav{display:flex;gap:17px;align-items:center}
 .nav a{font-size:14px;font-weight:600;color:var(--slate);transition:color .15s;white-space:nowrap}
 @media(max-width:1120px) and (min-width:641px){.topbar .inner{padding-left:16px;padding-right:16px}.nav{gap:13px}.nav a{font-size:13px}}
-.navdd{position:relative;display:inline-flex;align-items:center}.navdd>a{display:inline-flex;align-items:center;gap:4px}.navdd .caret{width:9px;height:9px;transition:transform .18s}.navdd .ddmenu{position:absolute;top:100%;left:-14px;min-width:170px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 26px rgba(7,37,84,.14);padding:6px;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all .16s;z-index:60}.navdd:hover .ddmenu{opacity:1;visibility:visible;transform:translateY(0)}.navdd:hover .caret{transform:rotate(180deg)}.navdd .ddmenu a{display:block;padding:9px 12px;border-radius:7px;font-size:13.5px}.navdd .ddmenu a:hover{background:rgba(255,107,0,.08);color:var(--navy)}@media(max-width:640px){.navdd{display:block;width:100%}.navdd>a{width:100%;justify-content:space-between}.navdd .caret{display:inline-block;width:12px;height:12px;flex-shrink:0;transition:transform .2s}.navdd.open>a .caret{transform:rotate(180deg)}.navdd .ddmenu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:none;border-radius:0;padding:0;margin:0;min-width:0;display:none}.navdd.open .ddmenu{display:block}.navdd:hover .ddmenu{display:none}.navdd.open:hover .ddmenu{display:block}.navdd .ddmenu a{padding:11px 20px 11px 36px;font-size:14px;color:var(--slate);background:rgba(7,37,84,.02)}}
+.navdd{position:relative;display:inline-flex;align-items:center}.navdd>a{display:inline-flex;align-items:center;gap:4px}.navdd .caret{width:9px;height:9px;transition:transform .18s}.navdd .ddmenu{position:absolute;top:100%;left:-14px;min-width:170px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 26px rgba(7,37,84,.14);padding:6px;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all .16s;z-index:60}.navdd:hover .ddmenu{opacity:1;visibility:visible;transform:translateY(0)}.navdd:hover .caret{transform:rotate(180deg)}.navdd .ddmenu a{display:block;padding:9px 12px;border-radius:7px;font-size:13.5px}.navdd .ddmenu a:hover{background:rgba(255,107,0,.08);color:var(--navy)}@media(max-width:640px){.navdd{display:block;width:100%}.navdd>a{width:100%;justify-content:space-between}.navdd .caret{display:inline-block;width:12px;height:12px;flex-shrink:0;transition:transform .2s}.navdd.open>a .caret{transform:rotate(180deg)}.navdd .ddmenu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:none;border-radius:0;padding:0;margin:0;min-width:0;display:none}.navdd.open .ddmenu{display:block}.navdd:hover .ddmenu{display:none}.navdd.open:hover .ddmenu{display:block}.navdd .ddmenu a{padding:11px 20px 11px 36px;font-size:14px;color:var(--slate);background:rgba(7,37,84,.02)}}
 .navtoggle{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:8px;margin-left:auto}
 .navtoggle span{display:block;width:22px;height:2.5px;background:var(--navy);border-radius:2px}
 /* language toggle — sibling of .nav, so it stays visible on mobile instead of
    collapsing into the hamburger dropdown */
 .nav{margin-left:auto}
 .langtog{display:inline-flex;align-items:stretch;border:1.5px solid var(--line);border-radius:8px;overflow:hidden;flex-shrink:0;order:3;line-height:1}
-.langtog a{display:flex;align-items:center;padding:7px 10px;font-size:12.5px;font-weight:700;color:var(--slate);text-decoration:none;letter-spacing:.03em;background:#fff;transition:background .15s,color .15s}
+.langtog a{display:flex;align-items:center;padding:7px 10px;font-size:12.5px;font-weight:700;color:var(--slate);text-decoration:none;letter-spacing:.03em;background:var(--card);transition:background .15s,color .15s}
 .langtog a+a{border-left:1.5px solid var(--line)}
 .langtog a.on{background:var(--orange);color:#fff}
 .langtog a:not(.on):hover{background:rgba(7,37,84,.06);color:var(--navy)}
 .brand{order:1}.nav{order:2}.navtoggle{order:4}
-@media(max-width:640px){.navtoggle{display:flex;margin-left:0;order:4}.langtog{margin-left:auto;order:3}.nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:0 12px 26px rgba(7,37,84,.12);padding:6px 0;z-index:40;margin-left:0}.nav.open{display:flex}.nav a{font-size:15px;padding:13px 20px;width:100%;box-sizing:border-box}.nav .langtog{display:none}}
+@media(max-width:640px){.navtoggle{display:flex;margin-left:0;order:4}.langtog{margin-left:auto;order:3}.nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;gap:0;background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:0 12px 26px rgba(7,37,84,.12);padding:6px 0;z-index:40;margin-left:0}.nav.open{display:flex}.nav a{font-size:15px;padding:13px 20px;width:100%;box-sizing:border-box}.nav .langtog{display:none}}
 .nav a:hover,.nav a.on{color:var(--navy)}
 .nav-spanky{background:var(--orange);color:#fff !important;padding:7px 14px;border-radius:8px;font-weight:700;margin-left:4px;transition:background .15s}.nav-spanky:hover{background:var(--orange-h);color:#fff !important}@media(max-width:640px){.nav-spanky{margin:6px 20px;padding:11px 14px;text-align:center;border-radius:8px}}
 header{position:relative;margin:0 calc(50% - 50vw);padding:56px max(28px,calc(50vw - 492px)) 46px;background:linear-gradient(180deg,#05122b 0%,#071e46 55%,#0b2a5c 100%);overflow:hidden;color:#EAF0FA;border-bottom:3px solid var(--orange)}
@@ -219,7 +219,7 @@ main{padding:34px 0 10px}
 .pkgtabs{display:flex;gap:8px;margin-bottom:18px;background:#eef2f7;padding:5px;border-radius:12px}
 .pkgtab{flex:1;padding:12px 14px;border:2px solid transparent;background:transparent;border-radius:9px;font-family:'Space Grotesk',sans-serif;font-weight:800;font-size:13.5px;color:var(--slate);cursor:pointer;transition:all .15s}
 .pkgtab:hover{color:var(--navy)}
-.pkgtab.on{background:#fff;color:var(--navy);border-color:var(--orange);box-shadow:0 2px 8px rgba(7,37,84,.1)}
+.pkgtab.on{background:var(--card);color:var(--navy);border-color:var(--orange);box-shadow:0 2px 8px rgba(7,37,84,.1)}
 .donate{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin:26px 0;padding:20px 24px;background:linear-gradient(135deg,var(--navy),#12294a);border-radius:16px;color:#fff}
 .donate-h{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px}
 .donate-s{font-size:13.5px;color:#b9c7dd;margin-top:4px;max-width:52ch}
@@ -247,7 +247,7 @@ main{padding:34px 0 10px}
 .cr-dot{color:#cdd5e0;margin:0 2px}
 .cr-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:7px}
 .cr-tag{font-size:11.5px;color:var(--slate);background:#f3f6fa;border:1px solid var(--line2);padding:2px 8px;border-radius:6px}
-.cr-tag-note{background:#fff;border-color:var(--line2);color:var(--slate)}
+.cr-tag-note{background:var(--card);border-color:var(--line2);color:var(--slate)}
 .cr-tag-dc{background:rgba(255,107,0,.10);border-color:#ffd9c2;color:#c2530f;font-weight:600}
 .snap-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:16px;box-shadow:var(--shadow-lg);padding:28px 30px;font-size:15.5px;line-height:1.7;color:var(--charcoal)}
 .snap-card p{margin:0 0 16px}.snap-card p:last-child{margin-bottom:0}
@@ -342,7 +342,7 @@ function lhref(page, lang) {
   if (page === '' || page === 'home') return useEs ? '/es' : '/';
   return (useEs ? '/es/' : '/') + page;
 }
-// reciprocal hreflang tags for a translated page (drop into <head>)
+// reciprocal hreflang tags for a translated page (drop into <head><script src="/theme.js" defer></script>)
 function hreflangTags(page) {
   const en = CANON + '/' + page;
   const es = CANON + '/es/' + page;
@@ -472,7 +472,7 @@ function perDiemPage(rows, lang) {
     "url":"https://trampherebro.com/" + (es?'es/':'') + "per-diem.html"
   }) + '<\/script>';
   const homeHref = es ? '/es/' : '/';
-  return '<!DOCTYPE html><html lang="' + lang + '"><head>' +
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script>' +
     '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + T.title + '</title><meta name="description" content="' + esc(T.desc) + '">' +
     '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
@@ -681,7 +681,7 @@ function localPage(local, calls, lang) {
   const S = es
     ? { head: 'Manda este local a un compa', sub: 'Envía estas llamadas por mensaje o correo a alguien buscando trabajo.', txt: 'Mandar mensaje', mail: 'Enviar correo', copy: 'Copiar enlace', copied: 'Enlace copiado', upd: 'Actualizado' }
     : { head: 'Send this local to a buddy', sub: 'Text or email these calls to someone chasing work.', txt: 'Text it', mail: 'Email it', copy: 'Copy link', copied: 'Link copied', upd: 'Updated' };
-  const shareBlock = `<div style="margin:22px 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="font-weight:800;color:var(--navy);font-size:15px">${S.head}</div><div data-ts="buddy" style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.55);border-radius:999px;color:var(--orange);font-size:12.5px;font-weight:800;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></span>${S.upd} ${stampFor(calls)}</div></div><div style="color:var(--slate);font-size:13px;margin:4px 0 13px">${S.sub}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="${_sms}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;text-decoration:none">${S.txt}</a><a href="${_mail}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;text-decoration:none">${S.mail}</a><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}');this.textContent='${S.copied}'}" style="padding:11px 20px;border-radius:10px;background:#fff;color:var(--navy);border:1px solid var(--line);font-weight:700;font-size:14px;cursor:pointer">${S.copy}</button></div></div>`;
+  const shareBlock = `<div style="margin:22px 0;padding:18px 20px;background:var(--card);border:1px solid var(--line);border-radius:14px"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="font-weight:800;color:var(--navy);font-size:15px">${S.head}</div><div data-ts="buddy" style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;background:rgba(255,107,0,.12);border:1px solid rgba(255,107,0,.55);border-radius:999px;color:var(--orange);font-size:12.5px;font-weight:800;white-space:nowrap"><span style="width:8px;height:8px;border-radius:50%;background:var(--orange)"></span>${S.upd} ${stampFor(calls)}</div></div><div style="color:var(--slate);font-size:13px;margin:4px 0 13px">${S.sub}</div><div style="display:flex;gap:10px;flex-wrap:wrap"><a href="${_sms}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--orange);color:#fff;font-weight:700;font-size:14px;text-decoration:none">${S.txt}</a><a href="${_mail}" style="display:inline-block;padding:11px 20px;border-radius:10px;background:var(--navy);color:#fff;font-weight:700;font-size:14px;text-decoration:none">${S.mail}</a><button type="button" onclick="if(navigator.clipboard){navigator.clipboard.writeText('${url}');this.textContent='${S.copied}'}" style="padding:11px 20px;border-radius:10px;background:var(--card);color:var(--navy);border:1px solid var(--line);font-weight:700;font-size:14px;cursor:pointer">${S.copy}</button></div></div>`;
   const hands = calls.reduce((s, c) => s + (Number(c.num_needed) || 0), 0);
   const hasCalls = calls.length > 0;
 
@@ -855,7 +855,7 @@ function localPage(local, calls, lang) {
         ? `La escala aún no está confirmada aquí. Contacta al despacho del local para conocer las tarifas actuales.`
         : `Scale isn't confirmed here yet. Contact the local's dispatch for current rates.`);
 
-  return `<!DOCTYPE html><html lang="${lang}"><head>
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
@@ -949,7 +949,7 @@ function hubPage(rows, lang) {
   const desc = es
     ? `Directorio de ${rows.length} locales del IBEW y UA con conteos de llamadas de trabajo en vivo, escala de oficial e información de contacto para trabajadores viajeros. ${totalCalls} llamadas abiertas en ${activeLocals} locales activos. Actualizado ${PRETTY_DATE_ES}.`
     : `Directory of ${rows.length} IBEW and UA locals with live job-call counts, journeyman scale and contact info for traveling tradesmen. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
-  return `<!DOCTYPE html><html lang="${lang}"><head>
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
@@ -1210,9 +1210,9 @@ const LANGTOG_CSS = `<style id="langtog-css">
 .topbar .brand,.topbar .inner>a:first-child{order:1}
 .topbar .nav{order:2;margin-left:auto;gap:17px}
 .topbar .nav a{white-space:nowrap}
-.langtog{order:3;display:inline-flex;align-items:stretch;border:1.5px solid var(--line,#e2e8f0);border-radius:8px;overflow:hidden;flex-shrink:0;line-height:1}
-.langtog a{display:flex;align-items:center;padding:7px 10px;font-size:12.5px;font-weight:700;color:var(--slate,#64748b);text-decoration:none;letter-spacing:.03em;background:#fff;transition:background .15s,color .15s}
-.langtog a+a{border-left:1.5px solid var(--line,#e2e8f0)}
+.langtog{order:3;display:inline-flex;align-items:stretch;border:1.5px solid var(--line,var(--line));border-radius:8px;overflow:hidden;flex-shrink:0;line-height:1}
+.langtog a{display:flex;align-items:center;padding:7px 10px;font-size:12.5px;font-weight:700;color:var(--slate,#64748b);text-decoration:none;letter-spacing:.03em;background:var(--card);transition:background .15s,color .15s}
+.langtog a+a{border-left:1.5px solid var(--line,var(--line))}
 .langtog a.on{background:var(--orange,#FF6B00);color:#fff}
 .langtog a:not(.on):hover{background:rgba(7,37,84,.06);color:var(--navy,#072554)}
 .topbar .navtoggle{order:4}
@@ -1606,7 +1606,7 @@ function uaManpowerPage(lang) {
 
   const when = feed.fetched_at ? new Date(feed.fetched_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' }) + ' ET' : '';
 
-  return '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8">' +
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + esc(T.title) + '</title>' +
     '<meta name="description" content="' + esc(T.desc) + '">' +
@@ -1675,7 +1675,7 @@ function millwrightsPage(lang) {
 
   const when = feed.fetched_at ? new Date(feed.fetched_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' }) + ' ET' : '';
 
-  return '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8">' +
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + esc(T.title) + '</title>' +
     '<meta name="description" content="' + esc(T.desc) + '">' +
@@ -1768,7 +1768,7 @@ function calculatorPage(rows, lang) {
   .calc-ctl{display:flex;flex-direction:column;gap:7px}
   .calc-ctl label{font:600 12px/1 'Space Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--slate)}
   .calc-ctl label b{color:var(--orange);font-size:14px}
-  .calc-ctl input[type=number],.calc-ctl select,.calc-baseline select{font:400 16px Inter,sans-serif;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--charcoal);width:100%;box-sizing:border-box}
+  .calc-ctl input[type=number],.calc-ctl select,.calc-baseline select{font:400 16px Inter,sans-serif;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--charcoal);width:100%;box-sizing:border-box}
   .calc-ctl input[type=range]{width:100%;accent-color:var(--orange)}
   .calc-baseline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:14px 18px}
   .calc-baseline label{font:600 13px 'Space Grotesk',sans-serif;color:var(--navy)}
@@ -1779,9 +1779,9 @@ function calculatorPage(rows, lang) {
   .calc-board{display:flex;flex-direction:column;gap:0;background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}
   .calc-rankby{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
   .calc-rankby span{font:600 12px/1 'Space Grotesk',sans-serif;letter-spacing:.04em;text-transform:uppercase;color:var(--slate)}
-  .calc-rankby .rb{font:600 13px Inter,sans-serif;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--slate);cursor:pointer}
+  .calc-rankby .rb{font:600 13px Inter,sans-serif;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--slate);cursor:pointer}
   .calc-rankby .rb.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .calc-rankby .tb{font:600 13px Inter,sans-serif;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--slate);cursor:pointer}
+  .calc-rankby .tb{font:600 13px Inter,sans-serif;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--slate);cursor:pointer}
   .calc-rankby .tb.on{background:var(--orange);color:#0a1226;border-color:var(--orange)}
   .calc-sub{display:block;font:400 12px Inter,sans-serif;color:var(--slate);margin-top:2px}
   .calc-sub2{display:block;font:400 11.5px Inter,sans-serif;color:var(--slate);margin-top:1px}
@@ -1798,10 +1798,10 @@ function calculatorPage(rows, lang) {
   .calc-delta.neg{background:#fee2e2;color:#b91c1c}
   .calc-note{font-size:12px;color:var(--slate);margin:14px 2px 0;line-height:1.5}
   .calc-picker{position:relative;flex:1;min-width:220px;max-width:420px}
-  .calc-picker input{width:100%;box-sizing:border-box;font:400 16px Inter,sans-serif;padding:10px 34px 10px 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--charcoal)}
+  .calc-picker input{width:100%;box-sizing:border-box;font:400 16px Inter,sans-serif;padding:10px 34px 10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--charcoal)}
   .calc-clear{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:22px;line-height:1;color:var(--slate);cursor:pointer;display:none;padding:2px 6px}
   .calc-picker.has .calc-clear{display:block}
-  .calc-picker-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(7,37,84,.16);max-height:270px;overflow-y:auto;z-index:30;display:none}
+  .calc-picker-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 28px rgba(7,37,84,.16);max-height:270px;overflow-y:auto;z-index:30;display:none}
   .calc-picker-list.open{display:block}
   .calc-picker-list button{display:block;width:100%;text-align:left;background:none;border:none;padding:11px 14px;font:400 14px Inter,sans-serif;color:var(--charcoal);cursor:pointer;border-top:1px solid var(--line2)}
   .calc-picker-list button:first-child{border-top:none}
@@ -1816,13 +1816,13 @@ function calculatorPage(rows, lang) {
   .calc-detail .cd-line.cd-tot span{color:#fff;font-size:14.5px;font-weight:700}
   .calc-detail .cd-grand{background:var(--orange);color:#fff;border-radius:10px;padding:12px 15px;margin-top:15px;display:flex;justify-content:space-between;font:700 16px 'Space Grotesk',sans-serif}
   .calc-more{display:flex;justify-content:center;margin-top:14px}
-  .calc-morebtn{font:600 14px Inter,sans-serif;padding:11px 24px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);cursor:pointer;box-shadow:var(--shadow)}
+  .calc-morebtn{font:600 14px Inter,sans-serif;padding:11px 24px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--navy);cursor:pointer;box-shadow:var(--shadow)}
   .calc-morebtn:hover{border-color:var(--orange);color:var(--orange)}
   @media(max-width:720px){.calc-controls{grid-template-columns:1fr 1fr}}
   @media(max-width:560px){.calc-controls{grid-template-columns:1fr}.calc-row{grid-template-columns:32px 1fr auto;gap:8px;row-gap:4px;padding:12px 14px}.calc-annual{grid-column:3;grid-row:1;text-align:right}.calc-delta{grid-column:3;grid-row:2;justify-self:end}.calc-name{grid-column:2;grid-row:1}}
   `;
 
-  return `<!DOCTYPE html><html lang="${lang}"><head>
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
@@ -2115,7 +2115,7 @@ function historyPage(lang) {
   @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}.h-won{grid-template-columns:1fr}}`;
   const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
   const won = D.WON.map(w => `<div class="h-w"><div class="h">${esc(w[0])}</div><div class="d">${esc(w[1])}</div></div>`).join('');
-  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${CANON}${urlPath}">
 ${hreflangTags('unionhistory')}
@@ -2231,7 +2231,7 @@ function ibewHistoryPage(lang) {
   .h-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
   @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}}`;
   const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
-  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${CANON}${urlPath}">
 ${hreflangTags('ibewhistory')}
@@ -2362,7 +2362,7 @@ function retirementPage(lang) {
   .r-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
   @media(max-width:640px){.r-stack{grid-template-columns:1fr}}`;
   const CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>';
-  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${CANON}${urlPath}">
 ${hreflangTags('unionretirement')}
@@ -2507,7 +2507,7 @@ function uaHistoryPage(lang) {
     "mainEntityOfPage":CANON+urlPath,
     "description":desc
   };
-  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <meta name="keywords" content="${esc(D.keywords)}">
 <link rel="canonical" href="${CANON}${urlPath}">
@@ -2657,7 +2657,7 @@ function ironHistoryPage(lang) {
     "mainEntityOfPage":CANON+urlPath,
     "description":desc
   };
-  return `<!DOCTYPE html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <meta name="keywords" content="${esc(D.keywords)}">
 <link rel="canonical" href="${CANON}${urlPath}">
@@ -2694,7 +2694,7 @@ ${footer(lang)}
 function snapshotPage(text, textLine, textUA) {
   const title = 'IBEW Trampin Snapshot — Daily Job Call Update | TrampHereBro';
   const desc = `Today's IBEW traveler snapshot: top-paying locals, the biggest boards, and where the data-center work is right now. Updated ${PRETTY_DATE}.`;
-  return `<!DOCTYPE html><html lang="en"><head>
+  return `<!DOCTYPE html><html lang="en"><head><script src="/theme.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
