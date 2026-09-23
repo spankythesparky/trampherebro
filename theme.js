@@ -33,12 +33,12 @@
   }
   function btn(){
     if(document.getElementById("thb-toggle")) return;
-    var host=document.querySelector(".langtog")||document.querySelector("nav.nav")||document.querySelector(".nav"); if(!host) return;
+    var lt=document.querySelector(".langtog"); var nv=document.querySelector("nav.nav")||document.querySelector(".nav"); if(!lt && !nv) return;
     var b=document.createElement("button"); b.id="thb-toggle"; b.type="button";
     b.setAttribute("aria-label","Toggle night mode");
     b.textContent = (document.documentElement.getAttribute("data-theme")==="dark") ? "\u2600" : "\u263E";
     b.onclick=function(){ set(document.documentElement.getAttribute("data-theme")==="dark" ? "light" : "dark"); };
-    host.appendChild(b);
+    if(lt){ lt.appendChild(b); } else { b.style.marginLeft="10px"; nv.parentNode.insertBefore(b, nv.nextSibling); }
   }
   var NAVY = ["rgb(7, 37, 84)","rgb(12, 46, 99)","rgb(15, 42, 82)","rgb(10, 35, 80)","rgb(11, 42, 92)"];
   function lum(c){ var m=/rgba?\((\d+), (\d+), (\d+)(?:, ([\d.]+))?\)/.exec(c); if(!m) return -1;
