@@ -66,7 +66,7 @@
         }
       }
       var bg=cs.backgroundColor, t=el.tagName;
-      if(t!=="IMG" && t!=="SVG" && t!=="CANVAS" && t!=="VIDEO" && lum(bg)>200){
+      if(t!=="IMG" && t!=="SVG" && t!=="CANVAS" && t!=="VIDEO" && el.offsetHeight>8 && el.offsetWidth>8 && lum(bg)>200){
         el.style.setProperty("background","var(--card)","important");
         if(!el.getAttribute("data-thb-fixed")){ el.style.color="var(--ink)"; el.setAttribute("data-thb-fixed","1"); }
         cs=window.getComputedStyle(el);
