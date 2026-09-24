@@ -55,6 +55,16 @@
     if(document.documentElement.getAttribute("data-theme")!=="dark") return;
     var all=document.querySelectorAll("body *"), i, el, cs;
     for(i=0;i<all.length;i++){ el=all[i]; cs=window.getComputedStyle(el);
+      var bi=cs.backgroundImage;
+      if(bi && bi.indexOf("gradient")>-1){
+        var cols=bi.match(/rgba?\([^)]+\)/g)||[], tot=0, cnt=0;
+        for(var q=0;q<cols.length;q++){ var lv=lum(cols[q]); if(lv>=0){ tot+=lv; cnt++; } }
+        if(cnt && tot/cnt>200){
+          el.style.setProperty("background-image","none","important");
+          el.style.setProperty("background-color","var(--card)","important");
+          cs=window.getComputedStyle(el);
+        }
+      }
       var bg=cs.backgroundColor, t=el.tagName;
       if(t!=="IMG" && t!=="SVG" && t!=="CANVAS" && t!=="VIDEO" && lum(bg)>200){
         el.style.setProperty("background","var(--card)","important");
