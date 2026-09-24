@@ -81,7 +81,7 @@
     var el=e.target; if(!el || !el.tagName) return;
     for(var i=0;i<4 && el && el.tagName;i++){
       var t=el.tagName;
-      if(t!=="IMG" && t!=="SVG" && t!=="CANVAS"){
+      if(t!=="IMG" && t!=="SVG" && t!=="CANVAS" && el.offsetHeight>8 && el.offsetWidth>8){
         var cs=window.getComputedStyle(el);
         if(lum(cs.backgroundColor)>200){ el.style.setProperty("background","rgba(255,255,255,.10)","important"); el.style.setProperty("color","var(--ink)","important"); }
       }
