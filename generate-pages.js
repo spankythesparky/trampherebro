@@ -342,7 +342,7 @@ function lhref(page, lang) {
   if (page === '' || page === 'home') return useEs ? '/es' : '/';
   return (useEs ? '/es/' : '/') + page;
 }
-// reciprocal hreflang tags for a translated page (drop into <head><script src="/theme.js" defer></script>)
+// reciprocal hreflang tags for a translated page (drop into <head><script src="/theme.js" defer></script><script src="/search.js" defer></script>)
 function hreflangTags(page) {
   const en = CANON + '/' + page;
   const es = CANON + '/es/' + page;
@@ -472,7 +472,7 @@ function perDiemPage(rows, lang) {
     "url":"https://trampherebro.com/" + (es?'es/':'') + "per-diem.html"
   }) + '<\/script>';
   const homeHref = es ? '/es/' : '/';
-  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script>' +
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script>' +
     '<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + T.title + '</title><meta name="description" content="' + esc(T.desc) + '">' +
     '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
@@ -855,7 +855,7 @@ function localPage(local, calls, lang) {
         ? `La escala aún no está confirmada aquí. Contacta al despacho del local para conocer las tarifas actuales.`
         : `Scale isn't confirmed here yet. Contact the local's dispatch for current rates.`);
 
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script>
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
@@ -949,7 +949,7 @@ function hubPage(rows, lang) {
   const desc = es
     ? `Directorio de ${rows.length} locales del IBEW y UA con conteos de llamadas de trabajo en vivo, escala de oficial e información de contacto para trabajadores viajeros. ${totalCalls} llamadas abiertas en ${activeLocals} locales activos. Actualizado ${PRETTY_DATE_ES}.`
     : `Directory of ${rows.length} IBEW and UA locals with live job-call counts, journeyman scale and contact info for traveling tradesmen. ${totalCalls} open calls across ${activeLocals} active locals. Updated ${PRETTY_DATE}.`;
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script>
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
@@ -1606,7 +1606,7 @@ function uaManpowerPage(lang) {
 
   const when = feed.fetched_at ? new Date(feed.fetched_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' }) + ' ET' : '';
 
-  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script><meta charset="utf-8">' +
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + esc(T.title) + '</title>' +
     '<meta name="description" content="' + esc(T.desc) + '">' +
@@ -1675,7 +1675,7 @@ function millwrightsPage(lang) {
 
   const when = feed.fetched_at ? new Date(feed.fetched_at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/New_York' }) + ' ET' : '';
 
-  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script><meta charset="utf-8">' +
+  return '<!DOCTYPE html><html lang="' + lang + '"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script><meta charset="utf-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>' + esc(T.title) + '</title>' +
     '<meta name="description" content="' + esc(T.desc) + '">' +
@@ -1822,7 +1822,7 @@ function calculatorPage(rows, lang) {
   @media(max-width:560px){.calc-controls{grid-template-columns:1fr}.calc-row{grid-template-columns:32px 1fr auto;gap:8px;row-gap:4px;padding:12px 14px}.calc-annual{grid-column:3;grid-row:1;text-align:right}.calc-delta{grid-column:3;grid-row:2;justify-self:end}.calc-name{grid-column:2;grid-row:1}}
   `;
 
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script>
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
@@ -2115,7 +2115,7 @@ function historyPage(lang) {
   @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}.h-won{grid-template-columns:1fr}}`;
   const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
   const won = D.WON.map(w => `<div class="h-w"><div class="h">${esc(w[0])}</div><div class="d">${esc(w[1])}</div></div>`).join('');
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${CANON}${urlPath}">
 ${hreflangTags('unionhistory')}
@@ -2231,7 +2231,7 @@ function ibewHistoryPage(lang) {
   .h-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
   @media(max-width:640px){.h-stats{grid-template-columns:repeat(2,1fr)}}`;
   const tl = D.TL.map(t => `<div class="h-i"><div class="h-y">${t[0]}</div><div class="h-e">${esc(t[1])}</div><div class="h-d">${esc(t[2])}</div></div>`).join('');
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${CANON}${urlPath}">
 ${hreflangTags('ibewhistory')}
@@ -2362,7 +2362,7 @@ function retirementPage(lang) {
   .r-close a{display:inline-block;background:var(--orange);color:#fff;text-decoration:none;font-weight:700;padding:11px 22px;border-radius:10px;font-size:14px}
   @media(max-width:640px){.r-stack{grid-template-columns:1fr}}`;
   const CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>';
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <link rel="canonical" href="${CANON}${urlPath}">
 ${hreflangTags('unionretirement')}
@@ -2507,7 +2507,7 @@ function uaHistoryPage(lang) {
     "mainEntityOfPage":CANON+urlPath,
     "description":desc
   };
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <meta name="keywords" content="${esc(D.keywords)}">
 <link rel="canonical" href="${CANON}${urlPath}">
@@ -2657,7 +2657,7 @@ function ironHistoryPage(lang) {
     "mainEntityOfPage":CANON+urlPath,
     "description":desc
   };
-  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  return `<!DOCTYPE html><html lang="${lang}"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
 <meta name="keywords" content="${esc(D.keywords)}">
 <link rel="canonical" href="${CANON}${urlPath}">
@@ -2694,7 +2694,7 @@ ${footer(lang)}
 function snapshotPage(text, textLine, textUA) {
   const title = 'IBEW Trampin Snapshot — Daily Job Call Update | TrampHereBro';
   const desc = `Today's IBEW traveler snapshot: top-paying locals, the biggest boards, and where the data-center work is right now. Updated ${PRETTY_DATE}.`;
-  return `<!DOCTYPE html><html lang="en"><head><script src="/theme.js" defer></script>
+  return `<!DOCTYPE html><html lang="en"><head><script src="/theme.js" defer></script><script src="/search.js" defer></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
