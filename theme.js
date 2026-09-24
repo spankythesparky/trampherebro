@@ -92,3 +92,17 @@
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", function(){ css(); btn(); }); }
   else { css(); btn(); }
 })();
+
+/* mobile nav in dark mode — hamburger bars and dropdown links */
+(function(){
+  var s = document.createElement("style");
+  s.id = "thb-mobnav-dark";
+  s.textContent =
+    'html[data-theme="dark"] .navtoggle span{background:#E7EEF9 !important}' +
+    '@media(max-width:640px){' +
+      'html[data-theme="dark"] .nav{background:#132034 !important;border-color:rgba(255,255,255,.14) !important}' +
+      'html[data-theme="dark"] .nav a{color:#C6D3E6 !important}' +
+      'html[data-theme="dark"] .nav a.on{background:rgba(255,255,255,.08) !important;color:#fff !important}' +
+    '}';
+  (document.head || document.documentElement).appendChild(s);
+})();
