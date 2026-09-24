@@ -54,7 +54,7 @@
     for(i=0;i<all.length;i++){ el=all[i]; cs=window.getComputedStyle(el);
       var bg=cs.backgroundColor, t=el.tagName;
       if(t!=="IMG" && t!=="SVG" && t!=="CANVAS" && t!=="VIDEO" && lum(bg)>200){
-        el.style.background="var(--card)";
+        el.style.setProperty("background","var(--card)","important");
         if(!el.getAttribute("data-thb-fixed")){ el.style.color="var(--ink)"; el.setAttribute("data-thb-fixed","1"); }
         cs=window.getComputedStyle(el);
       }
@@ -68,7 +68,7 @@
     var el=e.target; if(!el || !el.tagName) return;
     var t=el.tagName; if(t==="IMG"||t==="SVG"||t==="CANVAS") return;
     var cs=window.getComputedStyle(el);
-    if(lum(cs.backgroundColor)>200){ el.style.background="rgba(255,255,255,.10)"; el.style.color="var(--ink)"; }
+    if(lum(cs.backgroundColor)>200){ el.style.setProperty("background","rgba(255,255,255,.10)","important"); el.style.setProperty("color","var(--ink)","important"); }
   }, true);
 
   if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded", function(){ css(); btn(); }); }
