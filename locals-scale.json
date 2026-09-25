@@ -336,16 +336,17 @@
   "updated": "11/3/25"
  },
  "60": {
-  "scale": "39.00",
-  "total": "51.08",
-  "pension_def": "1.56",
-  "pension_dc": null,
-  "k401": "2.34",
-  "vacation": "$1.56",
-  "hw": "5.45",
-  "nebf": "1.17",
-  "dues": "3.50%",
-  "updated": "6/26/26"
+   "scale": "38.80",
+   "total": "51.63",
+   "pension_def": "1.55",
+   "pension_dc": null,
+   "k401": "2.33",
+   "vacation": "$1.55",
+   "hw": "5.85",
+   "nebf": "1.16",
+   "jatc": "0.39",
+   "dues": "3.50%",
+   "updated": "9/25/26"
  },
  "64": {
   "scale": "39.80",

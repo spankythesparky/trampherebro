@@ -713,8 +713,8 @@ function localPage(local, calls, lang) {
   const _scaleStr = _m(local.jw_scale);
   const _noPen = !_m(_sc.pension_def) && !_m(_sc.pension_dc) && !_m(_sc.nebf) && !_m(_sc.k401);
   const V = es
-    ? { jw: 'Escala de Oficial', total: 'Paquete Total', hw: 'Salud y Bienestar', pdef: 'Pensión Definida', pdc: 'Pensión de Contribución', nebf: 'Pensión NEBF', k401: '401(k)', pen: 'Pensión', vac: 'Vacaciones', dues: 'Cuotas de Trabajo', books: 'Libros', bk1: 'Lib1', bk2: 'Lib2' }
-    : { jw: 'Journeyman Scale', total: 'Total Package', hw: 'Health &amp; Welfare', pdef: 'Defined Pension', pdc: 'Contribution Pension', nebf: 'NEBF Pension', k401: '401(k)', pen: 'Pension', vac: 'Vacation', dues: 'Working Dues', books: 'Books', bk1: 'Bk1', bk2: 'Bk2' };
+    ? { jw: 'Escala de Oficial', total: 'Paquete Total', hw: 'Salud y Bienestar', pdef: 'Pensión Definida', pdc: 'Pensión de Contribución', nebf: 'Pensión NEBF', jatc: 'Fondo JATC', k401: '401(k)', pen: 'Pensión', vac: 'Vacaciones', dues: 'Cuotas de Trabajo', books: 'Libros', bk1: 'Lib1', bk2: 'Lib2' }
+    : { jw: 'Journeyman Scale', total: 'Total Package', hw: 'Health &amp; Welfare', pdef: 'Defined Pension', pdc: 'Contribution Pension', nebf: 'NEBF Pension', jatc: 'JATC Training', k401: '401(k)', pen: 'Pension', vac: 'Vacation', dues: 'Working Dues', books: 'Books', bk1: 'Bk1', bk2: 'Bk2' };
   const vitals = [
     _scaleStr ? vit(V.jw, _scaleStr + _hr) : '',
     _mp(_sc.total) ? vit(V.total, _mp(_sc.total) + (isNaN(Number(_sc.total)) ? '' : _hr)) : '',
@@ -722,6 +722,7 @@ function localPage(local, calls, lang) {
     _mp(_sc.pension_def) ? vit(V.pdef, _mp(_sc.pension_def)) : '',
     _mp(_sc.pension_dc) ? vit(V.pdc, _mp(_sc.pension_dc)) : '',
     _mp(_sc.nebf) ? vit(V.nebf, _mp(_sc.nebf)) : '',
+    _mp(_sc.jatc) ? vit(V.jatc, _mp(_sc.jatc)) : '',
     _m(_sc.k401) ? vit(V.k401, _m(_sc.k401)) : '',
     (_noPen && local.pension != null) ? vit(V.pen, money(local.pension), true) : '',
     _sc.vacation ? vit(V.vac, esc(_sc.vacation), true) : '',
@@ -770,6 +771,7 @@ function localPage(local, calls, lang) {
       _mp(_tel.pension_def) ? vit(V.pdef, _mp(_tel.pension_def)) : '',
       _mp(_tel.pension_dc) ? vit(V.pdc, _mp(_tel.pension_dc)) : '',
       _mp(_tel.nebf) ? vit(V.nebf, _mp(_tel.nebf)) : '',
+      _mp(_tel.jatc) ? vit(V.jatc, _mp(_tel.jatc)) : '',
       _tel.vacation ? vit(V.vac, esc(_tel.vacation), true) : '',
       _tel.dues ? vit(V.dues, esc(_tel.dues), true) : ''
     ].filter(Boolean).join('');
