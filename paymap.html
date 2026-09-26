@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pay Map — TrampHereBro</title>
+<meta name="description" content="Every IBEW local's wage package on one map — inside wireman and lineman. Total package, journeyman scale, and estimated weekly gross by schedule. Free, no limits, no account.">
+<link rel="canonical" href="https://trampherebro.com/paymap.html">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<style>
+  :root{
+    --navy:#0f2a52; --orange:#ff6b00;
+    --ink:#1b2433; --muted:#5b6678; --bg:#f4f6fa; --card:#fff; --line:#e3e7ee;
+    --land:#E9EEF4; --border:#FFFFFF; --water:#f4f6fa; --ring:#FFFFFF; --unknown:#98A4B6;
+    --s1:#E8964E; --s2:#D87825; --s3:#B85A06; --s4:#8E4100; --s5:#5E2A00;
+  }
+  html[data-theme="dark"]{
+    --ink:#E7EEF9; --muted:#9FB0C9; --bg:#0B1220; --card:#132034; --line:#24344e;
+    --land:#172338; --border:#0d1626; --water:#0B1220; --ring:#0F1A2E; --unknown:#5A6B85;
+    --s1:#8A450E; --s2:#BC5F0B; --s3:#E58021; --s4:#F7A751; --s5:#FFCE92;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+       background:var(--bg);color:var(--ink);line-height:1.5}
+  a{color:inherit}
+
+  header{background:var(--navy);color:#fff}
+  .bar{max-width:1240px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .bar img{height:38px;width:auto;background:#fff;border-radius:6px;padding:3px 6px;display:block}
+  .bar nav{display:flex;align-items:center;gap:14px}
+  .bar nav a{color:#fff;text-decoration:none;font-size:14px;opacity:.85}
+  .bar nav a:hover{opacity:1}
+  .tgl{cursor:pointer;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.35);
+       border-radius:8px;width:34px;height:30px;font-size:15px;line-height:1;flex:none}
+  .tgl:hover{border-color:var(--orange)}
+
+  .wrap{max-width:1240px;margin:0 auto;padding:18px 16px 40px}
+  h1{font-size:clamp(22px,3.6vw,32px);line-height:1.15;margin:0 0 6px}
+  h1 span{color:var(--orange)}
+  .lede{color:var(--muted);font-size:15px;margin:0 0 16px;max-width:780px}
+  .free{display:inline-block;background:var(--orange);color:#fff;font-weight:700;font-size:11px;
+        letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:4px 10px;margin-bottom:10px}
+
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 12px}
+  .seg{display:inline-flex;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 13px inherit;
+              padding:9px 13px;cursor:pointer;white-space:nowrap}
+  .seg button[aria-pressed="true"]{background:var(--orange);color:#fff}
+  .seg button+button{border-left:1px solid var(--line)}
+  .ctl-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-right:2px}
+
+  .layout{display:grid;grid-template-columns:1fr 320px;gap:16px;align-items:start}
+  #map{height:min(66vh,620px);border-radius:12px;border:1px solid var(--line);background:var(--water)}
+  .leaflet-container{font:inherit;border-radius:12px;background:var(--water)}
+  .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--card);color:var(--ink);box-shadow:0 8px 28px rgba(0,0,0,.28)}
+  .leaflet-popup-content{margin:12px 14px}
+  .leaflet-container a.leaflet-popup-close-button{color:var(--muted)}
+  .leaflet-bar a{background:var(--card);color:var(--ink);border-bottom-color:var(--line)}
+  .leaflet-bar a:hover{background:var(--bg);color:var(--ink)}
+  .leaflet-tooltip{background:var(--card);color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .leaflet-tooltip-top:before{border-top-color:var(--line)}
+
+  .legend{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:10px;font-size:12px;color:var(--muted)}
+  .ramp{display:flex;gap:0}
+  .ramp i{width:30px;height:11px;display:block}
+  .ramp i:first-child{border-radius:3px 0 0 3px}
+  .ramp i:last-child{border-radius:0 3px 3px 0}
+  .ramp-ends{display:flex;justify-content:space-between;width:158px;font-size:11px}
+  .legend .hollow{width:10px;height:10px;border-radius:50%;border:2px solid var(--unknown);display:inline-block;vertical-align:-1px;margin-right:4px}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .panel h2{margin:0 0 2px;font-size:14px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+  .panel .sub{font-size:12px;color:var(--muted);margin:0 0 10px}
+  .toplist{list-style:none;margin:0;padding:0;max-height:430px;overflow:auto}
+  .toplist li{display:flex;align-items:center;gap:9px;padding:7px 4px;border-radius:7px;cursor:pointer}
+  .toplist li:hover{background:rgba(255,107,0,.10)}
+  .toplist .dot{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:0 0 0 2px var(--ring)}
+  .toplist .nm{flex:1;min-width:0;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .toplist .nm small{display:block;color:var(--muted);font-size:11px}
+  .toplist .val{font-variant-numeric:tabular-nums;font-weight:700;font-size:13px}
+
+  .pop{min-width:216px}
+  .pop h3{margin:0 0 1px;font-size:15px}
+  .pop .loc{margin:0 0 8px;color:var(--muted);font-size:12px}
+  .pop table{border-collapse:collapse;width:100%;font-size:12.5px}
+  .pop td{padding:2px 0}
+  .pop td:last-child{text-align:right;font-variant-numeric:tabular-nums}
+  .pop tr.tot td{border-top:1px solid var(--line);padding-top:5px;font-weight:700}
+  .pop .go{display:inline-block;margin-top:9px;background:var(--orange);color:#fff;text-decoration:none;
+           font-weight:600;font-size:12.5px;border-radius:7px;padding:7px 11px}
+  .pop .asof{margin:7px 0 0;font-size:11px;color:var(--muted)}
+  .pop .warn{margin:7px 0 0;font-size:11px;color:var(--orange);font-weight:600}
+
+  .tablewrap{display:none;margin-top:14px;overflow:auto;max-height:70vh;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+  .tablewrap.on{display:block}
+  table.data{border-collapse:collapse;width:100%;font-size:13px}
+  table.data th,table.data td{padding:8px 12px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+  table.data th{position:sticky;top:0;background:var(--card);font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  table.data td.num{text-align:right;font-variant-numeric:tabular-nums}
+  table.data td.q{color:var(--muted)}
+
+  .note{margin-top:16px;font-size:12.5px;color:var(--muted);max-width:840px}
+  .note strong{color:var(--ink)}
+  footer{text-align:center;font-size:12px;color:var(--muted);padding:6px 16px 30px}
+
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr}
+    #map{height:56vh}
+    .toplist{max-height:260px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a href="/"><img src="/logo.png" alt="TrampHereBro"></a>
+    <nav>
+      <a href="/">Job Board</a>
+      <a href="/calculator">Pay Calculator</a>
+      <a href="/per-diem">Per Diem</a>
+      <button class="tgl" id="tgl" type="button" aria-label="Toggle night mode">🌙</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <span class="free">Free · no limits · no account</span>
+  <h1>Where the <span>money</span> is.</h1>
+  <p class="lede">Every IBEW local's wage package on one map — inside wireman and lineman. Switch between total package,
+     journeyman scale, and estimated weekly gross by schedule, then click a hall for the full breakdown.</p>
+
+  <div class="controls">
+    <div class="seg" id="trade">
+      <button type="button" data-t="inside" aria-pressed="true">Inside wireman</button>
+      <button type="button" data-t="lineman" aria-pressed="false">Lineman</button>
+    </div>
+    <span class="ctl-label">Color by</span>
+    <div class="seg" id="metric">
+      <button type="button" data-m="total" aria-pressed="true">Total package</button>
+      <button type="button" data-m="scale" aria-pressed="false">Journeyman scale</button>
+      <button type="button" data-m="weekly" aria-pressed="false">Est. weekly gross</button>
+    </div>
+    <span class="ctl-label" id="schedlabel" style="display:none">Schedule</span>
+    <div class="seg" id="sched" style="display:none">
+      <button type="button" data-s="40" aria-pressed="true">5×8</button>
+      <button type="button" data-s="50" aria-pressed="false">5×10</button>
+      <button type="button" data-s="60" aria-pressed="false">6×10</button>
+    </div>
+    <div class="seg" id="viewseg" style="margin-left:auto">
+      <button type="button" data-v="map" aria-pressed="true">Map</button>
+      <button type="button" data-v="table" aria-pressed="false">Table</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div id="map"></div>
+      <div class="legend">
+        <span id="legend-metric">Total package</span>
+        <span class="ramp" aria-hidden="true">
+          <i style="background:var(--s1)"></i><i style="background:var(--s2)"></i><i style="background:var(--s3)"></i><i style="background:var(--s4)"></i><i style="background:var(--s5)"></i>
+        </span>
+        <span class="ramp-ends"><span id="lo">—</span><span id="hi">—</span></span>
+        <span id="count"></span>
+        <span id="unknownkey" style="display:none"><i class="hollow"></i>not on file</span>
+      </div>
+    </div>
+
+    <aside class="panel">
+      <h2 id="toptitle">Highest total package</h2>
+      <p class="sub">Click a local to jump to it</p>
+      <ul class="toplist" id="toplist"></ul>
+    </aside>
+  </div>
+
+  <div class="tablewrap" id="tablewrap">
+    <table class="data">
+      <thead><tr><th>Local</th><th>City</th><th class="num">Scale</th><th class="num">Total package</th><th class="num">Est. weekly</th><th>Recorded</th></tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    <strong>How to read this.</strong> Figures are the published wage package for the journeyman classification at each
+    IBEW local, as last recorded — the date is on every hall's entry, and anything older than a year is marked.
+    Weekly gross is an <strong>estimate</strong>: straight time to 40 hours, then 1.5× beyond it. Overtime rules, shift
+    differentials, travel pay and dues vary by local and by job, so the number on your check will differ.
+    Halls drawn as hollow circles have a scale on file but no benefit detail — they are <em>not</em> low-paying locals,
+    they're locals we haven't recorded the package for, and they're left out of the total-package ranking rather than
+    ranked at the bottom. Always confirm with the hall before you drag up.
+  </p>
+</div>
+
+<footer>TrampHereBro has no affiliation with any union, employer, or government body.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  var KEY = "thb-theme";
+  function stored(){ try { return localStorage.getItem(KEY); } catch(e){ return null; } }
+  function prefersDark(){ try { return matchMedia("(prefers-color-scheme: dark)").matches; } catch(e){ return false; } }
+  function theme(){ return stored() || (prefersDark() ? "dark" : "light"); }
+
+  var map = L.map("map", { scrollWheelZoom:false, attributionControl:false, minZoom:3, maxZoom:10 })
+             .setView([39.5,-96], 4);
+  map.on("click", function(){ map.scrollWheelZoom.enable(); });
+  var landLayer = null, dots = L.layerGroup().addTo(map);
+
+  var SETS = { inside: [], lineman: [] };
+  var TRADE = "inside", METRIC = "total", HOURS = 40;
+  function rows(){ return SETS[TRADE]; }
+
+  function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+  function ramp(){ return [css("--s1"),css("--s2"),css("--s3"),css("--s4"),css("--s5")]; }
+  function money(n){ return "$" + n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+  function money0(n){ return "$" + Math.round(n).toLocaleString("en-US"); }
+
+  function weekly(scale, hours){
+    return hours <= 40 ? scale * hours : scale * 40 + scale * 1.5 * (hours - 40);
+  }
+  /* A "total" that merely repeats scale means the benefit detail was never recorded —
+     not that the hall pays nothing. Those are excluded from the package ranking. */
+  function hasPackage(r){ return r.total > r.scale * 1.05; }
+  function usable(r){ return METRIC === "total" ? hasPackage(r) : true; }
+  function value(r){
+    return METRIC === "total" ? r.total : METRIC === "scale" ? r.scale : weekly(r.scale, HOURS);
+  }
+  function fmt(v){ return METRIC === "weekly" ? money0(v) : money(v); }
+  function schedLabel(){ return HOURS === 40 ? "5×8" : HOURS === 50 ? "5×10" : "6×10"; }
+
+  function staleYears(updated){
+    var m = /(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/.exec(String(updated || ""));
+    if (!m) return null;
+    var y = Number(m[3]); if (y < 100) y += 2000;
+    return (new Date().getFullYear()) - y;
+  }
+
+  function buckets(vals){
+    var s = vals.slice().sort(function(a,b){ return a-b; }), cut = [];
+    for (var i = 1; i <= 4; i++) cut.push(s[Math.floor(s.length * i / 5)]);
+    return cut;
+  }
+  function bucketOf(v, cut){
+    for (var i = 0; i < cut.length; i++) if (v < cut[i]) return i;
+    return 4;
+  }
+
+  var TOL = 1.50;
+  function reconciles(r){
+    var sum = r.scale;
+    ["hw","nebf","pension_def","pension_dc","k401","jatc"].forEach(function(k){
+      if (isFinite(r[k])) sum += r[k];
+    });
+    return Math.abs(sum - r.total) <= TOL;
+  }
+
+  function popupHTML(r){
+    var body, pkg = hasPackage(r);
+    if (pkg && reconciles(r)) {
+      body = [
+        ["Journeyman scale", r.scale],
+        ["Health &amp; welfare", r.hw],
+        ["NEBF", r.nebf],
+        ["Defined pension", r.pension_def],
+        ["Contribution pension", r.pension_dc],
+        ["401(k)", r.k401],
+        ["JATC", r.jatc]
+      ].filter(function(x){ return x[1] != null && isFinite(x[1]); })
+       .map(function(x){ return "<tr><td>" + x[0] + "</td><td>" + money(x[1]) + "</td></tr>"; }).join("");
+    } else {
+      body = "<tr><td>Journeyman scale</td><td>" + money(r.scale) + "</td></tr>";
+    }
+
+    var tot = pkg
+      ? '<tr class="tot"><td>Total package</td><td>' + money(r.total) + "</td></tr>"
+      : '<tr class="tot"><td>Total package</td><td>not on file</td></tr>';
+    var pd = (r.per_diem && isFinite(r.per_diem))
+      ? "<tr><td>Per diem</td><td>" + money(r.per_diem) + "/day</td></tr>" : "";
+
+    var yrs = staleYears(r.updated);
+    var warn = (yrs != null && yrs >= 1)
+      ? '<p class="warn">Last recorded ' + r.updated + " — confirm with the hall.</p>" : "";
+    var note = (pkg && !reconciles(r))
+      ? '<p class="asof">Itemized breakdown isn’t on file for this hall.</p>' : "";
+
+    return '<div class="pop">' +
+      "<h3>IBEW " + r.n + (r.trade === "lineman" ? " · Lineman" : "") + "</h3>" +
+      '<p class="loc">' + r.city + ", " + r.state + "</p>" +
+      "<table>" + body + tot + pd +
+      "<tr><td>Est. weekly @ " + schedLabel() + "</td><td>" + money0(weekly(r.scale, HOURS)) + "</td></tr>" +
+      "</table>" + note + warn +
+      '<a class="go" href="/locals/' + (r.trade === "lineman" ? "lineman" : "ibew") + "-local-" + r.n + '">View local &rarr;</a>' +
+      (yrs != null && yrs < 1 && r.updated ? '<p class="asof">Package recorded ' + r.updated + "</p>" : "") +
+      "</div>";
+  }
+
+  function paintLand(){
+    if (landLayer) landLayer.setStyle({ fillColor: css("--land"), color: css("--border") });
+  }
+
+  function render(){
+    var R = rows();
+    if (!R.length) return;
+    var pal = ramp(), ringc = css("--ring"), unk = css("--unknown");
+
+    var shown = R.filter(usable);
+    var hidden = R.filter(function(r){ return !usable(r); });
+    var vals = shown.map(value), cut = buckets(vals);
+
+    dots.clearLayers();
+
+    hidden.forEach(function(r){
+      var m = L.circleMarker([r.lat, r.lng], {
+        radius: 5, weight: 2, color: unk, opacity: 1, fillOpacity: 0
+      });
+      m.bindPopup(popupHTML(r), { maxWidth:290 });
+      m.bindTooltip("IBEW " + r.n + " — package not on file", { direction:"top", offset:[0,-6] });
+      r._m = m; dots.addLayer(m);
+    });
+
+    shown.forEach(function(r){
+      var b = bucketOf(value(r), cut);
+      var m = L.circleMarker([r.lat, r.lng], {
+        radius: 5 + b,                      // size echoes the ramp so dense areas still read
+        weight: 2, color: ringc, opacity: 1,
+        fillColor: pal[b], fillOpacity: 1
+      });
+      m.bindPopup(popupHTML(r), { maxWidth:290 });
+      m.bindTooltip("IBEW " + r.n + " — " + fmt(value(r)), { direction:"top", offset:[0,-6] });
+      r._m = m; dots.addLayer(m);
+    });
+
+    document.getElementById("lo").textContent = fmt(Math.min.apply(null, vals));
+    document.getElementById("hi").textContent = fmt(Math.max.apply(null, vals));
+    document.getElementById("count").textContent = shown.length + " locals";
+    document.getElementById("unknownkey").style.display = hidden.length ? "" : "none";
+    document.getElementById("legend-metric").textContent =
+      METRIC === "total" ? "Total package" : METRIC === "scale" ? "Journeyman scale" : "Est. weekly gross — " + schedLabel();
+    document.getElementById("toptitle").textContent =
+      (METRIC === "total" ? "Highest total package" : METRIC === "scale" ? "Highest journeyman scale" : "Highest weekly gross");
+
+    var sorted = shown.slice().sort(function(a,b){ return value(b) - value(a); });
+    var ul = document.getElementById("toplist");
+    ul.innerHTML = "";
+    sorted.slice(0, 25).forEach(function(r){
+      var li = document.createElement("li");
+      li.setAttribute("role","button"); li.tabIndex = 0;
+      li.innerHTML = '<span class="dot" style="background:' + pal[bucketOf(value(r), cut)] + '"></span>' +
+                     '<span class="nm">IBEW ' + r.n + "<small>" + r.city + ", " + r.state + "</small></span>" +
+                     '<span class="val">' + fmt(value(r)) + "</span>";
+      function go(){ map.flyTo([r.lat, r.lng], 7, {duration:.7}); setTimeout(function(){ r._m.openPopup(); }, 720); }
+      li.addEventListener("click", go);
+      li.addEventListener("keydown", function(e){ if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+      ul.appendChild(li);
+    });
+
+    document.getElementById("tbody").innerHTML =
+      sorted.concat(hidden).map(function(r){
+        var pkg = hasPackage(r);
+        return "<tr><td>IBEW " + r.n + "</td><td>" + r.city + ", " + r.state + "</td>" +
+               '<td class="num">' + money(r.scale) + "</td>" +
+               (pkg ? '<td class="num">' + money(r.total) + "</td>" : '<td class="num q">not on file</td>') +
+               '<td class="num">' + money0(weekly(r.scale, HOURS)) + "</td>" +
+               "<td>" + (r.updated || "—") + "</td></tr>";
+      }).join("");
+  }
+
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+    document.getElementById("tgl").textContent = t === "dark" ? "☀️" : "🌙";
+    paintLand();
+    render();
+  }
+  document.getElementById("tgl").addEventListener("click", function(){
+    var t = theme() === "dark" ? "light" : "dark";
+    try { localStorage.setItem(KEY, t); } catch(e){}
+    applyTheme(t);
+  });
+
+  function segment(id, attr, onPick){
+    var el = document.getElementById(id);
+    el.addEventListener("click", function(e){
+      var b = e.target.closest("button[" + attr + "]");
+      if (!b) return;
+      [].forEach.call(el.querySelectorAll("button"), function(x){ x.setAttribute("aria-pressed", String(x === b)); });
+      onPick(b.getAttribute(attr));
+    });
+  }
+  segment("trade", "data-t", function(v){ TRADE = v; render(); });
+  segment("metric", "data-m", function(v){
+    METRIC = v;
+    var show = v === "weekly" ? "" : "none";
+    document.getElementById("sched").style.display = show;
+    document.getElementById("schedlabel").style.display = show;
+    render();
+  });
+  segment("sched", "data-s", function(v){ HOURS = parseFloat(v); render(); });
+  segment("viewseg", "data-v", function(v){
+    document.getElementById("tablewrap").classList.toggle("on", v === "table");
+    if (v === "map") setTimeout(function(){ map.invalidateSize(); }, 30);
+  });
+
+  function build(coords, scale, base, trade, out){
+    Object.keys(coords).forEach(function(id){
+      var num = Number(id);
+      if (num < base || num >= base + 10000) return;
+      var n = String(num - base), s = scale[n];
+      if (!s) return;
+      var sc = parseFloat(s.scale), tot = parseFloat(s.total);
+      if (!isFinite(sc) || sc <= 0) return;
+      if (!isFinite(tot) || tot <= 0) tot = sc;
+      var c = coords[id];
+      if (!c || !isFinite(c.lat) || !isFinite(c.lng)) return;
+      out.push({
+        n:n, trade:trade, lat:c.lat, lng:c.lng,
+        city:(c.city||"").replace(/\b\w/g, function(m){ return m.toUpperCase(); }),
+        state:c.state||"",
+        scale:sc, total:tot,
+        hw:parseFloat(s.hw), nebf:parseFloat(s.nebf),
+        pension_def:parseFloat(s.pension_def), pension_dc:parseFloat(s.pension_dc),
+        k401:parseFloat(s.k401), jatc:parseFloat(s.jatc),
+        per_diem:parseFloat(s.per_diem),
+        updated:s.updated || ""
+      });
+    });
+  }
+
+  Promise.all([
+    fetch("/us-states.json").then(function(r){ return r.json(); }),
+    fetch("/coords-cache.json").then(function(r){ return r.json(); }),
+    fetch("/locals-scale.json").then(function(r){ return r.json(); }),
+    fetch("/lineman-scale.json").then(function(r){ return r.json(); }).catch(function(){ return {}; })
+  ]).then(function(res){
+    var states = res[0], coords = res[1], inside = res[2], line = res[3];
+
+    landLayer = L.geoJSON(states, {
+      style: { fillColor: css("--land"), fillOpacity: 1, color: css("--border"), weight: 1.4 },
+      interactive: false
+    }).addTo(map);
+    map.fitBounds([[24.5,-125],[49.5,-66.5]]);
+    landLayer.bringToBack();
+
+    build(coords, inside, 10000, "inside",  SETS.inside);
+    build(coords, line,   30000, "lineman", SETS.lineman);
+
+    if (!SETS.lineman.length) {
+      var tb = document.getElementById("trade");
+      tb.querySelector('button[data-t="lineman"]').disabled = true;
+    }
+    applyTheme(theme());
+  }).catch(function(e){
+    document.getElementById("map").innerHTML =
+      '<p style="padding:20px;color:var(--muted)">Could not load map data: ' + e.message + "</p>";
+  });
+
+  applyTheme(theme());
+})();
+</script>
+</body>
+</html>
