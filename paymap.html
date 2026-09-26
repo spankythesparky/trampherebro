@@ -101,7 +101,19 @@
 
   .note{margin-top:16px;font-size:12.5px;color:var(--muted);max-width:840px}
   .note strong{color:var(--ink)}
-  footer{text-align:center;font-size:12px;color:var(--muted);padding:6px 16px 30px}
+  footer{border-top:3px solid var(--orange);background:var(--card);margin-top:26px}
+  .foot-inner{max-width:900px;margin:0 auto;padding:22px 16px 34px;font-size:12.5px;color:var(--muted);line-height:1.6}
+  .foot-inner p{margin:0 0 9px}
+  .foot-inner strong{color:var(--ink)}
+  .foot-h{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink);font-weight:700;margin-bottom:8px}
+  .foot-lead{border-left:3px solid var(--orange);padding-left:12px}
+  .foot-links{margin-top:14px}
+  .foot-links a{color:var(--muted);text-decoration:underline}
+  .foot-links a:hover{color:var(--orange)}
+  .foot-credit{margin-top:12px}
+  .foot-credit a{color:var(--orange);text-decoration:none;font-weight:700}
+  .foot-credit a:hover{text-decoration:underline}
+  .foot-copy{opacity:.75}
 
   @media(max-width:900px){
     .layout{grid-template-columns:1fr}
@@ -192,7 +204,47 @@
   </p>
 </div>
 
-<footer>TrampHereBro has no affiliation with any union, employer, or government body.</footer>
+<footer>
+  <div class="foot-inner">
+    <p class="foot-h">No affiliation</p>
+    <p class="foot-lead">TrampHereBro is an independent platform, privately owned and operated. It is
+      <strong>not affiliated with, endorsed by, sponsored by, or authorized by</strong> the International
+      Brotherhood of Electrical Workers or any other international, national or local union; any labor
+      organization, district council, union hall or dispatch office; any joint apprenticeship and training
+      committee, benefit, pension or health and welfare fund; any contractor, employer, staffing agency,
+      contractor association or industry group; or any government agency or public body. No union or
+      organization named on this page has reviewed, approved or supplied this site, and use of a union's
+      name or local number here is for identification only.</p>
+
+    <p class="foot-h" style="margin-top:16px">About these figures</p>
+    <p>Wage figures on this page are compiled from publicly available sources and from rate sheets provided by
+      local unions. They are <strong>not official</strong> and are published for informational and educational
+      purposes only.</p>
+
+    <p>The <strong>collective bargaining agreement and the local's dispatch office are the only authoritative
+      sources</strong> for wages, benefits and conditions of employment. Rates change, effective dates vary by
+      local, and any figure here may have been superseded by a newer agreement. Every entry carries the date it
+      was last recorded; anything older than a year is marked.</p>
+
+    <p>Figures shown are the journeyman classification only and do not reflect apprentice or other
+      classifications, deductions of any kind — including taxes, working dues and assessments — travel pay or
+      subsistence, shift differentials, zone pay, per diem except where noted, or the terms of any particular
+      job. Weekly gross figures are <strong>illustrative estimates</strong> computed at straight time to 40 hours
+      and 1.5× beyond, which is a common but not universal overtime structure. They are not an offer of
+      employment, a promise of hours, or a guarantee of earnings.</p>
+
+    <p><strong>Confirm with the local before you make any travel, employment or financial decision.</strong>
+      TrampHereBro accepts no liability for decisions made in reliance on this page.</p>
+
+    <p class="foot-links">
+      <a href="/contact">Spot an error? Tell us</a> &nbsp;·&nbsp;
+      <a href="/privacy">Privacy Policy</a> &nbsp;·&nbsp;
+      <a href="/terms">Terms of Service</a>
+    </p>
+    <p class="foot-credit">Proudly made by Noah "<a href="https://linktr.ee/spankythesparky" target="_blank" rel="noopener">Spanky The Sparky</a>" — IBEW Journeyman</p>
+    <p class="foot-copy">© 2026 TrampHereBro. All rights reserved.</p>
+  </div>
+</footer>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script>
