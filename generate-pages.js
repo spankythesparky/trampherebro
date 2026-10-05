@@ -23,7 +23,7 @@ const fs = require('fs');
 const path = require('path');
 
 /* ================= CONFIG — the only lines you'd ever change ================ */
-const SITE_DIR = '/Users/Owner/Desktop/trampherebro';   // your site repo folder
+const SITE_DIR = process.env.SITE_DIR || __dirname;   // your site repo folder
 const CANON    = 'https://www.trampherebro.com';        // canonical origin — matches your live redirect (apex → www)
 const SUPA_URL = 'https://cpyhqsfkvtkangjfddis.supabase.co';
 const SUPA_KEY = 'sb_publishable_lBCUtgCBIR7IkuwKt5I0Mg_-sb9vLMM';
