@@ -1,0 +1,17 @@
+{
+  "name": "trampherebro-batch",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "seed": "node seed-sources.js ../dispatch_classification.csv",
+    "scrape": "node batch-scrape.js",
+    "test": "node batch-scrape.js --limit 10 --dry-run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "dotenv": "^16.4.5",
+    "playwright": "^1.61.1",
+    "sharp": "^0.35.3"
+  }
+}

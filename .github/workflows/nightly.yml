@@ -1,0 +1,151 @@
+name: Nightly board update
+
+# GitHub Actions cron is UTC only and has no time zone support, so a single
+# schedule drifts by an hour when DST ends. Both times below are fired every
+# day and the "gate" job below exits all but the one that is actually
+# 7:15 PM Eastern — correct year round, including across the Nov 1 switch.
+on:
+  schedule:
+    - cron: "15 23 * * *"   # 7:15 PM Eastern while EDT is in effect
+    - cron: "15  0 * * *"   # 7:15 PM Eastern once EST begins (next UTC day)
+  workflow_dispatch:         # fire by hand from the Actions tab, phone included
+
+permissions:
+  contents: write            # needed so the job can push the rebuilt pages
+
+concurrency:
+  group: nightly
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------- gate ---
+  # Scheduled runs can be delayed by several minutes under load, so this
+  # checks the Eastern HOUR rather than the minute. A manual run always passes.
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.check.outputs.go }}
+    steps:
+      - id: check
+        run: |
+          H=$(TZ=America/New_York date +%H)
+          NOW=$(TZ=America/New_York date '+%Y-%m-%d %H:%M %Z')
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual run at $NOW — proceeding."
+            echo "go=yes" >> "$GITHUB_OUTPUT"
+          elif [ "$H" = "19" ]; then
+            echo "Scheduled run at $NOW — this is the 7 PM Eastern hour, proceeding."
+            echo "go=yes" >> "$GITHUB_OUTPUT"
+          else
+            echo "Scheduled run at $NOW — not the 7 PM Eastern hour, skipping."
+            echo "go=no" >> "$GITHUB_OUTPUT"
+          fi
+
+  # -------------------------------------------------------------- update ---
+  update:
+    needs: gate
+    if: needs.gate.outputs.go == 'yes'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      SUPABASE_URL:              ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      ANTHROPIC_API_KEY:         ${{ secrets.ANTHROPIC_API_KEY }}
+
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@v4
+
+      - name: Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: Install pipeline dependencies
+        working-directory: pipeline
+        run: npm install --no-audit --no-fund
+
+      - name: Install headless Chromium
+        working-directory: pipeline
+        run: npx playwright install --with-deps chromium
+
+      # ---- scrape -------------------------------------------------------
+      # Each scraper may fail without killing the run. A bad night for one
+      # source should still publish every other source's calls. A failed
+      # scraper leaves its previous calls in place rather than wiping them.
+
+      - name: UA locals
+        working-directory: pipeline
+        continue-on-error: true
+        run: node scrape-ua.js
+
+      - name: Millwrights
+        working-directory: pipeline
+        continue-on-error: true
+        run: node scrape-millwrights.js 20
+
+      - name: Local 8
+        working-directory: pipeline
+        continue-on-error: true
+        run: node add-8-calls.js
+
+      - name: Local 86
+        working-directory: pipeline
+        continue-on-error: true
+        run: node add-86-calls.js
+
+      - name: Batch scrape
+        working-directory: pipeline
+        continue-on-error: true
+        run: node batch-scrape.js
+
+      # The scrapers drop posting JSON next to themselves; the generator reads
+      # it from the repo root, so move anything they produced.
+      - name: Collect scraper output
+        run: |
+          for f in pipeline/ua-postings.json pipeline/millwright-postings.json; do
+            [ -f "$f" ] && cp "$f" ./ && echo "moved $f"
+          done
+          true
+
+      # ---- build and publish --------------------------------------------
+
+      - name: Generate pages
+        run: node generate-pages.js
+
+      - name: Build search index
+        run: node build-search-index.js
+
+      - name: Commit and push
+        run: |
+          git config user.name  "trampherebro-bot"
+          git config user.email "noreply@trampherebro.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -m "Nightly board update $(TZ=America/New_York date '+%Y-%m-%d')"
+            git push
+            echo "Published."
+          fi
+
+      # ---- report -------------------------------------------------------
+      # Runs even if something above failed, so the summary always says
+      # what happened. GitHub emails the repo owner when a scheduled run
+      # fails outright; this is the detail behind that notification.
+
+      - name: Run summary
+        if: always()
+        run: |
+          {
+            echo "### Nightly board update"
+            echo ""
+            echo "Finished $(TZ=America/New_York date '+%Y-%m-%d %H:%M %Z')"
+            echo ""
+            echo "A red X on any scrape step above means that source was skipped"
+            echo "and its previous calls were left in place rather than wiped."
+            echo ""
+            echo "Jobline calls are not yet part of this run — they are still placed"
+            echo "and transcribed by hand."
+          } >> "$GITHUB_STEP_SUMMARY"
