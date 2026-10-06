@@ -8,3 +8,4 @@ generate-pages.js.backup2
 Call_Recording.txt
 pipeline/node_modules/
 pipeline/*-postings.json
+/node_modules

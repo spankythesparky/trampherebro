@@ -66,6 +66,12 @@ jobs:
         working-directory: pipeline
         run: npm install --no-audit --no-fund
 
+      # union-call-extractor.js and batch/headless-fetch.js live at the repo root
+      # and import playwright. Node resolves packages by walking up from the
+      # importing file, so point the root at the one install in pipeline/.
+      - name: Link dependencies for root-level scripts
+        run: ln -sfn pipeline/node_modules node_modules
+
       - name: Install headless Chromium
         working-directory: pipeline
         run: npx playwright install --with-deps chromium
