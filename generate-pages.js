@@ -147,12 +147,12 @@ body{color:var(--charcoal);font-family:'Inter',system-ui,sans-serif;font-weight:
 .wrap{max-width:1040px;margin:0 auto;padding:0 28px}
 a{color:inherit;text-decoration:none}
 .topbar{background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 1px 10px rgba(7,37,84,.05);position:sticky;top:0;z-index:20}
-.topbar .inner{max-width:1040px;margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative}
+.topbar .inner{max-width:1280px;margin:0 auto;padding:15px 28px;display:flex;align-items:center;justify-content:space-between;gap:14px;position:relative;flex-wrap:wrap}
 .brand{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;color:var(--navy);letter-spacing:-.02em}
 .brand .b{color:var(--orange)}
 .nav{display:flex;gap:17px;align-items:center}
 .nav a{font-size:14px;font-weight:600;color:var(--slate);transition:color .15s;white-space:nowrap}
-@media(max-width:1120px) and (min-width:641px){.topbar .inner{padding-left:16px;padding-right:16px}.nav{gap:13px}.nav a{font-size:13px}}
+@media(max-width:1360px) and (min-width:641px){.topbar .inner{padding-left:16px;padding-right:16px}.nav{gap:12px}.nav a{font-size:13px}}
 .navdd{position:relative;display:inline-flex;align-items:center}.navdd>a{display:inline-flex;align-items:center;gap:4px}.navdd .caret{width:9px;height:9px;transition:transform .18s}.navdd .ddmenu{position:absolute;top:100%;left:-14px;min-width:170px;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 26px rgba(7,37,84,.14);padding:6px;margin-top:8px;opacity:0;visibility:hidden;transform:translateY(-4px);transition:all .16s;z-index:60}.navdd:hover .ddmenu{opacity:1;visibility:visible;transform:translateY(0)}.navdd:hover .caret{transform:rotate(180deg)}.navdd .ddmenu a{display:block;padding:9px 12px;border-radius:7px;font-size:13.5px}.navdd .ddmenu a:hover{background:rgba(255,107,0,.08);color:var(--navy)}@media(max-width:640px){.navdd{display:block;width:100%}.navdd>a{width:100%;justify-content:space-between}.navdd .caret{display:inline-block;width:12px;height:12px;flex-shrink:0;transition:transform .2s}.navdd.open>a .caret{transform:rotate(180deg)}.navdd .ddmenu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;border:none;border-radius:0;padding:0;margin:0;min-width:0;display:none}.navdd.open .ddmenu{display:block}.navdd:hover .ddmenu{display:none}.navdd.open:hover .ddmenu{display:block}.navdd .ddmenu a{padding:11px 20px 11px 36px;font-size:14px;color:var(--slate);background:rgba(7,37,84,.02)}}
 .navtoggle{display:none;flex-direction:column;gap:4px;background:none;border:none;cursor:pointer;padding:8px;margin-left:auto}
 .navtoggle span{display:block;width:22px;height:2.5px;background:var(--navy);border-radius:2px}
