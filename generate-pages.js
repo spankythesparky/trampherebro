@@ -117,7 +117,17 @@ async function supaGetAll(pathq) {
     if (!Array.isArray(chunk) || chunk.length < size) break;
     from += size;
   }
-  return out;
+  // PostgREST range pagination is only stable when the query carries an
+  // explicit order. Dedupe by id as a second line of defence so a repeated
+  // row at a page boundary can never be counted twice.
+  const seen = new Set();
+  return out.filter(r => {
+    const k = r && r.id;
+    if (k == null) return true;
+    if (seen.has(k)) return false;
+    seen.add(k);
+    return true;
+  });
 }
 const esc = s => String(s == null ? '' : s)
   .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
@@ -2730,7 +2740,7 @@ ${footer()}
   console.log('→ Fetching live data from Supabase…');
   const [locs, calls] = await Promise.all([
     supaGetAll('locals?select=*'),
-    supaGetAll('job_calls?select=*&status=eq.open')
+    supaGetAll('job_calls?select=*&status=eq.open&order=id')
   ]);
   console.log(`  locals: ${locs.length}   open calls: ${calls.length}`);
 
