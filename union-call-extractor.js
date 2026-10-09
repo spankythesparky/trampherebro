@@ -49,6 +49,18 @@ Field mapping - these labels mean num_needed: "Positions Requested", "Positions"
 
 Also map: "Journeyman Lineman", "JL", "lineman", "outside lineman" -> call_type "Journeyman Lineman". "Worksite"/"Report To" -> location. "Report On"/"Start"/"Request Date" -> start_date. "Incentives"/"per diem"/"subsistence" -> per_diem.
 
+Pay: scale is the BASE hourly rate only. If the page states an hourly premium on top of base -- an incentive, over-scale amount, zone pay or shift differential (for example "base rate + $20 per hour", "$2.00 over scale", "Zone Pay of $12.00 applies") -- keep scale at the base figure AND state the premium in notes as "Base $X/hr plus $Y/hr <premium>". Never drop a premium. Daily or weekly travel pay, subsistence and per diem belong in per_diem.
+
+Licenses and cards: list every required state license, certification or card in notes (state journeyman license, OSHA 10/30, Code of Excellence, NICET, CDL, drug card, phosphate card). If a call needs a license from a different state than the local's own, or from more than one state, say so plainly -- it decides whether a traveler can take the call at all.
+
+One posting is one call. Never merge two postings, even when contractor, site and classification match. If the page lists them separately -- different job reference numbers, separate blocks, different requirements -- emit a separate call object for each, with its own num_needed and its own notes. Never add counts together across postings.
+
+job_name carries the site as the page writes it, including city and state when given ("Simplot Ontario, OR." not "Simplot"). If a posting names no site, use its own description of the work instead ("Shop Call", "Oregon and Idaho Industrial Work"). Only set job_name to null when the posting gives neither a site nor any description.
+
+notes keep anything that changes whether or when a hand can take the call: reporting and onboarding steps, interview or orientation requirements, schedule, and any warning the page puts in capitals. Use the page's own wording and do not summarize these away.
+
+Not referral work: skip any posting the page marks as not for referral, non-bargaining, a staff or office position, or an opening at the local union itself -- for example anything under a heading like "Positions not for Referral". These are not job calls and must never appear in the output.
+
 Local ${local?.id ?? "?"} (${local?.name ?? ""}).
 <DISPATCH_DATA>
 ${pageText}
