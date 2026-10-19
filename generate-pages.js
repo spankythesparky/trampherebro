@@ -905,7 +905,7 @@ ${(() => {
   const D = es
     ? { head: 'Este tablero es gratis y siempre lo será.', sub: 'Si te ahorró una noche llamando a los salones, echa unos dólares para mantenerlo funcionando.', btn: 'Miembros: apoya el tablero' }
     : { head: "This board is free — and always will be.", sub: 'If it saved you a night of calling halls, chip in to keep it running.', btn: 'Members: support the board' };
-  return `<div class="donate"><div class="donate-txt"><div class="donate-h">${D.head}</div><div class="donate-s">${D.sub}</div></div><div class="donate-btns"><a class="donate-btn" href="https://www.buymeacoffee.com/trampherebro" target="_blank" rel="noopener">${D.btn}</a><a class="donate-btn alt" href="/partner/">${(typeof lang!=="undefined"&&lang==="es")?"Patrocina el tablero":"Sponsor the board"}</a></div></div>`;
+  return "";   // donate block removed 2026-10-19
 })()}
 
 
